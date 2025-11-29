@@ -5,18 +5,15 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-function Popover({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Root>) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
-}
+// Re-export base components from shared package
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverTrigger,
+} from '@workspace/ui/components/popover';
 
-function PopoverTrigger({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
-}
-
+// Extended PopoverContent with container support
+// This is app-specific functionality not available in the shared package
 function PopoverContent({
   className,
   align = 'center',
@@ -42,10 +39,4 @@ function PopoverContent({
   );
 }
 
-function PopoverAnchor({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
-}
-
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };
+export { PopoverContent };

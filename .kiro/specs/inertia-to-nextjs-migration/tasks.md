@@ -268,30 +268,14 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Phase 9: Page Migration - Content Pages
-- [-] 11. Migrate blog pages
 
-
-
-
-
-
-
-
-
-
-
-
-
-- [ ] 11. Migrate blog pages
+- [x] 11. Migrate blog pages
 
   - [x] 11.1 Create blog routes
-
-
     - Create `apps/web/app/blog/page.tsx` from `migrate/pages/blog/index.tsx`
     - Create `apps/web/app/blog/[slug]/page.tsx` from `migrate/pages/blog/show.tsx`
     - Add metadata generation for dynamic blog posts
     - _Requirements: 2.4, 3.1_
--
 
 - [x] 12. Migrate legal pages
 
