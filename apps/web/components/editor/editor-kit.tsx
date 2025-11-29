@@ -92,4 +92,6 @@ export const EditorKit = [
 
 export type MyEditor = TPlateEditor<Value, (typeof EditorKit)[number]>;
 
-export const useEditor = () => useEditorRef<MyEditor>();
+export function useEditor(): MyEditor {
+  return useEditorRef<MyEditor>();
+}

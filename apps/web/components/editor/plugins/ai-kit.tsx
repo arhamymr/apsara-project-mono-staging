@@ -18,7 +18,8 @@ import { useChat } from '../use-chat';
 import { CursorOverlayKit } from './cursor-overlay-kit';
 import { MarkdownKit } from './markdown-kit';
 
-export const aiChatPlugin = AIChatPlugin.extend({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const aiChatPlugin: any = AIChatPlugin.extend({
   options: {
     chatOptions: {
       api: '/api/ai/command',

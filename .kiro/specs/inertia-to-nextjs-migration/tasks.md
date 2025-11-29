@@ -259,7 +259,9 @@
     - Create `apps/web/app/dashboard/website/[id]/edit/page.tsx` from `migrate/pages/dashboard/website/edit.tsx`
     - _Requirements: 2.3_
 
-- [-] 10. Checkpoint - Verify core pages work
+- [x] 10. Checkpoint - Verify core pages work
+
+
 
 
 
@@ -267,6 +269,7 @@
 
 ## Phase 9: Page Migration - Content Pages
 - [x] 11. Migrate blog pages
+
 
 
 
@@ -285,10 +288,16 @@
     - Create `apps/web/app/blog/[slug]/page.tsx` from `migrate/pages/blog/show.tsx`
     - Add metadata generation for dynamic blog posts
     - _Requirements: 2.4, 3.1_
+-
 
-- [ ] 12. Migrate legal pages
+- [x] 12. Migrate legal pages
 
-  - [ ] 12.1 Create legal layout and routes
+
+
+
+  - [x] 12.1 Create legal layout and routes
+
+
     - Create `apps/web/app/legal/layout.tsx` using migrated LegalLayout
     - Create `apps/web/app/legal/page.tsx` from `migrate/pages/legal/index.tsx`
     - Create `apps/web/app/legal/privacy/page.tsx` from `migrate/pages/legal/privacy.tsx`
@@ -298,33 +307,51 @@
 
 ## Phase 10: Page Migration - Remaining Pages
 
-- [ ] 13. Migrate remaining pages
+- [x] 13. Migrate remaining pages
 
-  - [ ] 13.1 Create sketch page
+
+
+
+
+  - [x] 13.1 Create sketch page
+
+
     - Create `apps/web/app/sketch/page.tsx` from `migrate/pages/sketch/index.tsx`
     - _Requirements: 2.6_
-  - [ ] 13.2 Create components showcase page
+  - [x] 13.2 Create components showcase page
+
+
     - Create `apps/web/app/components/page.tsx` from `migrate/pages/components/index.tsx`
     - Copy `migrate/pages/components/` subdirectories (components/, data/, examples/, hooks/, lib/, types/)
     - _Requirements: 2.6_
-  - [ ] 13.3 Create email pages
+  - [x] 13.3 Create email pages
+
+
     - Create `apps/web/app/email/unsubscribe/page.tsx` from `migrate/pages/email/unsubscribe.tsx`
     - Create `apps/web/app/email/unsubscribed/page.tsx` from `migrate/pages/email/unsubscribed.tsx`
     - _Requirements: 2.6_
-  - [ ] 13.4 Create websites show page
+  - [x] 13.4 Create websites show page
+
+
     - Create `apps/web/app/websites/[id]/page.tsx` from `migrate/pages/websites/show.tsx`
     - _Requirements: 2.6_
-  - [ ] 13.5 Create me/profile page
+  - [x] 13.5 Create me/profile page
+
+
     - Create `apps/web/app/me/page.tsx` from `migrate/pages/me.tsx`
     - _Requirements: 2.6_
-  - [ ] 13.6 Create error page
+  - [x] 13.6 Create error page
+
+
     - Create `apps/web/app/error.tsx` from `migrate/pages/error.tsx`
     - Adapt to Next.js error boundary conventions
     - _Requirements: 2.6_
 
 ## Phase 11: Final Validation
 
-- [ ] 14. Import path cleanup and validation
+- [-] 14. Import path cleanup and validation
+
+
   - [ ] 14.1 Update all import paths
     - Run TypeScript compiler to identify broken imports
     - Fix all import path errors across migrated files
