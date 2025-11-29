@@ -1,7 +1,16 @@
+import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
 import { Providers } from "@/components/providers"
+
+export const metadata: Metadata = {
+  title: {
+    default: "Apsara Digital - AI-Powered Web Development & Digital Solutions",
+    template: "%s | Apsara Digital",
+  },
+  description: "AI-powered web development and digital solutions platform",
+}
 
 const fontSans = Geist({
   subsets: ["latin"],

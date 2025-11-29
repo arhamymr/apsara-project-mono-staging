@@ -275,7 +275,7 @@ export default function EmailTemplateManagerUI() {
                   <div className="flex justify-between">
                     <span>Name</span>
                     <span className="text-muted-foreground">
-                      {selectedIdx !== null ? templates[selectedIdx].name : '—'}
+                      {selectedIdx !== null && templates[selectedIdx] ? templates[selectedIdx].name : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -291,7 +291,7 @@ export default function EmailTemplateManagerUI() {
                     <span className="text-muted-foreground">Yes</span>
                   </div>
                   <div className="flex flex-wrap gap-1 pt-1">
-                    {selectedIdx !== null &&
+                    {selectedIdx !== null && templates[selectedIdx] &&
                       templates[selectedIdx].tags.map((tg) => (
                         <Badge key={tg} variant="secondary">
                           {tg}

@@ -2,7 +2,7 @@
 'use client';
 
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { EditableProvider } from '@/context/editable-context';
+import { EditableProvider } from '@/contexts/editable-context';
 import { useWebsite } from '@/hooks/use-website';
 import {
   fetchWebsiteBySlug,

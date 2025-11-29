@@ -126,6 +126,7 @@ export function moveLayer(
   if (idx < 0) return nodes;
   const arr = nodes.slice();
   const [item] = arr.splice(idx, 1);
+  if (!item) return nodes;
   if (dir === 'up') arr.splice(Math.min(idx + 1, arr.length), 0, item);
   else if (dir === 'down') arr.splice(Math.max(idx - 1, 0), 0, item);
   else if (dir === 'top') arr.push(item);
@@ -174,8 +175,8 @@ export const clamp = (n: number, min: number, max: number) =>
       } as RectNode,
     ];
     const up = moveLayer(nodesArr, 'a', 'up');
-    console.assert(up[1].id === 'a', '[TEST] move up');
+    console.assert(up[1]?.id === 'a', '[TEST] move up');
     const top = moveLayer(nodesArr, 'a', 'top');
-    console.assert(top[top.length - 1].id === 'a', '[TEST] move top');
+    console.assert(top[top.length - 1]?.id === 'a', '[TEST] move top');
   } catch {}
 })();

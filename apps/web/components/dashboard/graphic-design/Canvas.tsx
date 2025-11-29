@@ -297,7 +297,7 @@ export default function Canvas({
     });
     Object.keys(shapesRef.current).forEach((id) => {
       if (!seen[id]) {
-        shapesRef.current[id].destroy();
+        shapesRef.current[id]?.destroy();
         delete shapesRef.current[id];
       }
     });

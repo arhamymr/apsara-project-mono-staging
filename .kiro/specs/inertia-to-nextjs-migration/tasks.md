@@ -137,7 +137,9 @@
     - Will be used to create `app/legal/layout.tsx`
     - _Requirements: 7.1_
 
-- [-] 5. Checkpoint - Ensure foundation is solid
+
+- [x] 5. Checkpoint - Ensure foundation is solid
+
 
 
 
@@ -186,13 +188,27 @@
 
 ## Phase 6: Page Migration - Core Pages
 
-- [ ] 7. Migrate home and marketing pages
-  - [ ] 7.1 Migrate home page
+- [x] 7. Migrate home and marketing pages
+
+
+
+
+
+  - [x] 7.1 Migrate home page
+
+
+
+
     - Convert `migrate/pages/index.tsx` to `apps/web/app/page.tsx`
     - Replace `Head` with Next.js metadata export
     - Update component imports to new paths
     - _Requirements: 2.1, 3.1_
-  - [ ] 7.2 Migrate standalone marketing pages
+  - [x] 7.2 Migrate standalone marketing pages
+
+
+
+
+
     - Create `apps/web/app/ai-integration/page.tsx` from `migrate/pages/ai-integration.tsx`
     - Create `apps/web/app/create-website/page.tsx` from `migrate/pages/create-website.tsx`
     - Create `apps/web/app/digital-products/page.tsx` from `migrate/pages/digital-products.tsx`
@@ -203,14 +219,23 @@
     - _Requirements: 2.6, 3.1_
 
 ## Phase 7: Page Migration - Auth Pages
+-
 
-- [ ] 8. Migrate authentication pages
-  - [ ] 8.1 Create auth route group and pages
+- [x] 8. Migrate authentication pages
+
+
+
+
+
+  - [x] 8.1 Create auth route group and pages
+
     - Create `apps/web/app/(auth)/login/page.tsx` from `migrate/pages/auth/login.tsx`
     - Create `apps/web/app/(auth)/register/page.tsx` from `migrate/pages/auth/register.tsx`
     - Create `apps/web/app/(auth)/verify-email/page.tsx` from `migrate/pages/auth/verify-email.tsx`
     - _Requirements: 2.2_
-  - [ ] 8.2 Convert Inertia form handling to Next.js
+  - [x] 8.2 Convert Inertia form handling to Next.js
+
+
     - Replace `useForm` from Inertia with react-hook-form
     - Replace `form.post(route('login'))` with fetch/server actions
     - Replace Inertia `Link` with next/link
@@ -219,30 +244,50 @@
 
 ## Phase 8: Page Migration - Dashboard
 
-- [ ] 9. Migrate dashboard pages
-  - [ ] 9.1 Create dashboard layout and index
+- [x] 9. Migrate dashboard pages
+
+  - [x] 9.1 Create dashboard layout and index
     - Create `apps/web/app/dashboard/layout.tsx` that wraps with OS desktop layout
     - Create `apps/web/app/dashboard/page.tsx` from `migrate/pages/dashboard/index.tsx`
     - _Requirements: 2.3, 7.3_
-  - [ ] 9.2 Create dashboard website routes
+
+  - [x] 9.2 Create dashboard website routes
+
+
     - Create `apps/web/app/dashboard/website/page.tsx` from `migrate/pages/dashboard/website/index.tsx`
     - Create `apps/web/app/dashboard/website/create/page.tsx` from `migrate/pages/dashboard/website/create.tsx`
     - Create `apps/web/app/dashboard/website/[id]/edit/page.tsx` from `migrate/pages/dashboard/website/edit.tsx`
     - _Requirements: 2.3_
 
-- [ ] 10. Checkpoint - Verify core pages work
+- [-] 10. Checkpoint - Verify core pages work
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Phase 9: Page Migration - Content Pages
+- [x] 11. Migrate blog pages
+
+
+
+
+
+
+
+
 
 - [ ] 11. Migrate blog pages
-  - [ ] 11.1 Create blog routes
+
+  - [x] 11.1 Create blog routes
+
+
     - Create `apps/web/app/blog/page.tsx` from `migrate/pages/blog/index.tsx`
     - Create `apps/web/app/blog/[slug]/page.tsx` from `migrate/pages/blog/show.tsx`
     - Add metadata generation for dynamic blog posts
     - _Requirements: 2.4, 3.1_
 
 - [ ] 12. Migrate legal pages
+
   - [ ] 12.1 Create legal layout and routes
     - Create `apps/web/app/legal/layout.tsx` using migrated LegalLayout
     - Create `apps/web/app/legal/page.tsx` from `migrate/pages/legal/index.tsx`
@@ -254,6 +299,7 @@
 ## Phase 10: Page Migration - Remaining Pages
 
 - [ ] 13. Migrate remaining pages
+
   - [ ] 13.1 Create sketch page
     - Create `apps/web/app/sketch/page.tsx` from `migrate/pages/sketch/index.tsx`
     - _Requirements: 2.6_

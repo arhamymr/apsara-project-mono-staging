@@ -1,12 +1,37 @@
-import { Button } from "@workspace/ui/components/button"
+'use client';
 
-export default function Page() {
+import { SkipToContent } from '@/components/home/components';
+import {
+  Blog,
+  CallToAction,
+  FAQ,
+  Features,
+  Footer,
+  Hero,
+  Integrations,
+  OSShowcase,
+  Pricing,
+  Services,
+  TopNav,
+} from '@/components/home/sections';
+
+export default function ApsaraLandingPage() {
   return (
-    <div className="flex items-center justify-center min-h-svh">
-      <div className="flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl font-bold">Hello World change</h1>
-        <Button size="sm">Button</Button>
-      </div>
+    <div className="text-foreground relative min-h-dvh">
+      <SkipToContent />
+      <TopNav />
+      <main id="main-content">
+        <Hero />
+        <Features />
+        <OSShowcase />
+        <Integrations />
+        <Pricing />
+        <Services />
+        <Blog />
+        <CallToAction />
+        <FAQ />
+      </main>
+      <Footer />
     </div>
-  )
+  );
 }

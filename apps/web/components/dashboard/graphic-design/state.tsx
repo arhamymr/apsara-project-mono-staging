@@ -157,6 +157,7 @@ function reducer(state: State, action: Action): State {
       if (idx < 0) return state;
       const arr = nodes.slice();
       const [item] = arr.splice(idx, 1);
+      if (!item) return state;
       if (action.payload.dir === 'up')
         arr.splice(Math.min(idx + 1, arr.length), 0, item);
       else if (action.payload.dir === 'down')
