@@ -212,7 +212,9 @@ export const useWebsiteStore = create<State & Actions>()((set, get) => ({
       return; // out of bounds → no-op
     }
     const [moved] = next.splice(fromIndex, 1);
-    next.splice(toIndex, 0, moved);
+    if (moved) {
+      next.splice(toIndex, 0, moved);
+    }
 
     const nextPage: IPageData = { ...page, sections: next };
     set({

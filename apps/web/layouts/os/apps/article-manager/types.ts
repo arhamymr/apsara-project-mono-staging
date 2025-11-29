@@ -12,6 +12,7 @@ export type PostListItem = {
   image_url?: string | null;
   websites?: PostWebsiteSummary[];
   category?: { id: number; name: string } | null;
+  excerpt?: string | null;
 };
 
 export type Category = { id: number; name: string };

@@ -32,7 +32,7 @@ export const ThemeContext = React.createContext<{
   setTheme: () => {},
 });
 
-export function ThemeProvider({ children, defaultTheme = 'light' as Theme }) {
+export function ThemeProvider({ children, defaultTheme = 'light' as Theme }: { children: React.ReactNode; defaultTheme?: Theme }) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
     // Initialize from localStorage immediately if available
     if (typeof window !== 'undefined') {
