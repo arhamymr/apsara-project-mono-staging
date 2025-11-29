@@ -48,8 +48,9 @@ export default function KanbanApp() {
   // Auto-select first board or create one if none exist
   React.useEffect(() => {
     if (!isLoadingBoards && boards) {
-      if (boards.length > 0 && !selectedBoardId) {
-        setSelectedBoardId(boards[0].id);
+      const firstBoard = boards[0];
+      if (boards.length > 0 && !selectedBoardId && firstBoard) {
+        setSelectedBoardId(firstBoard.id);
       } else if (boards.length === 0) {
         // Auto-create a default board
         createBoard.mutate(

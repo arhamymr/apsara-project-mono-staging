@@ -145,37 +145,40 @@
 
 
 
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Phase 5: Component Migration
 -
 
 
-- [ ] 6. Migrate UI and shared components
 
+- [x] 6. Migrate UI and shared components
 
-  - [ ] 6.1 Migrate UI components
+  - [x] 6.1 Migrate UI components
     - Copy `migrate/components/ui/` to `apps/web/components/ui/` (merge with existing)
     - Ensure no Inertia imports remain
     - Add 'use client' where needed
     - _Requirements: 4.1, 4.3, 4.4_
-  - [ ] 6.2 Migrate home/landing components
+  - [x] 6.2 Migrate home/landing components
     - Copy `migrate/components/home/` to `apps/web/components/home/`
     - Update any Inertia Link to next/link
     - _Requirements: 4.2, 4.3_
-  - [ ] 6.3 Migrate dashboard components
+  - [x] 6.3 Migrate dashboard components
     - Copy `migrate/components/dashboard/` to `apps/web/components/dashboard/`
     - Update Inertia patterns to Next.js equivalents
     - _Requirements: 4.2, 4.3_
-  - [ ] 6.4 Migrate editor components
+  - [x] 6.4 Migrate editor components
     - Copy `migrate/components/editor/` to `apps/web/components/editor/`
     - Copy `migrate/components/text-editor/` to `apps/web/components/text-editor/`
     - _Requirements: 4.2_
-  - [ ] 6.5 Migrate remaining shared components
+  - [x] 6.5 Migrate remaining shared components
     - Copy `migrate/components/asset-picker/` to `apps/web/components/asset-picker/`
     - Copy `migrate/components/modal/` to `apps/web/components/modal/`
     - Copy `migrate/components/legal/` to `apps/web/components/legal/`
     - Copy standalone components: breadcrumbs.tsx, category-select.tsx, image-upload.tsx, etc.
+
     - _Requirements: 4.2_
   - [ ]* 6.6 Write property test for import path validity
     - **Property 3: Import Path Validity**

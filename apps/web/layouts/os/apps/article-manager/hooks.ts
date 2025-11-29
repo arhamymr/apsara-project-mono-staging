@@ -24,7 +24,7 @@ export function useArticles(params: AdminArticlesParams = {}) {
   return useQuery({
     queryKey: [...qk.articles, params],
     queryFn: () => fetchAdminArticles(params),
-    keepPreviousData: true,
+    placeholderData: (previousData) => previousData,
   });
 }
 

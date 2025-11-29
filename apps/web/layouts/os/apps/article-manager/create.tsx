@@ -67,7 +67,7 @@ export default function CreateArticleWindow({
     try {
       // optimistic UI update
       setCategories((prev) => prev.filter((c) => c.id !== id));
-      await deleteCategoryMut.mutateAsync(id);
+      await deleteCategoryMut.mutateAsync(String(id));
       if (selectedCategory === id) setSelectedCategory('');
       toast.success('Category removed');
     } catch (e: any) {

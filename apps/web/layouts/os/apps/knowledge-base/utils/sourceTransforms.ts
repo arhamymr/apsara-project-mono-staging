@@ -11,7 +11,7 @@ const SOURCE_STATUS_MAP: Record<string, IngestStatus> = {
 
 export function toDisplayStatus(status?: string | null): IngestStatus {
   const normalized = status?.toLowerCase();
-  return SOURCE_STATUS_MAP[normalized ?? 'processing'];
+  return SOURCE_STATUS_MAP[normalized ?? 'processing'] ?? 'processing';
 }
 
 export function toDisplayKind(kind?: string | null): 'document' | 'source' {

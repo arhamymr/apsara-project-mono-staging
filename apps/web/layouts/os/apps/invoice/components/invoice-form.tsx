@@ -44,7 +44,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
   const [formData, setFormData] = useState<InvoiceFormData>({
     customer_id: initialData?.customer_id || 0,
     invoice_date:
-      initialData?.invoice_date || new Date().toISOString().split('T')[0],
+      initialData?.invoice_date || new Date().toISOString().split('T')[0] || '',
     due_date: initialData?.due_date || '',
     tax_rate: initialData?.tax_rate || 0,
     notes: initialData?.notes || '',
@@ -82,7 +82,10 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({
     value: string | number,
   ) => {
     const newItems = [...formData.items];
-    newItems[index] = { ...newItems[index], [field]: value };
+    const currentItem = newItems[index];
+    if (currentItem) {
+      newItems[index] = { ...currentItem, [field]: value } as InvoiceItemFormData;
+    }
     setFormData({ ...formData, items: newItems });
   };
 

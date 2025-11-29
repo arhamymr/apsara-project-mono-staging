@@ -102,9 +102,9 @@ export function PlaygroundPanel({
           </div>
           <div className="text-muted-foreground flex items-center gap-3 text-xs">
             <span className="tabular-nums">
-              Temp {temperature[0].toFixed(2)}
+              Temp {(temperature[0] ?? 0).toFixed(2)}
             </span>
-            <span className="tabular-nums">Top-P {topP[0].toFixed(2)}</span>
+            <span className="tabular-nums">Top-P {(topP[0] ?? 0).toFixed(2)}</span>
             <span className="tabular-nums">Max {maxTokens}</span>
           </div>
         </div>

@@ -124,7 +124,7 @@ export function ArticleCard({
                 {post.title}
               </p>
               <p className="text-muted-foreground truncate font-mono text-sm">
-                {parse(post?.excerpt)}
+                {post?.excerpt ? parse(post.excerpt) : null}
               </p>
             </div>
           </Card>

@@ -119,7 +119,7 @@ export function toFiniteNumber(value: unknown): number | null {
 }
 
 export function buildChunkPayload(entries: unknown[]): ChunkUpsertInput[] {
-  return entries
+  const results: (ChunkUpsertInput | null)[] = entries
     .map((entry, index) => {
       if (!entry || typeof entry !== 'object') return null;
 
@@ -173,8 +173,8 @@ export function buildChunkPayload(entries: unknown[]): ChunkUpsertInput[] {
         vector_id: vectorId,
         vector_dim: vectorDim != null ? Math.trunc(vectorDim) : undefined,
       } satisfies ChunkUpsertInput;
-    })
-    .filter((chunk): chunk is ChunkUpsertInput => chunk !== null);
+    });
+  return results.filter((chunk): chunk is ChunkUpsertInput => chunk !== null);
 }
 
 export function prepareChunkExtraction(

@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateCard, useDeleteCard, useUpdateCard } from '@/hooks/useKanban';
-import { cardSchema, type CardFormData } from '@/schemas/kanban';
+import { cardSchema, type CardFormData } from '@/lib/schemas/kanban';
 import { type Card } from '@/types/kanban';
 
 interface CardModalProps {

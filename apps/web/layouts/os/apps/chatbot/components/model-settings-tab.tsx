@@ -107,7 +107,7 @@ export function ModelSettingsTab({
               <div className="flex items-center justify-between">
                 <Label htmlFor="temperature">Temperature</Label>
                 <span className="text-muted-foreground text-sm tabular-nums">
-                  {temperature[0].toFixed(2)}
+                  {(temperature[0] ?? 0).toFixed(2)}
                 </span>
               </div>
               <Slider
@@ -126,7 +126,7 @@ export function ModelSettingsTab({
               <div className="flex items-center justify-between">
                 <Label htmlFor="topP">Top-P</Label>
                 <span className="text-muted-foreground text-sm tabular-nums">
-                  {topP[0].toFixed(2)}
+                  {(topP[0] ?? 0).toFixed(2)}
                 </span>
               </div>
               <Slider

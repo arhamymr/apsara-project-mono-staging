@@ -69,7 +69,7 @@ export function KnowledgeSidebar({
         if (!acc[collection.kbId]) {
           acc[collection.kbId] = [];
         }
-        acc[collection.kbId].push(collection);
+        acc[collection.kbId]?.push(collection);
         return acc;
       }, {});
 

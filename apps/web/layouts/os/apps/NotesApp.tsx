@@ -162,7 +162,8 @@ export default function NotesApp() {
     const upTo = text.slice(0, idx);
     const lines = upTo.split('\n');
     const line = lines.length;
-    const col = lines[lines.length - 1].length + 1;
+    const lastLine = lines[lines.length - 1];
+    const col = (lastLine?.length ?? 0) + 1;
     setLineCol({ line, col });
   };
 

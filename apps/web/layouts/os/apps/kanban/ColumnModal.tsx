@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useCreateColumn, useUpdateColumn } from '@/hooks/useKanban';
-import { columnSchema, type ColumnFormData } from '@/schemas/kanban';
+import { columnSchema, type ColumnFormData } from '@/lib/schemas/kanban';
 import { type Column } from '@/types/kanban';
 
 interface ColumnModalProps {

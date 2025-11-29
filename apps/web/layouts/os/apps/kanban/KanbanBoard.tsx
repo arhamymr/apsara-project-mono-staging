@@ -192,7 +192,9 @@ export function KanbanBoard({
         if (oldIndex !== -1 && newIndex !== -1) {
           const reorderedColumns = [...columns];
           const [movedColumn] = reorderedColumns.splice(oldIndex, 1);
-          reorderedColumns.splice(newIndex, 0, movedColumn);
+          if (movedColumn) {
+            reorderedColumns.splice(newIndex, 0, movedColumn);
+          }
 
           const columnPositions = reorderedColumns.map((col, index) => ({
             id: col.id,

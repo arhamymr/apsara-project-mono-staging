@@ -156,8 +156,9 @@ export function useKnowledgeBaseState(): UseKnowledgeBaseStateResult {
       if (selectedKbId !== null) setSelectedKbId(null);
       return;
     }
-    if (!selectedKbId || !kbs.some((kb) => kb.id === selectedKbId)) {
-      setSelectedKbId(kbs[0].id);
+    const firstKb = kbs[0];
+    if ((!selectedKbId || !kbs.some((kb) => kb.id === selectedKbId)) && firstKb) {
+      setSelectedKbId(firstKb.id);
     }
   }, [kbs, selectedKbId]);
 
@@ -173,11 +174,12 @@ export function useKnowledgeBaseState(): UseKnowledgeBaseStateResult {
       if (selectedCollectionId !== null) setSelectedCollectionId(null);
       return;
     }
+    const firstMatch = matches[0];
     if (
-      !selectedCollectionId ||
-      !matches.some((collection) => collection.id === selectedCollectionId)
+      (!selectedCollectionId ||
+      !matches.some((collection) => collection.id === selectedCollectionId)) && firstMatch
     ) {
-      setSelectedCollectionId(matches[0].id);
+      setSelectedCollectionId(firstMatch.id);
     }
   }, [collections, selectedKbId, selectedCollectionId]);
 

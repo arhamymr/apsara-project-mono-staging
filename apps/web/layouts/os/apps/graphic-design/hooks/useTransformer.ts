@@ -1,5 +1,5 @@
-import { Konva } from '';
-import { useRef } from 'react';
+import Konva from 'konva';
+import React, { useRef } from 'react';
 
 export function useTransformer() {
   const trRef = useRef<Konva.Transformer>(null);

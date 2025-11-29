@@ -1,6 +1,6 @@
 export type SourceKind = 'pdf' | 'docx' | 'web' | 'md' | 'sheet' | 'faq';
 
-export type SourceStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type SourceStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'synced' | 'syncing' | 'stale' | 'error';
 
 export type Source = {
   id: string;

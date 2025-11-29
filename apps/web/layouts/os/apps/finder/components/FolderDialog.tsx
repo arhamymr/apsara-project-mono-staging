@@ -20,7 +20,7 @@ type FolderDialogProps = {
   onNameChange: (value: string) => void;
   onSubmit: (event?: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
 };
 
 export function FolderDialog({

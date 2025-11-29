@@ -91,7 +91,7 @@ export default function AIChatbotSettingsDashboard() {
     };
     const assistantMessage: PlayMessage = {
       role: 'assistant',
-      content: `Temp=${temperature[0].toFixed(2)}, TopP=${topP[0].toFixed(
+      content: `Temp=${(temperature[0] ?? 0).toFixed(2)}, TopP=${(topP[0] ?? 0).toFixed(
         2,
       )}. (Demo reply) ${draftUserMsg.trim()}`,
     };

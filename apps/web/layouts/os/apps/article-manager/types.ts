@@ -23,4 +23,5 @@ export type PostDetail = PostListItem & {
   created_at?: string | null;
   published_at?: string | null;
   author?: { name?: string | null } | null;
+  cover_credit?: string | null;
 };
