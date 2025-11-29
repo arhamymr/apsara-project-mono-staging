@@ -10,7 +10,8 @@ import { GhostText } from '@/components/ui/ghost-text';
 
 import { MarkdownKit } from './markdown-kit';
 
-export const CopilotKit = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const CopilotKit: any[] = [
   ...MarkdownKit,
   CopilotPlugin.configure(({ api }) => ({
     options: {

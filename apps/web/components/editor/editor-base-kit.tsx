@@ -19,7 +19,8 @@ import { BaseTableKit } from './plugins/table-base-kit';
 import { BaseTocKit } from './plugins/toc-base-kit';
 import { BaseToggleKit } from './plugins/toggle-base-kit';
 
-export const BaseEditorKit = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const BaseEditorKit: any[] = [
   ...BaseBasicBlocksKit,
   ...BaseCodeBlockKit,
   ...BaseTableKit,
