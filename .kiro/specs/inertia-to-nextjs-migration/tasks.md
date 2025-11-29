@@ -46,14 +46,29 @@
     - _Requirements: 8.1, 8.2_
 
 
-  - [ ] 2.2 Migrate type definitions
+  - [x] 2.2 Migrate type definitions
+
+
+
+
+
+
+
+
+
+
     - Copy `migrate/types/*.ts` and `migrate/types/*.d.ts` to `apps/web/types/`
     - Remove any Inertia-specific type references
 
 
     - Add Next.js page props types
     - _Requirements: 9.1, 9.2_
-  - [ ] 2.3 Migrate schemas
+  - [x] 2.3 Migrate schemas
+
+
+
+
+
     - Copy `migrate/schemas/*.ts` to `apps/web/lib/schemas/` or `apps/web/types/`
     - _Requirements: 8.1_
   - [ ]* 2.4 Write property test for no Inertia imports in lib/types
@@ -62,19 +77,29 @@
 
 ## Phase 3: Context and Hook Migration
 
-- [ ] 3. Migrate contexts and hooks
-  - [ ] 3.1 Migrate context files
+- [x] 3. Migrate contexts and hooks
+
+
+
+
+
+  - [x] 3.1 Migrate context files
+
     - Copy `migrate/context/site-context.tsx` to `apps/web/contexts/`
     - Copy `migrate/context/editable-context.tsx` to `apps/web/contexts/`
     - Ensure 'use client' directive is present
     - Remove any Inertia-specific patterns
     - _Requirements: 6.1, 6.3_
-  - [ ] 3.2 Migrate i18n files
+
+  - [x] 3.2 Migrate i18n files
+
     - Copy `migrate/i18n/*.ts` and `migrate/i18n/*.tsx` to `apps/web/i18n/`
     - Copy `migrate/i18n/landing/` and `migrate/i18n/os/` subdirectories
     - Update LocaleContext for Next.js App Router compatibility
     - _Requirements: 10.1, 10.2_
-  - [ ] 3.3 Migrate hooks
+
+  - [x] 3.3 Migrate hooks
+
     - Copy `migrate/hooks/*.ts` and `migrate/hooks/*.tsx` to `apps/web/hooks/`
     - Copy `migrate/hooks/use-website/` folder
     - Update any hooks using Inertia APIs to use Next.js equivalents
@@ -85,28 +110,50 @@
 
 ## Phase 4: Layout Migration
 
-- [ ] 4. Migrate layout components
-  - [ ] 4.1 Migrate dark-mode theme components
+- [x] 4. Migrate layout components
+
+
+
+
+
+  - [x] 4.1 Migrate dark-mode theme components
+
+
     - Copy `migrate/layouts/dark-mode/` to `apps/web/layouts/dark-mode/`
     - Update theme-provider.tsx to work alongside next-themes if needed
     - Ensure 'use client' directives are present
     - _Requirements: 7.2_
-  - [ ] 4.2 Migrate OS desktop layout
+
+  - [x] 4.2 Migrate OS desktop layout
+
     - Copy `migrate/layouts/os/` to `apps/web/layouts/os/`
     - This includes: apps/, components/, state/, widgets/, and all root files
     - Update any Inertia-specific imports to Next.js equivalents
     - _Requirements: 7.3_
-  - [ ] 4.3 Migrate legal layout
+  - [x] 4.3 Migrate legal layout
+
+
     - Copy `migrate/layouts/LegalLayout.tsx` to `apps/web/layouts/`
     - Will be used to create `app/legal/layout.tsx`
     - _Requirements: 7.1_
 
-- [ ] 5. Checkpoint - Ensure foundation is solid
+- [-] 5. Checkpoint - Ensure foundation is solid
+
+
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Phase 5: Component Migration
+-
+
 
 - [ ] 6. Migrate UI and shared components
+
+
   - [ ] 6.1 Migrate UI components
     - Copy `migrate/components/ui/` to `apps/web/components/ui/` (merge with existing)
     - Ensure no Inertia imports remain

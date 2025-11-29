@@ -1,0 +1,247 @@
+import { Card } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useOSStrings } from '@/i18n/os';
+import { useWindowContext } from '@/layouts/os/WindowContext';
+import { MAX_DOCK_ITEMS } from '@/layouts/os/useDesktopState';
+import { cn } from '@/lib/utils';
+import { XCircle } from 'lucide-react';
+import * as React from 'react';
+import { toast } from 'sonner';
+import AppLauncher from '../app-launcher';
+import Assistant from '../assistant';
+import { DockAppTile } from './DockAppTile';
+// DockSettings popover replaced by right-click windowed manager
+
+export default function Dock() {
+  const {
+    apps,
+    windows,
+    activeId,
+    openApp,
+    openAppById,
+    dockAppIds,
+    setDockAppIds,
+    clearAllWindows,
+    minimizeWindow,
+  } = useWindowContext();
+  const hasMaximizedWindow = React.useMemo(
+    () => windows.some((window) => window.maximized && !window.minimized),
+    [windows],
+  );
+  const [isHovering, setIsHovering] = React.useState(false);
+  const [assistantOpen, setAssistantOpen] = React.useState(false);
+  const [appLauncherOpen, setAppLauncherOpen] = React.useState(false);
+  const hideTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const showTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const dockApps = React.useMemo(
+    () => apps.filter((app) => dockAppIds.includes(app.id)),
+    [apps, dockAppIds],
+  );
+
+  // Separate active windows from dock apps
+  const activeWindows = React.useMemo(
+    () => windows.filter((window) => !window.minimized),
+    [windows],
+  );
+
+  const minimizedWindows = React.useMemo(
+    () => windows.filter((window) => window.minimized),
+    [windows],
+  );
+
+  // Get app IDs that have active windows (to avoid showing duplicate icons)
+  const activeAppIds = React.useMemo(
+    () => new Set(windows.map((window) => window.appId)),
+    [windows],
+  );
+
+  const toggleDockApp = React.useCallback(
+    (id: string) => {
+      setDockAppIds((previous) => {
+        if (previous.includes(id)) {
+          return previous.filter((item) => item !== id);
+        }
+        if (previous.length >= MAX_DOCK_ITEMS) {
+          toast.warning(`Dock supports up to ${MAX_DOCK_ITEMS} apps.`);
+          return previous;
+        }
+        return [...previous, id];
+      });
+    },
+    [setDockAppIds],
+  );
+
+  React.useEffect(() => {
+    if (!hasMaximizedWindow && isHovering) {
+      setIsHovering(false);
+    }
+  }, [hasMaximizedWindow, isHovering]);
+
+  // Cleanup timeouts on unmount
+  React.useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+      if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
+    };
+  }, []);
+
+  const handleMouseEnter = React.useCallback(() => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    if (hasMaximizedWindow) {
+      showTimeoutRef.current = setTimeout(() => {
+        setIsHovering(true);
+      }, 300); // 300ms delay before showing
+    } else {
+      setIsHovering(true);
+    }
+  }, [hasMaximizedWindow]);
+
+  const handleMouseLeave = React.useCallback(() => {
+    if (showTimeoutRef.current) {
+      clearTimeout(showTimeoutRef.current);
+      showTimeoutRef.current = null;
+    }
+    if (hasMaximizedWindow) {
+      hideTimeoutRef.current = setTimeout(() => {
+        setIsHovering(false);
+      }, 500); // 500ms delay before hiding
+    } else {
+      setIsHovering(false);
+    }
+  }, [hasMaximizedWindow]);
+
+  const s = useOSStrings();
+
+  return (
+    <TooltipProvider delayDuration={150}>
+      <div
+        className="fixed bottom-3 left-1/2 z-[9999] -translate-x-1/2"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocusCapture={handleMouseEnter}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+            handleMouseLeave();
+          }
+        }}
+      >
+        <Card
+          role="menubar"
+          aria-label="Desktop dock"
+          className={cn(
+            'flex items-center justify-center px-3 py-2 @md:gap-4 @md:px-5',
+            'rounded-xl border bg-transparent shadow-none backdrop-blur-xl transition-all duration-300',
+            hasMaximizedWindow &&
+              !isHovering &&
+              !assistantOpen &&
+              !appLauncherOpen
+              ? 'translate-y-[85%] opacity-20'
+              : 'translate-y-0 opacity-100',
+          )}
+        >
+          <AppLauncher onOpenChange={setAppLauncherOpen} />
+          <Assistant onOpenChange={setAssistantOpen} />
+
+          <nav
+            className="ml-2 flex items-end gap-3 @md:gap-4"
+            aria-label="Applications"
+          >
+            {/* Docked apps on the left - only show if no active windows for this app */}
+            {dockApps.map((app) => {
+              // Skip if this app already has active windows (shown in active windows section)
+              if (activeAppIds.has(app.id)) {
+                return null;
+              }
+
+              return (
+                <DockAppTile
+                  key={app.id}
+                  app={app}
+                  count={0}
+                  isActive={false}
+                  isCurrentActive={false}
+                  onPress={() => openApp(app)}
+                  onTogglePin={toggleDockApp}
+                />
+              );
+            })}
+          </nav>
+
+          {/* Separator between docked apps and active windows */}
+          {activeWindows.length > 0 && (
+            <div className="bg-border mx-1 h-6 w-px" />
+          )}
+
+          {/* Active windows on the right side */}
+          <nav
+            className="flex items-end gap-3 @md:gap-4"
+            aria-label="Active windows"
+          >
+            {[...activeWindows, ...minimizedWindows].map((window) => {
+              const app = apps.find((a) => a.id === window.appId);
+              if (!app) return null;
+
+              const isCurrentActive = window.id === activeId;
+              const isMinimized = window.minimized;
+              const isActive = !isMinimized;
+
+              return (
+                <DockAppTile
+                  key={`window-${window.id}`}
+                  app={app}
+                  count={0} // No count needed for individual windows
+                  isActive={isActive}
+                  isCurrentActive={isCurrentActive}
+                  isMinimized={isMinimized}
+                  onPress={() => {
+                    if (isMinimized) {
+                      // Restore the window if it's minimized
+                      openAppById(window.id);
+                    } else {
+                      // Focus or minimize the window
+                      if (window.id === activeId) {
+                        minimizeWindow(window.id);
+                      } else {
+                        openAppById(window.id);
+                      }
+                    }
+                  }}
+                  onTogglePin={toggleDockApp}
+                />
+              );
+            })}
+          </nav>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={clearAllWindows}
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+                  'text-muted-foreground hover:bg-muted/40 cursor-pointer',
+                )}
+                title={s.dock.closeAll}
+                aria-label={s.dock.closeAll}
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">{s.dock.closeAll}</TooltipContent>
+          </Tooltip>
+
+          {/* Dock settings moved to Desktop right-click > Manage Apps */}
+        </Card>
+      </div>
+    </TooltipProvider>
+  );
+}
