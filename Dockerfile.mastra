@@ -1,0 +1,85 @@
+# ================================
+# Stage 1: Base image with pnpm (Node 22 required for Mastra)
+# ================================
+FROM node:22-alpine AS base
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
+
+# Set working directory
+WORKDIR /app
+
+# ================================
+# Stage 2: Install dependencies
+# ================================
+FROM base AS deps
+
+# Copy package files for dependency installation
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/mastra/package.json ./apps/mastra/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/typescript-config/package.json ./packages/typescript-config/
+
+# Install dependencies with frozen lockfile
+RUN pnpm install --frozen-lockfile
+
+# ================================
+# Stage 3: Build the application
+# ================================
+FROM base AS builder
+
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/mastra/node_modules ./apps/mastra/node_modules
+
+# Copy source code
+COPY . .
+
+# Build Mastra application
+WORKDIR /app/apps/mastra
+RUN pnpm build
+
+# ================================
+# Stage 4: Production runner
+# ================================
+FROM node:22-alpine AS runner
+
+# Install pnpm for runtime
+RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
+
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 mastra
+
+# Copy built application
+COPY --from=builder /app/apps/mastra/.mastra ./apps/mastra/.mastra
+COPY --from=builder /app/apps/mastra/package.json ./apps/mastra/
+COPY --from=builder /app/apps/mastra/node_modules ./apps/mastra/node_modules
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+
+# Set correct permissions
+RUN chown -R mastra:nodejs /app
+
+# Switch to non-root user
+USER mastra
+
+# Set working directory to mastra app
+WORKDIR /app/apps/mastra
+
+# Expose Mastra default port
+EXPOSE 4111
+
+# Set hostname to listen on all interfaces
+ENV HOSTNAME="0.0.0.0"
+ENV PORT=4111
+
+# Start Mastra server
+CMD ["pnpm", "start"]

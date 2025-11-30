@@ -288,10 +288,14 @@
 
 
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.8 Convert sidebar.tsx to re-export
+  - [x] 8.8 Convert sidebar.tsx to re-export
+
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.9 Convert sonner.tsx to re-export
+
+  - [x] 8.9 Convert sonner.tsx to re-export
+
     - _Requirements: 2.1, 3.1_
+
   - [ ] 8.10 Convert kbd.tsx to re-export
     - _Requirements: 2.1, 3.1_
   - [ ] 8.11 Convert empty.tsx to re-export
@@ -347,7 +351,9 @@
     - Execute `pnpm build` in apps/web
     - Verify successful build
     - _Requirements: 5.1, 5.3_
-  - [-] 11.3 Write property test for utility function compatibility
+  - [x] 11.3 Write property test for utility function compatibility
+
+
 
 
 
@@ -357,7 +363,11 @@
 
 
 
-- [ ] 12. Final Checkpoint - Ensure all tests pass
+
+-
+
+- [-] 12. Final Checkpoint - Ensure all tests pass
+
 
 
 
