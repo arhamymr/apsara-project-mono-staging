@@ -1,51 +1,31 @@
 'use client';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from './useTheme';
+import { useTheme } from 'next-themes';
+
+import { Button } from '@workspace/ui/components/button';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
-  // Calculate current effective theme (resolves 'system' to actual dark/light)
-  const getEffectiveTheme = () => {
-    if (theme === 'dark') return 'dark';
-    if (theme === 'light') return 'light';
-    // system theme - check OS preference
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-    }
-    return 'light';
-  };
-
-  const effectiveTheme = getEffectiveTheme();
-  const isDark = effectiveTheme === 'dark';
+  // resolvedTheme handles 'system' -> actual dark/light
+  const isDark = resolvedTheme === 'dark';
 
   const toggleTheme = () => {
-    // Simple toggle: if currently dark (or system+dark), go light; otherwise go dark
-    // This ignores 'system' and explicitly sets light/dark
     setTheme(isDark ? 'light' : 'dark');
   };
 
   return (
-    <div
-      className="cursor-pointer p-2"
+    <Button
+      variant="ghost"
+      size="icon"
       onClick={toggleTheme}
-      role="button"
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleTheme();
-        }
-      }}
     >
       {isDark ? (
         <Moon className="h-4 w-4 text-indigo-500" />
       ) : (
         <Sun className="h-4 w-4 text-yellow-500" />
       )}
-    </div>
+    </Button>
   );
 }
