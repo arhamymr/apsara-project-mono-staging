@@ -12,7 +12,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       unifiedPlatform: 'Platform',
       digitalProducts: 'Digital Assets',
       blog: 'Blog',
-      pricing: 'Pricing',
+      pricing: 'About Me',
       descriptions: {
         createWebsite: 'Custom websites built for your business.',
         fixWebsite: 'Fix, optimize, and enhance your existing site.',
@@ -36,7 +36,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       unifiedPlatform: 'Platform',
       digitalProducts: 'Aset Digital',
       blog: 'Blog',
-      pricing: 'Harga',
+      pricing: 'Tentang saya',
       descriptions: {
         createWebsite: 'Website kustom yang dibangun untuk bisnis Anda.',
         fixWebsite: 'Perbaiki, optimalkan, dan tingkatkan situs Anda.',

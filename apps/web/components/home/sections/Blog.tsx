@@ -1,25 +1,28 @@
 'use client';
 
 import { Section } from '@/components/home/components';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { useLandingStrings as useStrings } from '@/i18n/landing';
-import Link from 'next/link';
-import { ArrowRight, Calendar, User } from 'lucide-react';
-
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
+import { useLandingStrings as useStrings } from '@/i18n/landing';
+import { ArticleCard } from '@workspace/ui/components/article-card';
 import { motion } from 'framer-motion';
+import { ArrowRight, Calendar, User } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+interface Article {
+  title: string;
+  excerpt: string;
+  category: string;
+  date: string;
+  author: string;
+  slug: string;
+  image?: string;
+}
 
 export function Blog() {
   const s = useStrings();
   const fadeUp = useFadeUp();
+  const articles = s.blog.articles as Article[];
 
   return (
     <Section id="blog" className="py-20">
@@ -34,64 +37,27 @@ export function Blog() {
         {...fadeUp}
         className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
       >
-        {s.blog.articles.map((article: any, index: number) => (
-          <Card
+        {articles.map((article, index) => (
+          <ArticleCard
             key={index}
-            className="border-border bg-card/50 hover:border-foreground/30 flex flex-col overflow-hidden transition-all"
-          >
-            <div className="relative h-48 w-full overflow-hidden">
-              <img
-                src={article.image}
-                alt={article.title}
-                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-            <CardHeader className="p-6">
-              <div className="mb-4 flex items-center justify-between">
-                <Badge
-                  variant="secondary"
-                  className="bg-primary/10 text-primary hover:bg-primary/20"
-                >
-                  {article.category}
-                </Badge>
-                <div className="text-muted-foreground flex items-center text-xs">
-                  <Calendar className="mr-1 h-3 w-3" />
-                  {article.date}
-                </div>
-              </div>
-              <CardTitle className="line-clamp-2 text-xl leading-tight font-semibold">
-                <Link
-                  href={`/blog/${article.slug}`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {article.title}
-                </Link>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 px-6 pb-6">
-              <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
-                {article.excerpt}
-              </p>
-            </CardContent>
-            <CardFooter className="border-border border-t px-6 py-4">
-              <div className="flex w-full items-center justify-between">
-                <div className="text-muted-foreground flex items-center text-xs">
-                  <User className="mr-1 h-3 w-3" />
-                  {article.author}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:text-primary/80 h-8 p-0 hover:bg-transparent"
-                  asChild
-                >
-                  <Link href={`/blog/${article.slug}`}>
-                    {s.blog.readMore} <ArrowRight className="ml-1 h-3 w-3" />
-                  </Link>
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
+            title={article.title}
+            excerpt={article.excerpt}
+            category={article.category}
+            date={article.date}
+            author={article.author}
+            slug={article.slug}
+            image={article.image}
+            readMoreLabel={s.blog.readMore}
+            dateIcon={<Calendar className="mr-1 h-3 w-3" />}
+            authorIcon={<User className="mr-1 h-3 w-3" />}
+            arrowIcon={<ArrowRight className="ml-1 h-3 w-3" />}
+            renderLink={({ href, children, className }) => (
+              <Link href={href} className={className}>{children}</Link>
+            )}
+            renderImage={({ src, alt, className }) => (
+              <Image src={src} alt={alt} fill className={className} />
+            )}
+          />
         ))}
       </motion.div>
     </Section>

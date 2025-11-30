@@ -10,6 +10,7 @@ import {
   Briefcase,
   Calendar,
   Github,
+  Home,
   Linkedin,
   Mail,
   MapPin,
@@ -210,6 +211,13 @@ export default function PortfolioPage() {
           }`}
         >
           <div className="bg-background/80 border-border flex items-center gap-2 rounded-full border px-2 py-2 shadow-lg backdrop-blur-md">
+            <a
+              href="/"
+              className="hover:bg-muted rounded-full p-2.5 transition-colors"
+              aria-label="Go to home"
+            >
+              <Home className="h-4 w-4" />
+            </a>
             <button
               onClick={toggleTheme}
               className="hover:bg-muted rounded-full p-2.5 transition-colors"

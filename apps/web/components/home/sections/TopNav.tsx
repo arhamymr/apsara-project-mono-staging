@@ -105,7 +105,7 @@ export function TopNav() {
       ],
     },
     { href: '/blog', label: s.topNav.links.blog },
-    { href: '/#pricing', label: s.topNav.links.pricing },
+    { href: '/me', label: s.topNav.links.pricing },
   ];
 
   return (
