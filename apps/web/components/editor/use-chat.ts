@@ -298,6 +298,7 @@ const fakeStreamText = ({
 
         for (let i = 0; i < blocks.length; i++) {
           const block = blocks[i];
+          if (!block) continue;
 
           // Stream the block content
           for (const chunk of block) {

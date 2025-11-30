@@ -219,7 +219,9 @@
 
     - _Requirements: 2.1, 3.1_
 
-- [-] 8. Remaining Base Components Re-export (Batch 6)
+- [x] 8. Remaining Base Components Re-export (Batch 6)
+
+
 
 
 
@@ -231,15 +233,60 @@
 
     - _Requirements: 2.1, 3.1_
 
-  - [ ] 8.3 Convert table.tsx to re-export
+
+  - [x] 8.3 Convert table.tsx to re-export
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.4 Convert carousel.tsx to re-export
+
+
+
+
+
+
+
+  - [x] 8.4 Convert carousel.tsx to re-export
+
+
+
+
+
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.5 Convert chart.tsx to re-export
+  - [x] 8.5 Convert chart.tsx to re-export
+
+
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.6 Convert pagination.tsx to re-export
+
+
+  - [x] 8.6 Convert pagination.tsx to re-export
+
+
+
+
+
     - _Requirements: 2.1, 3.1_
-  - [ ] 8.7 Convert resizable.tsx to re-export
+  - [x] 8.7 Convert resizable.tsx to re-export
+
+
+
+
+
     - _Requirements: 2.1, 3.1_
   - [ ] 8.8 Convert sidebar.tsx to re-export
     - _Requirements: 2.1, 3.1_
@@ -250,37 +297,68 @@
   - [ ] 8.11 Convert empty.tsx to re-export
     - _Requirements: 2.1, 3.1_
 
-- [ ] 9. Checkpoint - Verify all base components work
+- [x] 9. Checkpoint - Verify all base components work
+
+
+
 
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 10. Verify App-Specific Components Unchanged
-  - [ ] 10.1 Verify Plate editor node components are preserved
+- [x] 10. Verify App-Specific Components Unchanged
+
+
+
+
+
+
+  - [x] 10.1 Verify Plate editor node components are preserved
+
     - Check all `*-node.tsx` and `*-node-static.tsx` files remain unchanged
     - _Requirements: 4.1, 4.3_
   - [ ]* 10.2 Write property test for app-specific component preservation
     - **Property 4: App-Specific Component Preservation**
     - **Validates: Requirements 4.1, 4.3**
-  - [ ] 10.3 Verify toolbar button components are preserved
+
+  - [x] 10.3 Verify toolbar button components are preserved
+
     - Check all `*-toolbar-button.tsx` files remain unchanged
     - _Requirements: 4.1_
-  - [ ] 10.4 Verify AI components are preserved
+
+  - [x] 10.4 Verify AI components are preserved
+
     - Check all `ai-*.tsx` files remain unchanged
     - _Requirements: 4.1_
 
-- [ ] 11. Final Verification
-  - [ ] 11.1 Run TypeScript compilation
+- [x] 11. Final Verification
+
+
+
+
+
+  - [x] 11.1 Run TypeScript compilation
+
     - Execute `pnpm typecheck` in apps/web
     - Fix any type errors
     - _Requirements: 5.3_
-  - [ ] 11.2 Run build
+
+  - [x] 11.2 Run build
+
     - Execute `pnpm build` in apps/web
     - Verify successful build
     - _Requirements: 5.1, 5.3_
-  - [ ]* 11.3 Write property test for utility function compatibility
+  - [-] 11.3 Write property test for utility function compatibility
+
+
+
+
     - **Property 6: Utility Function Compatibility**
     - **Validates: Requirements 6.2**
 
+
+
 - [ ] 12. Final Checkpoint - Ensure all tests pass
+
+
+
   - Ensure all tests pass, ask the user if questions arise.

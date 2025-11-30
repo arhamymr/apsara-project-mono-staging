@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Refactor to UI Package",
+  "description": "When a file is edited, analyze it and refactor to use shared components from packages/ui/src/components instead of local implementations",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.tsx",
+      "**/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the edited file and refactor it to use components from the shared UI package at packages/ui/src/components. Look for any UI components (like Button, Card, Dialog, Input, Select, Tabs, etc.) that are imported from local paths or other sources and replace them with imports from @repo/ui or the appropriate package path. Available components in packages/ui/src/components include: accordion, alert-dialog, alert, aspect-ratio, avatar, badge, breadcrumb, button-group, button, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer, dropdown-menu, empty, field, form, hover-card, input-group, input-otp, input, item, kbd, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, toggle-group, toggle, and tooltip. Update the imports and ensure the component usage remains compatible."
+  }
+}

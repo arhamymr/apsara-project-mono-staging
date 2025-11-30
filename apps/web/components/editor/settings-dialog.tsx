@@ -218,7 +218,7 @@ export const models: Model[] = [
 export function SettingsDialog() {
   const editor = useEditorRef();
 
-  const [tempModel, setTempModel] = React.useState(models[7]);
+  const [tempModel, setTempModel] = React.useState(models[7] ?? models[0]!);
   const [tempKeys, setTempKeys] = React.useState<Record<string, string>>({
     aiGatewayApiKey: '',
     uploadthing: '',
