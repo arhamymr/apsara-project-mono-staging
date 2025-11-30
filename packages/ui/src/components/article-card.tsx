@@ -1,16 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { cn } from '../lib/utils.js';
-import { Badge } from './badge.js';
-import { Button } from './button.js';
+
+import { cn } from '@workspace/ui/lib/utils';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from './card.js';
+} from '@workspace/ui/components/card';
 
 export interface ArticleCardProps {
   title: string;

@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useState } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-import { AppLocaleProvider } from "@/i18n/LocaleContext"
+import * as React from "react";
+import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { AppLocaleProvider } from "@/i18n/LocaleContext";
+import {ConvexClientProvider} from "@/provider/convex";
 
 const queryClientOptions = {
   defaultOptions: {
@@ -13,10 +14,10 @@ const queryClientOptions = {
       retry: 1,
     },
   },
-}
+};
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient(queryClientOptions))
+  const [queryClient] = useState(() => new QueryClient(queryClientOptions));
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -28,9 +29,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableColorScheme
       >
         <AppLocaleProvider>
-          {children}
+          <ConvexClientProvider>{children}</ConvexClientProvider>
         </AppLocaleProvider>
       </NextThemesProvider>
     </QueryClientProvider>
-  )
+  );
 }

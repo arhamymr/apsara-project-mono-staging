@@ -1,20 +1,20 @@
-import { Card } from '@/components/ui/card';
+import { Card } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useOSStrings } from '@/i18n/os';
-import { useWindowContext } from '@/layouts/os/WindowContext';
-import { MAX_DOCK_ITEMS } from '@/layouts/os/useDesktopState';
-import { cn } from '@/lib/utils';
-import { XCircle } from 'lucide-react';
-import * as React from 'react';
-import { toast } from 'sonner';
-import AppLauncher from '../app-launcher';
-import Assistant from '../assistant';
-import { DockAppTile } from './DockAppTile';
+} from "@/components/ui/tooltip";
+import { useOSStrings } from "@/i18n/os";
+import { useWindowContext } from "@/layouts/os/WindowContext";
+import { MAX_DOCK_ITEMS } from "@/layouts/os/useDesktopState";
+import { cn } from "@/lib/utils";
+import { XCircle } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
+import AppLauncher from "../app-launcher";
+import Assistant from "../assistant";
+import { DockAppTile } from "./dock";
 // DockSettings popover replaced by right-click windowed manager
 
 export default function Dock() {
@@ -31,7 +31,7 @@ export default function Dock() {
   } = useWindowContext();
   const hasMaximizedWindow = React.useMemo(
     () => windows.some((window) => window.maximized && !window.minimized),
-    [windows],
+    [windows]
   );
   const [isHovering, setIsHovering] = React.useState(false);
   const [assistantOpen, setAssistantOpen] = React.useState(false);
@@ -41,24 +41,24 @@ export default function Dock() {
 
   const dockApps = React.useMemo(
     () => apps.filter((app) => dockAppIds.includes(app.id)),
-    [apps, dockAppIds],
+    [apps, dockAppIds]
   );
 
   // Separate active windows from dock apps
   const activeWindows = React.useMemo(
     () => windows.filter((window) => !window.minimized),
-    [windows],
+    [windows]
   );
 
   const minimizedWindows = React.useMemo(
     () => windows.filter((window) => window.minimized),
-    [windows],
+    [windows]
   );
 
   // Get app IDs that have active windows (to avoid showing duplicate icons)
   const activeAppIds = React.useMemo(
     () => new Set(windows.map((window) => window.appId)),
-    [windows],
+    [windows]
   );
 
   const toggleDockApp = React.useCallback(
@@ -74,7 +74,7 @@ export default function Dock() {
         return [...previous, id];
       });
     },
-    [setDockAppIds],
+    [setDockAppIds]
   );
 
   React.useEffect(() => {
@@ -138,17 +138,16 @@ export default function Dock() {
           role="menubar"
           aria-label="Desktop dock"
           className={cn(
-            'flex items-center justify-center px-3 py-2 @md:gap-4 @md:px-5',
-            'rounded-xl border bg-transparent shadow-none backdrop-blur-xl transition-all duration-300',
+            "flex flex-row items-center justify-center px-3 py-2 @md:gap-2 @md:px-5",
+            "rounded-xl border bg-transparent shadow-none backdrop-blur-xl transition-all duration-300",
             hasMaximizedWindow &&
               !isHovering &&
               !assistantOpen &&
               !appLauncherOpen
-              ? 'translate-y-[85%] opacity-20'
-              : 'translate-y-0 opacity-100',
+              ? "translate-y-[85%] opacity-20"
+              : "translate-y-0 opacity-100"
           )}
         >
-          <AppLauncher onOpenChange={setAppLauncherOpen} />
           <Assistant onOpenChange={setAssistantOpen} />
 
           <nav
@@ -220,15 +219,15 @@ export default function Dock() {
               );
             })}
           </nav>
-
+          <AppLauncher onOpenChange={setAppLauncherOpen} />
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
                 onClick={clearAllWindows}
                 className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
-                  'text-muted-foreground hover:bg-muted/40 cursor-pointer',
+                  "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+                  "text-muted-foreground hover:bg-muted/40 cursor-pointer"
                 )}
                 title={s.dock.closeAll}
                 aria-label={s.dock.closeAll}

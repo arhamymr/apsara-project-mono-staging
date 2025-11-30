@@ -4,11 +4,7 @@
   "description": "When a file is edited, analyze it and refactor to use shared components from packages/ui/src/components instead of local implementations\n\n@workspace/ui use this always",
   "version": "1",
   "when": {
-    "type": "fileEdited",
-    "patterns": [
-      "**/*.tsx",
-      "**/*.ts"
-    ]
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",

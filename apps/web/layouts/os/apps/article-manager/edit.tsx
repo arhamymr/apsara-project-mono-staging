@@ -1,7 +1,6 @@
 'use client';
 
 import { AssetPicker } from '@/components/asset-picker';
-import TextEditor from '@/components/text-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import React from 'react';
@@ -109,10 +108,7 @@ export default function EditArticleWindow({
 
           <label className="text-xs">Content</label>
           <div className="border-border h-60 overflow-hidden rounded-md border">
-            <TextEditor
-              value={post.content ?? post.description ?? ''}
-              onChange={(val) => setPost({ ...post, content: val })}
-            />
+            
           </div>
 
           <div className="flex gap-2">

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo } from 'react';
 
 import LanguageSelector from '@/components/LanguageSelector';
@@ -19,6 +20,7 @@ import { WidgetsBoard } from '@/layouts/os/components/widgets/WidgetsBoard';
 import WindowItem from '@/layouts/os/components/window-item';
 import { useDesktopState } from '@/layouts/os/useDesktopState';
 import { WidgetsProvider } from '@/layouts/os/widgets/WidgetsContext';
+import UserDropdown from "./UserDropdown";
 
 type MacOSLayoutProps = {
   initialAppId?: string;
@@ -51,10 +53,19 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
 
           <div className="fixed inset-x-0 top-0 z-[222] flex items-center justify-between border-b bg-black/20 p-2 text-xs text-white backdrop-blur-xl">
             <div className="flex items-center gap-2">
-              <img
+              <Image
+                src="https://assets.apsaradigital.com/logo.png"
+                alt="logo"
+                width={80}
+                height={24}
+                className="mr-1 ml-2 block dark:hidden"
+              />
+              <Image
                 src="https://assets.apsaradigital.com/logo-white.png"
                 alt="logo"
-                className="mr-1 ml-2 w-[80px]"
+                width={80}
+                height={24}
+                className="mr-1 ml-2 hidden dark:block"
               />
               ✦
               <TitleLabel
@@ -66,6 +77,7 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
               <NotificationBell />
               <ClockDisplay simple />
               <ThemeToggle />
+              <UserDropdown />
             </div>
           </div>
 

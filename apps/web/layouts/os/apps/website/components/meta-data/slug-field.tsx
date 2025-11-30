@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { fetcher } from '@/lib/fetcher';
 import { useMemo, useRef, useState } from 'react';
 
-const WEBSITE_HOST = import.meta.env.VITE_WEBSITE_HOST;
+const WEBSITE_HOST = process.env.NEXT_PUBLIC_WEBSITE_HOST ?? '';
 
 export default function SlugField({ form }: { form: any }) {
   const [status, setStatus] = useState<null | 'checking' | 'ok' | 'taken'>(
@@ -91,7 +91,7 @@ export default function SlugField({ form }: { form: any }) {
   };
 
   // penting: depend on `form` biar closure update saat instance form berubah
-  const debouncedCheck = useMemo(() => debounce(checkSlug, 400), [form]);
+  const debouncedCheck = useMemo(() => debounce(checkSlug, 400), [checkSlug]);
 
   return (
     <FormField
