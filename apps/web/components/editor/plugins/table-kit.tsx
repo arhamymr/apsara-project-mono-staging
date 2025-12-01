@@ -12,7 +12,7 @@ import {
   TableCellHeaderElement,
   TableElement,
   TableRowElement,
-} from '@/components/ui/table-node';
+} from '@workspace/ui/components/table-node';
 
 export const TableKit = [
   TablePlugin.withComponent(TableElement),

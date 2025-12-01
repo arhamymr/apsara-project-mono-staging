@@ -1,8 +1,8 @@
 'use client';
 
 import { AssetPicker } from '@/components/asset-picker';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import React from 'react';
 import { toast } from 'sonner';
 import { useArticle, useDeleteArticle, useUpdateArticle } from './hooks';

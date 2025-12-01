@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { Download, Mail, Trash2 } from 'lucide-react';
 import { ComponentExample } from '../types';
 
@@ -96,7 +96,7 @@ export const buttonExamples: ComponentExample[] = [
     id: 'default',
     title: 'Default Button',
     description: 'Basic button with primary styling',
-    code: `import { Button } from '@/components/ui/button';
+    code: `import { Button } from '@workspace/ui/components/button';
 
 export default function Example() {
   return (
@@ -113,7 +113,7 @@ export default function Example() {
     id: 'variants',
     title: 'Button Variants',
     description: 'All available button style variants',
-    code: `import { Button } from '@/components/ui/button';
+    code: `import { Button } from '@workspace/ui/components/button';
 
 export default function Example() {
   return (
@@ -133,7 +133,7 @@ export default function Example() {
     id: 'sizes',
     title: 'Button Sizes',
     description: 'Different button sizes',
-    code: `import { Button } from '@/components/ui/button';
+    code: `import { Button } from '@workspace/ui/components/button';
 
 export default function Example() {
   return (
@@ -150,7 +150,7 @@ export default function Example() {
     id: 'with-icons',
     title: 'Buttons with Icons',
     description: 'Buttons with icon elements',
-    code: `import { Button } from '@/components/ui/button';
+    code: `import { Button } from '@workspace/ui/components/button';
 import { Mail, Download, Trash2 } from 'lucide-react';
 
 export default function Example() {
@@ -180,7 +180,7 @@ export default function Example() {
     id: 'disabled',
     title: 'Disabled State',
     description: 'Buttons in disabled state',
-    code: `import { Button } from '@/components/ui/button';
+    code: `import { Button } from '@workspace/ui/components/button';
 
 export default function Example() {
   return (

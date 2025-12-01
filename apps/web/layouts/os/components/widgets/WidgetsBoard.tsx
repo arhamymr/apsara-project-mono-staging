@@ -1,13 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@workspace/ui/components/button';
+import { Card } from '@workspace/ui/components/card';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@workspace/ui/components/dialog';
+import { Input } from '@workspace/ui/components/input';
 import { SiteBuilderWidget } from '@/layouts/os/components/widgets/bodies/SiteBuilderWidget';
 import { cn } from '@/lib/utils';
 import { GripVertical, Settings, Trash } from 'lucide-react';
@@ -64,7 +64,7 @@ function WidgetFrame({
     onMove(nx, ny);
   };
 
-  const onMouseUp = () => {
+  const onMouseUp = useCallback(() => {
     dragging.current = false;
     start.current = null;
     window.removeEventListener('mousemove', onMouseMove);
@@ -89,9 +89,9 @@ function WidgetFrame({
       lastPos.current = { x: sx, y: sy };
       onMove(sx, sy);
     }
-  };
+  });
 
-  React.useEffect(() => () => onMouseUp(), []);
+  React.useEffect(() => () => onMouseUp(), [onMouseUp]);
 
   return (
     <Card
@@ -153,15 +153,13 @@ function WidgetSettingsDialog({
     onOpenChange(false);
   };
 
-  if (!widget) return null;
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open && !!widget} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Widget Settings</DialogTitle>
         </DialogHeader>
-        {widget.type === 'note' && (
+        {widget?.type === 'note' && (
           <div className="space-y-2">
             <label className="text-xs font-medium">Text</label>
             <Input
@@ -170,7 +168,7 @@ function WidgetSettingsDialog({
             />
           </div>
         )}
-        {widget.type === 'clock' && (
+        {widget?.type === 'clock' && (
           <div className="flex items-center gap-2 text-sm">
             <input
               id="clock-seconds"
@@ -181,7 +179,7 @@ function WidgetSettingsDialog({
             <label htmlFor="clock-seconds">Show seconds</label>
           </div>
         )}
-        {widget.type === 'site-builder' && (
+        {widget?.type === 'site-builder' && (
           <p className="text-muted-foreground text-xs">
             No settings for this widget.
           </p>

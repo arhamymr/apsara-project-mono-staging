@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@workspace/ui/components/badge';
 import { PropsTableProps } from '../types';
 
 export function PropsTable({ props }: PropsTableProps) {

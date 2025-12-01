@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@workspace/ui/components/button';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { Code, Loader2, Send } from 'lucide-react';
 import VibeCodeEditor from './editor';

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useOSStrings } from '@/i18n/os';
 import { cn } from '@/lib/utils';
 import { Minimize, Minus, Square, X } from 'lucide-react';

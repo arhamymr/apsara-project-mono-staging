@@ -1,9 +1,9 @@
 'use client';
 
 // Component Showcase Page - Main entry point
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@workspace/ui/components/button';
+import { Sheet, SheetContent, SheetTrigger } from '@workspace/ui/components/sheet';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Menu } from 'lucide-react';
 import * as React from 'react';
 import { ComponentDetail } from './_showcase/components/ComponentDetail';

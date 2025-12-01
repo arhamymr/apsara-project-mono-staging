@@ -1,15 +1,15 @@
 'use client';
 
 import LanguageSelector from '@/components/LanguageSelector';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Kbd } from '@/components/ui/kbd';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+} from '@workspace/ui/components/dropdown-menu';
+import { Kbd } from '@workspace/ui/components/kbd';
+import { Sheet, SheetContent, SheetTrigger } from '@workspace/ui/components/sheet';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { ThemeToggle } from '@/layouts/dark-mode/theme-toggle';
 import { cn } from '@/lib/utils';

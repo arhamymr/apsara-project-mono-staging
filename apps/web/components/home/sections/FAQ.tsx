@@ -7,7 +7,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@workspace/ui/components/accordion';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 
 export function FAQ() {

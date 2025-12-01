@@ -1,7 +1,7 @@
 'use client';
 
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
+import { TooltipProvider } from '@workspace/ui/components/tooltip';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { Database, Plug, Shield, Sliders, Sparkles } from 'lucide-react';
 import { useState } from 'react';

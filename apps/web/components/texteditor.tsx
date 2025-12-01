@@ -2,12 +2,12 @@ import type { Value } from 'platejs';
 
 import { Plate, usePlateEditor } from 'platejs/react';
 
-import { Editor, EditorContainer } from '@/components/ui/editor';
-import { FixedToolbar } from '@/components/ui/fixed-toolbar';
-import { MarkToolbarButton } from '@/components/ui/mark-toolbar-button';
+import { Editor, EditorContainer } from '@workspace/ui/components/editor';
+import { FixedToolbar } from '@workspace/ui/components/fixed-toolbar';
+import { MarkToolbarButton } from '@workspace/ui/components/mark-toolbar-button';
 
 import { BasicBlocksKit } from '@/components/editor/plugins/basic-blocks-kit';
-import { ToolbarButton } from '@/components/ui/toolbar';
+import { ToolbarButton } from '@workspace/ui/components/toolbar';
 import { AIKit } from './editor/plugins/ai-kit';
 import { AIToolbarButton } from './ui/ai-toolbar-button';
 

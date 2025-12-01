@@ -6,11 +6,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { TabsContent } from '@/components/ui/tabs';
+} from '@workspace/ui/components/card';
+import { Label } from '@workspace/ui/components/label';
+import { Separator } from '@workspace/ui/components/separator';
+import { Switch } from '@workspace/ui/components/switch';
+import { TabsContent } from '@workspace/ui/components/tabs';
 import { Database, Globe, Plug } from 'lucide-react';
 import * as React from 'react';
 

@@ -5,9 +5,9 @@ import {
   CardContent,
   CardDescription,
   CardTitle,
-} from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useSidebar } from '@/components/ui/sidebar';
+} from '@workspace/ui/components/card';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { useSidebar } from '@workspace/ui/components/sidebar';
 import { IPageData, useWebsite } from '@/hooks/use-website';
 import { useWebsiteHistory } from '@/hooks/use-website/history-store';
 import { useBuilderSelection } from '@/hooks/use-website/selection-store';

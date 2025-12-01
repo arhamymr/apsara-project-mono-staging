@@ -10,7 +10,7 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 import type {
   KnowledgeBase,
   KnowledgeBaseCollection,

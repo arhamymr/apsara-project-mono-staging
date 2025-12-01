@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { Asterisk } from 'lucide-react';
 import { useCallback } from 'react';
 import ChatAssistant from './chat';

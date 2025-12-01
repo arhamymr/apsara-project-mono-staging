@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Badge } from '@workspace/ui/components/badge';
 import { cn } from '@/lib/utils';
 import type { Card } from '@/types/kanban';
 import { useSortable } from '@dnd-kit/sortable';

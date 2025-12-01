@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import type { UnsplashPhoto } from './types';
 
 /** Tile for displaying Unsplash photo search results */

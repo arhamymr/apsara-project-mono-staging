@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@workspace/ui/components/sidebar';
 import { EditableProvider } from '@/contexts/editable-context';
 import { useWebsite } from '@/hooks/use-website';
 import {

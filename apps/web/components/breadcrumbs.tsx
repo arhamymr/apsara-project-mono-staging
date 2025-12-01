@@ -7,7 +7,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@workspace/ui/components/breadcrumb';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import Link from 'next/link';
 import { Fragment } from 'react';

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design describes the approach for consolidating UI components from `apps/web/components/ui` to use the shared `@workspace/ui` package (shadcn-based) while maintaining backward compatibility with existing imports. The `packages/ui` package is configured with shadcn's "new-york" style and serves as the single source of truth for base UI components. The solution uses re-exports to preserve import paths like `@/components/ui/button` while sourcing implementations from the shared package.
+This design describes the approach for consolidating UI components from `apps/web/components/ui` to use the shared `@workspace/ui` package (shadcn-based) while maintaining backward compatibility with existing imports. The `packages/ui` package is configured with shadcn's "new-york" style and serves as the single source of truth for base UI components. The solution uses re-exports to preserve import paths like `@workspace/ui/components/button` while sourcing implementations from the shared package.
 
 ## Architecture
 
@@ -156,7 +156,7 @@ After analyzing the prework, the following properties were identified as redunda
 **Validates: Requirements 1.3**
 
 ### Property 3: Re-export Completeness
-*For any* consolidated base component, the re-export file SHALL export all symbols that were originally exported, and importing from `@/components/ui/{component}` SHALL resolve to the same exports as `@workspace/ui/components/{component}`.
+*For any* consolidated base component, the re-export file SHALL export all symbols that were originally exported, and importing from `@workspace/ui/components/{component}` SHALL resolve to the same exports as `@workspace/ui/components/{component}`.
 **Validates: Requirements 2.1, 2.2, 2.3, 3.1, 3.2, 3.3**
 
 ### Property 4: App-Specific Component Preservation

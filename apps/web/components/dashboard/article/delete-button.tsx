@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@workspace/ui/components/alert-dialog';
 import { useRouter } from 'next/navigation';
 
 export function DeleteButton({

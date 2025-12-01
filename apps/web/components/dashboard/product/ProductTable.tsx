@@ -1,7 +1,7 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@workspace/ui/components/badge';
+import { Checkbox } from '@workspace/ui/components/checkbox';
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@workspace/ui/components/table';
 import { Image as ImageIcon, Tag } from 'lucide-react';
 import { MOCK_PRODUCTS } from './mock';
 import { StatusBadge } from './StatusBadge';

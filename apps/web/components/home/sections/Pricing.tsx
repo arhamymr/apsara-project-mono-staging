@@ -1,7 +1,7 @@
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';

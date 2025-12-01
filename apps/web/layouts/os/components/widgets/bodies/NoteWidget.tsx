@@ -1,4 +1,4 @@
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@workspace/ui/components/separator';
 
 type Props = {
   text: string;

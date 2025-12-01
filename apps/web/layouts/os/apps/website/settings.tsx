@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useWebsite } from '@/hooks/use-website';
 import { fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';

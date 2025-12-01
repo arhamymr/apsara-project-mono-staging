@@ -5,7 +5,7 @@ import type { AnyPluginConfig } from 'platejs';
 import { SlashInputPlugin, SlashPlugin } from '@platejs/slash-command/react';
 import { KEYS } from 'platejs';
 
-import { SlashInputElement } from '@/components/ui/slash-node';
+import { SlashInputElement } from '@workspace/ui/components/slash-node';
 
 export const SlashKit: AnyPluginConfig[] = [
   SlashPlugin.configure({

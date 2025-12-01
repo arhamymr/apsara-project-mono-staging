@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import { ArrowUpRight, Mail, MessageCircle, Share2 } from 'lucide-react';
 import './animations.css';
 import { FeatureCard } from './FeatureCard';

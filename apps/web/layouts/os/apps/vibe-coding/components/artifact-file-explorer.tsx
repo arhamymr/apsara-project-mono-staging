@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@workspace/ui/components/button';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { useTheme } from '@/layouts/dark-mode/useTheme';
 import { fetcher } from '@/lib/fetcher';
 import {

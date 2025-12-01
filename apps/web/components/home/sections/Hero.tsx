@@ -1,6 +1,6 @@
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';

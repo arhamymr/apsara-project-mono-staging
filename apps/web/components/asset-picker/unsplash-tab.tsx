@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { TabsContent } from '@/components/ui/tabs';
+import { Button } from '@workspace/ui/components/button';
+import { Card } from '@workspace/ui/components/card';
+import { Input } from '@workspace/ui/components/input';
+import { TabsContent } from '@workspace/ui/components/tabs';
 import { Search } from 'lucide-react';
 import * as React from 'react';
 import { UnsplashTile } from './tiles';

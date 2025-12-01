@@ -1,5 +1,5 @@
 import { AssetPicker } from '@/components/asset-picker';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { cn } from '@/lib/utils';
 import React from 'react';
 

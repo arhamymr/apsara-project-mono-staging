@@ -5,8 +5,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Input } from '@/components/ui/input';
+} from '@workspace/ui/components/accordion';
+import { Input } from '@workspace/ui/components/input';
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import * as React from 'react';

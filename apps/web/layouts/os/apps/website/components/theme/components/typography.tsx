@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* ThemePalette.tsx */
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@workspace/ui/components/select';
 import { useWebsite } from '@/hooks/use-website';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';

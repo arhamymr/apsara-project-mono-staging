@@ -5,8 +5,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+} from '@workspace/ui/components/card';
+import { Separator } from '@workspace/ui/components/separator';
 import * as React from 'react';
 import { LeadFormDialog } from './leads-dialog';
 import { LeadsTable } from './leads-table';

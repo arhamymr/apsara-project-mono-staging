@@ -1,30 +1,30 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@workspace/ui/components/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@workspace/ui/components/card';
+import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { TabsContent } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
+} from '@workspace/ui/components/select';
+import { Slider } from '@workspace/ui/components/slider';
+import { TabsContent } from '@workspace/ui/components/tabs';
+import { Textarea } from '@workspace/ui/components/textarea';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@workspace/ui/components/tooltip';
 import { Sliders, Wand2 } from 'lucide-react';
 import * as React from 'react';
 

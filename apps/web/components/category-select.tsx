@@ -1,8 +1,8 @@
 'use client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import {
   Command,
   CommandEmpty,
@@ -10,13 +10,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Input } from '@/components/ui/input';
+} from '@workspace/ui/components/command';
+import { Input } from '@workspace/ui/components/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@workspace/ui/components/popover';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronsUpDown, X } from 'lucide-react';

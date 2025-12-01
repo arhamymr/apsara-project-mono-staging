@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@workspace/ui/components/dialog';
 import { formatSize } from '../utils';
 
 type PreviewData = {

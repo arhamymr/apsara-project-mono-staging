@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import { Card } from '@workspace/ui/components/card';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { cn } from '@/lib/utils';
 

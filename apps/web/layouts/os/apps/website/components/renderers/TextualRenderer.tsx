@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { cn } from '@/lib/utils';
 import type React from 'react';
 import type { TemplateNode } from '../../template-schema';

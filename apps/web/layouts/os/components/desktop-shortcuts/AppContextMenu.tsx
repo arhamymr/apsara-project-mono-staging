@@ -2,7 +2,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 
 type GroupLite = { id: string; label: string };
 

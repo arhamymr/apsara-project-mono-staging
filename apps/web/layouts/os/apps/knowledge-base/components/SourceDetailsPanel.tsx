@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Separator } from '@workspace/ui/components/separator';
 import { StatusBadge } from '@/layouts/os/apps/knowledge-base/components/StatusBadge';
 import type { Source } from '@/layouts/os/apps/knowledge-base/types';
 import type { MastraIngestStatus } from '@/layouts/os/apps/knowledge-base/utils/network';

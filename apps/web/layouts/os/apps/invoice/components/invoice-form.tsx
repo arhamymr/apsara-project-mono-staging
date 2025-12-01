@@ -1,15 +1,15 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent } from '@workspace/ui/components/card';
+import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@workspace/ui/components/select';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useInvoiceCalculations } from '../hooks/useInvoiceCalculations';

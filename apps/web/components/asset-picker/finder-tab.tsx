@@ -2,9 +2,9 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { TabsContent } from '@/components/ui/tabs';
+} from '@workspace/ui/components/breadcrumb';
+import { Button } from '@workspace/ui/components/button';
+import { TabsContent } from '@workspace/ui/components/tabs';
 import type { StorageEntry } from '@/layouts/os/apps/finder/queries';
 import { useStorageList } from '@/layouts/os/apps/finder/queries';
 import { cn } from '@/lib/utils';

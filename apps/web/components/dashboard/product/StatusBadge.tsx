@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@workspace/ui/components/badge';
 import type { ProductStatus } from './types';
 
 export function StatusBadge({ status }: { status: ProductStatus }) {

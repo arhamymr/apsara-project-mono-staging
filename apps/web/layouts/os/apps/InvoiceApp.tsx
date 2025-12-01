@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Kbd } from '@/components/ui/kbd';
+import { Button } from '@workspace/ui/components/button';
+import { Kbd } from '@workspace/ui/components/kbd';
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@workspace/ui/components/select';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import React from 'react';
 import { toast } from 'sonner';

@@ -4,11 +4,11 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@workspace/ui/components/accordion';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { Plus, RefreshCcw, Search, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { KBCollection, KnowledgeBase } from './types';

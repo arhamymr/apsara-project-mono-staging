@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@workspace/ui/components/badge';
+import { Card } from '@workspace/ui/components/card';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -9,7 +9,7 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 import { cn } from '@/lib/utils';
 import parse from 'html-react-parser';
 import { Check } from 'lucide-react';

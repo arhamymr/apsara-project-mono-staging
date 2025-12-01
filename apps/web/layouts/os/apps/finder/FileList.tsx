@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@workspace/ui/components/badge';
+import { Card } from '@workspace/ui/components/card';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -11,9 +11,9 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+} from '@workspace/ui/components/context-menu';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { Table, TableBody, TableCell, TableRow } from '@workspace/ui/components/table';
 import type {
   KnowledgeBase,
   KnowledgeBaseCollection,

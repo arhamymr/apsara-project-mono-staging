@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Kbd } from '@/components/ui/kbd';
+import { Button } from '@workspace/ui/components/button';
+import { Kbd } from '@workspace/ui/components/kbd';
 import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
 import { ChunkEditorSheet } from '@/layouts/os/apps/knowledge-base/components/ChunkEditorSheet';
 import { ChunksPanel } from '@/layouts/os/apps/knowledge-base/components/ChunksPanel';

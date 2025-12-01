@@ -1,4 +1,4 @@
-import { MarkdownContent } from '@/components/ui/markdown-content';
+import { MarkdownContent } from '@workspace/ui/components/markdown-content';
 import { Loader2, Wrench } from 'lucide-react';
 
 interface ChatStreamingMessageProps {

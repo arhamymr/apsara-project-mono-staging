@@ -1,7 +1,7 @@
 import {
   ContextMenuContent,
   ContextMenuItem,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 
 type Props = {
   id: string;

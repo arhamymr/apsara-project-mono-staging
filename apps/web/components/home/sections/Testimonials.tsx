@@ -1,6 +1,6 @@
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { MagicCard } from '@/components/ui/magic-card';
+import { Card } from '@workspace/ui/components/card';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';

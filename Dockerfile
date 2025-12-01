@@ -1,10 +1,10 @@
 # ================================
-# Stage 1: Base image with pnpm
+# Stage 1: Base image with yarn
 # ================================
 FROM node:20-alpine AS base
 
-# Enable corepack for pnpm
-RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
+# Enable corepack for yarn
+RUN corepack enable && corepack prepare yarn@4.5.1 --activate
 
 # Set working directory
 WORKDIR /app
@@ -15,14 +15,15 @@ WORKDIR /app
 FROM base AS deps
 
 # Copy package files for dependency installation
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json yarn.lock .yarnrc.yml ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/mastra/package.json ./apps/mastra/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 # Install dependencies with frozen lockfile
-RUN pnpm install --frozen-lockfile
+RUN yarn install --immutable
 
 # ================================
 # Stage 3: Build the application
@@ -41,7 +42,7 @@ COPY . .
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm turbo build --filter=web
+RUN yarn turbo build --filter=web
 
 # ================================
 # Stage 4: Production runner

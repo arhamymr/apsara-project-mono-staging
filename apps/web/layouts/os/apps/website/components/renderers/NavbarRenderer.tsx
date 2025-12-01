@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import type { TemplateNode } from '@/layouts/os/apps/website/template-schema';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';

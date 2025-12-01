@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '@workspace/ui/components/button';
+import { Card } from '@workspace/ui/components/card';
 import { useWebsite } from '@/hooks/use-website';
 import { HttpError, fetcher } from '@/lib/fetcher';
 import { cn } from '@/lib/utils';

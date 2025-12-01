@@ -1,5 +1,5 @@
 /* ThemePalette.tsx */
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import { useWebsite } from '@/hooks/use-website';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';

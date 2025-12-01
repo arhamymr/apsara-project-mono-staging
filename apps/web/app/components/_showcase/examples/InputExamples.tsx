@@ -1,7 +1,7 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 import { ComponentExample } from '../types';
 
 /**
@@ -91,8 +91,8 @@ export const inputExamples: ComponentExample[] = [
     id: 'default',
     title: 'Default Input',
     description: 'Basic text input with label',
-    code: `import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+    code: `import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 
 export default function Example() {
   return (
@@ -108,8 +108,8 @@ export default function Example() {
     id: 'types',
     title: 'Input Types',
     description: 'Different HTML input types',
-    code: `import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+    code: `import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 
 export default function Example() {
   return (
@@ -139,8 +139,8 @@ export default function Example() {
     id: 'disabled',
     title: 'Disabled State',
     description: 'Input in disabled state',
-    code: `import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+    code: `import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 
 export default function Example() {
   return (
@@ -173,8 +173,8 @@ export default function Example() {
     id: 'file',
     title: 'File Upload',
     description: 'File input for uploading files',
-    code: `import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+    code: `import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 
 export default function Example() {
   return (

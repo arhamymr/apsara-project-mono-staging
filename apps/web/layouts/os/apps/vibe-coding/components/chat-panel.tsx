@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@workspace/ui/components/button';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { Loader2, Plus, Send } from 'lucide-react';
 import { useChat } from '../hooks/use-chat';
 import { ChatEmptyState } from './chat-empty-state';

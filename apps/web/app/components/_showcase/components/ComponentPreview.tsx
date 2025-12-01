@@ -1,14 +1,14 @@
 'use client';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@workspace/ui/components/select';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { cn } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
 import * as React from 'react';

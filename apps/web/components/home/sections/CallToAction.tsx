@@ -1,9 +1,9 @@
 import { Section } from '@/components/home/components';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import { motion } from 'framer-motion';
 // ... imports
 

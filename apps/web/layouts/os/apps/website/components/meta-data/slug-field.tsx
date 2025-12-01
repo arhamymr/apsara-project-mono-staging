@@ -5,8 +5,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@workspace/ui/components/form';
+import { Input } from '@workspace/ui/components/input';
 import { fetcher } from '@/lib/fetcher';
 import { useMemo, useRef, useState } from 'react';
 

@@ -1,5 +1,5 @@
 import { Section } from '@/components/home/components';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { Bot, Database, Layers, Mail, ShieldCheck } from 'lucide-react';
 

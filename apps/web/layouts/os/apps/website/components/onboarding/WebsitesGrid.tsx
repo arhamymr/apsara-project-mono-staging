@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { AlertTriangle, FileQuestionIcon, Globe, Loader2 } from 'lucide-react';
 import { TemplatesSection, WebsiteInfoCard } from '.';

@@ -10,13 +10,13 @@ import {
   ChatMessageHeader,
   ChatMessageMarkdown,
   ChatMessageTimestamp,
-} from '@/components/ui/chat-message';
+} from '@workspace/ui/components/chat-message';
 import {
   ChatMessageArea,
   ChatMessageAreaContent,
   ChatMessageAreaScrollButton,
-} from '@/components/ui/chat-message-area';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@workspace/ui/components/chat-message-area';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { useChatContext } from './ChatContext';
 
 export function ChatMessageAreaComp() {

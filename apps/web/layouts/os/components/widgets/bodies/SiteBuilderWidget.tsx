@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@workspace/ui/components/button';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { Separator } from '@workspace/ui/components/separator';
 import { useActiveSite } from '@/contexts/site-context';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { useRouter } from 'next/navigation';

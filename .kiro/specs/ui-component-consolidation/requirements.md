@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document specifies the requirements for consolidating UI components from `apps/web/components/ui` to use the shared `@workspace/ui` package at `packages/ui`. The goal is to eliminate duplicate component implementations while maintaining backward compatibility with existing imports (e.g., `@/components/ui/button` continues to work). Components that already exist in `packages/ui` will be re-exported, while app-specific components (like Plate editor nodes) will remain in the web app.
+This document specifies the requirements for consolidating UI components from `apps/web/components/ui` to use the shared `@workspace/ui` package at `packages/ui`. The goal is to eliminate duplicate component implementations while maintaining backward compatibility with existing imports (e.g., `@workspace/ui/components/button` continues to work). Components that already exist in `packages/ui` will be re-exported, while app-specific components (like Plate editor nodes) will remain in the web app.
 
 ## Glossary
 
@@ -37,7 +37,7 @@ This document specifies the requirements for consolidating UI components from `a
 
 1. WHEN a base component is consolidated THEN the System SHALL create a re-export file at `apps/web/components/ui/{component}.tsx` that exports from `@workspace/ui`.
 
-2. WHEN importing `@/components/ui/button` THEN the System SHALL resolve to the same Button component as `@workspace/ui/components/button`.
+2. WHEN importing `@workspace/ui/components/button` THEN the System SHALL resolve to the same Button component as `@workspace/ui/components/button`.
 
 3. WHEN a component has the same API in both locations THEN the System SHALL use the `packages/ui` version as the source of truth.
 

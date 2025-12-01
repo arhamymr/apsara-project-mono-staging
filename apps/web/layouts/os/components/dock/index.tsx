@@ -1,10 +1,10 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "@workspace/ui/components/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@workspace/ui/components/tooltip";
 import { useOSStrings } from "@/i18n/os";
 import { useWindowContext } from "@/layouts/os/WindowContext";
 import { MAX_DOCK_ITEMS } from "@/layouts/os/useDesktopState";

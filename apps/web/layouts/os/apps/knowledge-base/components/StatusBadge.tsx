@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@workspace/ui/components/badge';
 import type { IngestStatus } from './types';
 
 const STATUS_STYLES: Record<

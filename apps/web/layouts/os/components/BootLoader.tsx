@@ -1,7 +1,7 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card } from '@workspace/ui/components/card';
+import { Progress } from '@workspace/ui/components/progress';
 import { useOSStrings } from '@/i18n/os';
 import { cn } from '@/lib/utils';
 import React from 'react';

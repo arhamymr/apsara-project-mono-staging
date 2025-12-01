@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Separator } from '@/components/ui/separator';
+} from '@workspace/ui/components/collapsible';
+import { Separator } from '@workspace/ui/components/separator';
 import { ComponentData, useWebsite } from '@/hooks/use-website';
 import { ChevronDown, ChevronUp, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';

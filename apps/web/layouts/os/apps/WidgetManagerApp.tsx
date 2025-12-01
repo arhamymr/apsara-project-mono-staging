@@ -1,10 +1,10 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import { Card } from '@workspace/ui/components/card';
+import { Input } from '@workspace/ui/components/input';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import {
   useWidgets,
   type WidgetType,

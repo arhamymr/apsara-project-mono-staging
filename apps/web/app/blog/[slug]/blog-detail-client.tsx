@@ -2,8 +2,8 @@
 
 import { Background, SkipToContent } from '@/components/home/components';
 import { Footer, TopNav } from '@/components/home/sections';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, Share2, User } from 'lucide-react';
 

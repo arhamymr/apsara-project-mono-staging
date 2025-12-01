@@ -1,4 +1,4 @@
-import { ContextMenu, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { ContextMenu, ContextMenuTrigger } from '@workspace/ui/components/context-menu';
 import DesktopIcon from '@/layouts/os/components/desktop-icon';
 import AppContextMenu from '@/layouts/os/components/desktop-shortcuts/AppContextMenu';
 import type { DesktopAppShortcut } from '@/layouts/os/types';

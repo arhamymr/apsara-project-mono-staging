@@ -1,4 +1,4 @@
-import { ContextMenu, ContextMenuTrigger } from '@/components/ui/context-menu';
+import { ContextMenu, ContextMenuTrigger } from '@workspace/ui/components/context-menu';
 import GroupContextMenu from '@/layouts/os/components/desktop-shortcuts/GroupContextMenu';
 import GroupCard from '@/layouts/os/components/group-card';
 import type { DesktopGroup } from '@/layouts/os/types';

@@ -12,8 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@workspace/ui/components/alert-dialog';
+import { Button } from '@workspace/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@workspace/ui/components/dialog';
 import {
   Form,
   FormControl,
@@ -29,16 +29,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@workspace/ui/components/form';
+import { Input } from '@workspace/ui/components/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@workspace/ui/components/select';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { useCreateCard, useDeleteCard, useUpdateCard } from '@/hooks/useKanban';
 import { cardSchema, type CardFormData } from '@/lib/schemas/kanban';
 import { type Card } from '@/types/kanban';

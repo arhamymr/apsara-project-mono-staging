@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import React from 'react';
 
 export function GradientButton(props: React.ComponentProps<typeof Button>) {

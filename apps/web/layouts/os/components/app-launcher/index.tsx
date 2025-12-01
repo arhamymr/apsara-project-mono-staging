@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { cn } from '@/lib/utils';
 import { Grid3x3, Search } from 'lucide-react';

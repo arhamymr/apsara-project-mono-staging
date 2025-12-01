@@ -6,7 +6,7 @@ import { createContext, useContext } from 'react';
 
 import { EditorKit } from '@/components/editor/editor-kit';
 import { SettingsDialog } from '@/components/editor/settings-dialog';
-import { Editor, EditorContainer } from '@/components/ui/editor';
+import { Editor, EditorContainer } from '@workspace/ui/components/editor';
 import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
 import { normalizeNodeId } from 'platejs';
 

@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { cn } from '@/lib/utils';
 import type { TemplateDefinition } from '../../template-schema';

@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui/card';
+import { Card } from '@workspace/ui/components/card';
 import { cn } from '@/lib/utils';
 import { useInView } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';

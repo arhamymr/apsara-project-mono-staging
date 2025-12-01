@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@workspace/ui/components/card';
 import { CheckCircle2, Mail, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { FormEventHandler, useState } from 'react';

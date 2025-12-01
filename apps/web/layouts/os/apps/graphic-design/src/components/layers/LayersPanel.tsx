@@ -1,8 +1,8 @@
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { Eye, EyeOff, Lock, Unlock } from 'lucide-react';
 
 import { useCanvasStore } from '../../store/canvas.store';

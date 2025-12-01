@@ -3,7 +3,7 @@ import { BaseColumnItemPlugin, BaseColumnPlugin } from '@platejs/layout';
 import {
   ColumnElementStatic,
   ColumnGroupElementStatic,
-} from '@/components/ui/column-node-static';
+} from '@workspace/ui/components/column-node-static';
 
 export const BaseColumnKit = [
   BaseColumnPlugin.withComponent(ColumnGroupElementStatic),

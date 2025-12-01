@@ -3,8 +3,8 @@
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { Footer, TopNav } from '@/components/home/sections';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
 import { AI_INTEGRATION_STRINGS } from '@/i18n/ai-integration';
 import { cn } from '@/lib/utils';

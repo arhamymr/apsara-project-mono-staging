@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@workspace/ui/components/badge';
+import { Input } from '@workspace/ui/components/input';
+import { Separator } from '@workspace/ui/components/separator';
+import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { CalendarDays, Search } from 'lucide-react';
 
 interface ControlsProps {

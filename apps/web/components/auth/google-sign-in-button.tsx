@@ -1,12 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
+interface GoogleSignInButtonProps {
+  redirectTo?: string;
+}
 
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ redirectTo = '/dashboard' }: GoogleSignInButtonProps) {
   const { signIn } = useAuthActions();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +20,7 @@ export function GoogleSignInButton() {
       disabled={isLoading}
       onClick={() => {
         setIsLoading(true);
-        void signIn('google');
+        void signIn('google', { redirectTo });
       }}
     >
       {isLoading ? (

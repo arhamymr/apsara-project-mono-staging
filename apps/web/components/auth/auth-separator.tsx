@@ -1,6 +1,6 @@
 'use client';
 
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@workspace/ui/components/separator';
 
 interface AuthSeparatorProps {
   text?: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   Card,
   CardContent,
@@ -8,9 +8,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@workspace/ui/components/card';
+import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 import { ComponentExample } from '../types';
 
 /**
@@ -121,7 +121,7 @@ export const cardExamples: ComponentExample[] = [
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@workspace/ui/components/card';
 
 export default function Example() {
   return (
@@ -152,8 +152,8 @@ export default function Example() {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@workspace/ui/components/card';
+import { Button } from '@workspace/ui/components/button';
 
 export default function Example() {
   return (
@@ -190,10 +190,10 @@ export default function Example() {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@workspace/ui/components/card';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
+import { Label } from '@workspace/ui/components/label';
 
 export default function Example() {
   return (
@@ -230,7 +230,7 @@ export default function Example() {
     id: 'simple',
     title: 'Simple Card',
     description: 'Card without sub-components',
-    code: `import { Card } from '@/components/ui/card';
+    code: `import { Card } from '@workspace/ui/components/card';
 
 export default function Example() {
   return (

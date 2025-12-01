@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbItem as UiBreadcrumbItem,
-} from '@/components/ui/breadcrumb';
+} from '@workspace/ui/components/breadcrumb';
 
 type FinderBreadcrumb = {
   name: string;

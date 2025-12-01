@@ -4,7 +4,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 import { ClipboardPaste, Copy, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useCanvasStore } from '../../store/canvas.store';

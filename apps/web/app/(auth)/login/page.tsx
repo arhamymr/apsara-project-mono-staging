@@ -6,9 +6,9 @@ import {
   GoogleSignInButton,
   LoginForm,
 } from '@/components/auth';
-import { Button } from '@/components/ui/button';
-import { Toaster } from '@/components/ui/sonner';
-import { StatusBanner } from '@/components/ui/status-banner';
+import { Button } from '@workspace/ui/components/button';
+import { Toaster } from '@workspace/ui/components/sonner';
+import { StatusBanner } from '@workspace/ui/components/status-banner';
 import Link from 'next/link';
 
 export default function SignInPage() {

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@workspace/ui/components/checkbox';
+import { Input } from '@workspace/ui/components/input';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import type { AppDef } from '@/layouts/os/types';
 import { MAX_DOCK_ITEMS } from '@/layouts/os/useDesktopState';

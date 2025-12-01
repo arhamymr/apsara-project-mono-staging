@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@workspace/ui/components/card';
 import { motion } from 'framer-motion';
 
 export default function TopPages({ pages }: { pages: any[] }) {

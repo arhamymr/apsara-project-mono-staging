@@ -1,4 +1,4 @@
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@workspace/ui/components/separator';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { FileText } from 'lucide-react';
 import { TemplateCard } from '.';

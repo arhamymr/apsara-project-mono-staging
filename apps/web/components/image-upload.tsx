@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { AssetPicker } from '@/components/asset-picker';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { cn } from '@/lib/utils';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import * as React from 'react';

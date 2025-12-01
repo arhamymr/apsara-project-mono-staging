@@ -4,7 +4,7 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { WindowPortalProvider } from '@/layouts/os/WindowPortalContext';
 import { cn } from '@/lib/utils';

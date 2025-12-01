@@ -1,13 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@workspace/ui/components/button';
+import { Separator } from '@workspace/ui/components/separator';
 import {
   Sheet,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Textarea } from '@/components/ui/textarea';
+} from '@workspace/ui/components/sheet';
+import { Textarea } from '@workspace/ui/components/textarea';
 import type { KBChunk } from './types';
 
 type ChunkEditorSheetProps = {

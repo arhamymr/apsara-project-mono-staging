@@ -6,36 +6,34 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@workspace/ui/components/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useRouter } from 'next/navigation';
 import { LogOut, Settings as SettingsIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useWindowContext } from '@/layouts/os/WindowContext';
-import { useCallback } from 'react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export default function UserDropdown() {
-
   const user = useQuery(api.auth.getCurrentUser);
-
-  console.log(user, "useg")
+  const { signOut } = useAuthActions();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await fetch('/logout', { method: 'POST' });
+      await signOut();
       router.push('/login');
     } finally {
       setIsLoggingOut(false);
     }
   };
 
-   const { apps, openApp } = useWindowContext();
+  const { apps, openApp } = useWindowContext();
 
   const openSettings = useCallback(
     (appId?: string) => {
@@ -53,7 +51,7 @@ export default function UserDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex cursor-pointer gap-2">
-          <UserInfo user={user?.name || ""} />
+          <UserInfo user={user ? { name: user.name, email: user.email, image: user.image } : null} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-[99999999] w-52">

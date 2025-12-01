@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // ThemePanel.tsx
-import { useSidebar } from '@/components/ui/sidebar';
+import { useSidebar } from '@workspace/ui/components/sidebar';
 import { useWebsite } from '@/hooks/use-website';
 import { useDashboardStrings } from '@/i18n/dashboard';
 import { cn } from '@/lib/utils';

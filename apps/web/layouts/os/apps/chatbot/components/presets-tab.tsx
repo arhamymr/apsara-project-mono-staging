@@ -1,14 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { TabsContent } from '@/components/ui/tabs';
+} from '@workspace/ui/components/card';
+import { TabsContent } from '@workspace/ui/components/tabs';
 import { Sparkles, Wand2 } from 'lucide-react';
 import * as React from 'react';
 

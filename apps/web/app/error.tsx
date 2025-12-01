@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   Card,
   CardContent,
@@ -10,8 +10,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+} from '@workspace/ui/components/card';
+import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };

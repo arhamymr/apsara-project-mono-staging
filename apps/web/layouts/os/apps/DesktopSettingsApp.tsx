@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@workspace/ui/components/input';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { GRADIENT_VARIANTS } from '@/layouts/os/gradients';
 import {
   getWallpaper,

@@ -3,8 +3,8 @@
 import { Check, Copy } from 'lucide-react';
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@workspace/ui/components/button';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { cn } from '@/lib/utils';
 import type { CodeBlockProps } from '../types';
 

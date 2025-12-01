@@ -3,7 +3,7 @@
 import { Background, Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { Footer, TopNav } from '@/components/home/sections';
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import { DIGITAL_PRODUCTS_STRINGS } from '@/i18n/digital-products';
 import { useLocale } from '@/i18n/LocaleContext';
 import { cn } from '@/lib/utils';

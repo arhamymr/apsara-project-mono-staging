@@ -2,8 +2,8 @@
 
 import { LogoSwitch } from '@/components/LogoSwitch';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Twitter } from 'lucide-react';

@@ -7,7 +7,7 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+} from '@workspace/ui/components/context-menu';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { useWidgets } from '@/layouts/os/widgets/WidgetsContext';
 import { FilePlus, RefreshCcw, Settings, XCircle } from 'lucide-react';

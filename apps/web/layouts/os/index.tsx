@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import LanguageSelector from '@/components/LanguageSelector';
 import NotificationBell from '@/components/NotificationBell';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@workspace/ui/components/sonner';
 import { useOSStrings } from '@/i18n/os';
 import { ThemeToggle } from '@/layouts/dark-mode/theme-toggle';
 import { WindowProvider } from '@/layouts/os/WindowContext';

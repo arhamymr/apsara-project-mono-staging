@@ -3,9 +3,9 @@
 import { Background, Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { Footer, TopNav } from '@/components/home/sections';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MagicCard } from '@/components/ui/magic-card';
+import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
+import { MagicCard } from '@workspace/ui/components/magic-card';
 import { useLocale } from '@/i18n/LocaleContext';
 import { UNIFIED_PLATFORM_STRINGS } from '@/i18n/unified-platform';
 import { motion } from 'framer-motion';

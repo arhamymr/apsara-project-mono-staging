@@ -6,7 +6,7 @@ import {
   ChatInputGroupAddon,
   ChatInputSubmitButton,
   useChatInput,
-} from '@/components/ui/chat-input';
+} from '@workspace/ui/components/chat-input';
 import { useChatContext } from './ChatContext';
 
 export function ChatInputComp() {

@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@workspace/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@workspace/ui/components/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Card, Column } from '@/types/kanban';
 import { useDroppable } from '@dnd-kit/core';

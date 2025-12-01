@@ -2,9 +2,9 @@
 'use client';
 
 import { PlateEditor } from '@/components/editor/plate-editor';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Kbd } from '@/components/ui/kbd';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
+import { Kbd } from '@workspace/ui/components/kbd';
 import {
   Select,
   SelectContent,
@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@workspace/ui/components/select';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import React from 'react';
 import { toast } from 'sonner';

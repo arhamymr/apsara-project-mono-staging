@@ -1,4 +1,4 @@
-import { MarkdownContent } from '@/components/ui/markdown-content';
+import { MarkdownContent } from '@workspace/ui/components/markdown-content';
 import type { AgentMessage } from '@/types/agent';
 import {
   Eye,

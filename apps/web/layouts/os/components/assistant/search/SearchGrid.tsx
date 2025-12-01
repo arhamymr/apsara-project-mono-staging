@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import type { AppDef } from '@/layouts/os/types';
 
 type Props = {

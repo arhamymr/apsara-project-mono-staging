@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
+import { Switch } from '@workspace/ui/components/switch';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { Mic, MicOff, Send, StopCircle } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';

@@ -3,8 +3,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+} from '@workspace/ui/components/accordion';
+import { Button } from '@workspace/ui/components/button';
 import { useTheme } from '@/layouts/dark-mode/useTheme';
 import { Check, Copy } from 'lucide-react';
 import { useEffect, useState } from 'react';
