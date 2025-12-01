@@ -17,11 +17,13 @@ import Link from 'next/link';
 import {
   Bot,
   ChevronDown,
-  Globe,
+  Code2,
   Image,
   LayoutDashboard,
   Menu,
+  Server,
   ShoppingBag,
+  Smartphone,
   Wrench,
   X,
 } from 'lucide-react';
@@ -62,10 +64,22 @@ export function TopNav() {
       label: s.topNav.links.services,
       children: [
         {
-          href: '/create-website',
-          label: s.topNav.links.createWebsite,
-          description: s.topNav.links.descriptions.createWebsite,
-          icon: Globe,
+          href: '/full-stack-development',
+          label: s.topNav.links.fullStackDevelopment,
+          description: s.topNav.links.descriptions.fullStackDevelopment,
+          icon: Code2,
+        },
+        {
+          href: '/mobile-app-development',
+          label: s.topNav.links.mobileAppDevelopment,
+          description: s.topNav.links.descriptions.mobileAppDevelopment,
+          icon: Smartphone,
+        },
+        {
+          href: '/api-development',
+          label: s.topNav.links.apiDevelopment,
+          description: s.topNav.links.descriptions.apiDevelopment,
+          icon: Server,
         },
         {
           href: '/fix-website',

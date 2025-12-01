@@ -6,34 +6,31 @@ import { Footer, TopNav } from '@/components/home/sections';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
-import { CREATE_WEBSITE_STRINGS } from '@/i18n/create-website';
+import { API_DEVELOPMENT_STRINGS } from '@/i18n/api-development';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
-  Briefcase,
   Check,
   Clock,
-  Code2,
+  FileText,
+  GitBranch,
   Globe,
-  Layout,
-  Palette,
+  Lock,
+  MessageCircle,
   Rocket,
-  Search,
+  Server,
   Shield,
-  ShoppingCart,
-  Smartphone,
   Sparkles,
-  User,
   Zap,
 } from 'lucide-react';
 
 function useStrings() {
   const { lang } = useLocale();
-  return CREATE_WEBSITE_STRINGS[lang];
+  return API_DEVELOPMENT_STRINGS[lang];
 }
 
-export default function CreateWebsite() {
+export default function ApiDevelopment() {
   return (
     <div className="bg-background text-foreground min-h-dvh">
       <TopNav />
@@ -73,8 +70,8 @@ function HeroSection() {
               variant="outline"
               className="border-primary/20 bg-primary/5 text-primary mb-8 px-4 py-2 text-sm font-medium"
             >
-              <Globe className="mr-2 h-4 w-4" />
-              Website Development
+              <Server className="mr-2 h-4 w-4" />
+              API Development
             </Badge>
           </motion.div>
 
@@ -107,7 +104,7 @@ function HeroSection() {
               </a>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href="#services">View Services</a>
+              <a href="#features">View Features</a>
             </Button>
           </motion.div>
         </div>
@@ -119,10 +116,10 @@ function HeroSection() {
 function TrustBadges() {
   const fadeUp = useFadeUp();
   const badges = [
-    { icon: Zap, label: 'Fast Delivery' },
-    { icon: Shield, label: 'Secure & Reliable' },
-    { icon: Clock, label: 'On-Time Guarantee' },
-    { icon: Sparkles, label: 'Modern Design' },
+    { icon: Clock, label: '24-48h Response' },
+    { icon: Shield, label: 'Secure APIs' },
+    { icon: MessageCircle, label: 'Free Consultation' },
+    { icon: Sparkles, label: 'Modern Standards' },
   ];
 
   return (
@@ -151,15 +148,15 @@ function FeaturesSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const icons = {
-    Palette: Palette,
-    Search: Search,
-    Smartphone: Smartphone,
-    Zap: Zap,
+  const iconMap: Record<string, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+    Globe,
+    GitBranch,
+    Shield,
+    FileText,
   };
 
   return (
-    <Section className="py-24 lg:py-32">
+    <Section id="features" className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
@@ -171,50 +168,39 @@ function FeaturesSection() {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {s.features.list.map(
-            (
-              feature: { title: string; description: string; icon: string },
-              i: number,
-            ) => {
-              const Icon = icons[feature.icon as keyof typeof icons] || Zap;
-              return (
-                <motion.div
-                  key={feature.title}
-                  {...fadeUp}
-                  transition={{ delay: i * 0.1 }}
-                  className={cn(
-                    'group border-foreground/20 hover:border-foreground/30 bg-card/50 relative rounded-xl border p-8 transition-all duration-300',
-                  )}
-                >
-                  <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl">
-                    <Icon className="h-6 w-6" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="mb-3 text-xl font-medium">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              );
-            },
-          )}
+          {s.features.list.map((feature: { title: string; description: string; icon?: string }, i: number) => {
+            const Icon = iconMap[feature.icon || ''] || Globe;
+            return (
+              <motion.div
+                key={feature.title}
+                {...fadeUp}
+                transition={{ delay: i * 0.1 }}
+                className={cn(
+                  'group border-foreground/20 hover:border-foreground/30 bg-card/50 relative rounded-xl border p-8 transition-all duration-300',
+                )}
+              >
+                <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl">
+                  <Icon className="h-6 w-6" strokeWidth={1.5} />
+                </div>
+                <h3 className="mb-3 text-xl font-medium">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </Section>
   );
 }
 
+
 function ServicesSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const services = [
-    { icon: Layout, ...s.services.list[0] },
-    { icon: Briefcase, ...s.services.list[1] },
-    { icon: ShoppingCart, ...s.services.list[2] },
-    { icon: User, ...s.services.list[3] },
-    { icon: Palette, ...s.services.list[4] },
-    { icon: Code2, ...s.services.list[5] },
-  ];
+  const icons = [Globe, Server, Lock, GitBranch, FileText, Zap];
 
   return (
     <Section id="services" className="bg-muted/30 py-24 lg:py-32">
@@ -228,58 +214,60 @@ function ServicesSection() {
           </p>
         </motion.div>
 
-        <div className="mx-auto max-w-5xl">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, i) => (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {s.services.list.map((service: { title: string; description: string }, i: number) => {
+            const Icon = icons[i] || Server;
+            return (
               <motion.div
                 key={service.title}
                 {...fadeUp}
                 transition={{ delay: i * 0.1 }}
-                className="border-border bg-card hover:border-foreground/30 group rounded-xl border p-8 transition-all duration-300"
+                className={cn(
+                  'group border-foreground/20 hover:border-foreground/30 bg-card relative rounded-xl border p-8 transition-all duration-300',
+                )}
               >
                 <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl">
-                  <service.icon className="h-6 w-6" strokeWidth={1.5} />
+                  <Icon className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h3 className="mb-3 text-lg font-medium">{service.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <h3 className="mb-3 text-xl font-medium">{service.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   {service.description}
                 </p>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </Section>
   );
 }
 
-
 function WorkflowSection() {
   const fadeUp = useFadeUp();
   const steps = [
     {
       number: '01',
-      title: 'Discovery',
+      title: 'API Design',
       description:
-        'We learn about your business, goals, and target audience to create the perfect strategy.',
+        'Define endpoints, data models, authentication, and create OpenAPI specifications.',
     },
     {
       number: '02',
-      title: 'Design',
+      title: 'Development',
       description:
-        'Our designers create stunning mockups that align with your brand identity.',
+        'Build secure, performant APIs with proper error handling and validation.',
     },
     {
       number: '03',
-      title: 'Development',
+      title: 'Testing',
       description:
-        'We build your website with clean code, optimized for speed and SEO.',
+        'Comprehensive testing including unit, integration, and load testing.',
     },
     {
       number: '04',
-      title: 'Launch',
+      title: 'Deployment',
       description:
-        'After thorough testing, we deploy your site and provide ongoing support.',
+        'Deploy with monitoring, rate limiting, and auto-generated documentation.',
     },
   ];
 
@@ -288,10 +276,10 @@ function WorkflowSection() {
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
-            Our Process
+            How It Works
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
-            A proven workflow that delivers results every time.
+            A structured approach to building your API.
           </p>
         </motion.div>
 
@@ -320,22 +308,23 @@ function WorkflowSection() {
   );
 }
 
+
 function PricingSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const starterFeatures = [
-    'Responsive Design',
-    'Basic SEO Setup',
-    'Contact Form',
-    '1 Week Delivery',
+  const hourlyFeatures = [
+    'Flexible scheduling',
+    'Direct communication',
+    'Detailed time tracking',
+    'No minimum hours',
   ];
 
-  const businessFeatures = [
-    'Advanced Design',
-    'Full SEO Optimization',
-    'CMS Integration',
-    'Priority Support',
+  const projectFeatures = [
+    'Complete API design',
+    'Full documentation',
+    'Security implementation',
+    'Deployment support',
   ];
 
   return (
@@ -351,31 +340,31 @@ function PricingSection() {
         </motion.div>
 
         <div className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-2">
-          {/* Starter */}
+          {/* Hourly Rate */}
           <motion.div
             {...fadeUp}
             className="border-foreground/20 bg-card relative overflow-hidden rounded-xl border p-8 lg:p-10"
           >
             <div className="mb-8">
               <h3 className="text-muted-foreground mb-2 text-sm font-medium tracking-wider uppercase">
-                {s.pricing.starter.title}
+                {s.pricing.hourly.title}
               </h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-medium tracking-tight">
-                  {s.pricing.starter.price}
+                  {s.pricing.hourly.price}
                 </span>
                 <span className="text-muted-foreground">
-                  {s.pricing.starter.unit}
+                  {s.pricing.hourly.unit}
                 </span>
               </div>
             </div>
 
             <p className="text-muted-foreground mb-8 text-lg">
-              {s.pricing.starter.description}
+              {s.pricing.hourly.description}
             </p>
 
             <ul className="mb-10 space-y-4">
-              {starterFeatures.map((feature) => (
+              {hourlyFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
                     <Check className="text-primary h-4 w-4" />
@@ -391,13 +380,13 @@ function PricingSection() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.pricing.starter.cta}
+                {s.pricing.hourly.cta}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
           </motion.div>
 
-          {/* Business */}
+          {/* Project-Based */}
           <motion.div
             {...fadeUp}
             className="bg-foreground text-background relative overflow-hidden rounded-xl p-8 lg:p-10"
@@ -408,24 +397,24 @@ function PricingSection() {
 
             <div className="mb-8">
               <h3 className="text-background/60 mb-2 text-sm font-medium tracking-wider uppercase">
-                {s.pricing.business.title}
+                {s.pricing.project.title}
               </h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-medium tracking-tight">
-                  {s.pricing.business.price}
+                  {s.pricing.project.price}
                 </span>
                 <span className="text-background/60">
-                  {s.pricing.business.unit}
+                  {s.pricing.project.unit}
                 </span>
               </div>
             </div>
 
             <p className="text-background/70 mb-8 text-lg">
-              {s.pricing.business.description}
+              {s.pricing.project.description}
             </p>
 
             <ul className="mb-10 space-y-4">
-              {businessFeatures.map((feature) => (
+              {projectFeatures.map((feature) => (
                 <li key={feature} className="flex items-center gap-3">
                   <div className="bg-background/10 flex h-6 w-6 items-center justify-center rounded-full">
                     <Check className="text-background h-4 w-4" />
@@ -441,14 +430,16 @@ function PricingSection() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.pricing.business.cta}
+                {s.pricing.project.cta}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
 
-            <p className="text-background/50 mt-6 text-center text-xs">
-              {s.pricing.business.note}
-            </p>
+            {s.pricing.project.note && (
+              <p className="text-background/50 mt-6 text-center text-xs">
+                {s.pricing.project.note}
+              </p>
+            )}
           </motion.div>
         </div>
       </div>

@@ -4,7 +4,9 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
   en: {
     links: {
       services: 'Services',
-      createWebsite: 'Website Development',
+      fullStackDevelopment: 'Full-Stack Development',
+      mobileAppDevelopment: 'Mobile App Development',
+      apiDevelopment: 'API Development',
       fixWebsite: 'Website Repair',
       aiIntegration: 'AI Solutions',
       instagramPost: 'Instagram Post Design',
@@ -14,7 +16,9 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       blog: 'Blog',
       pricing: 'About Me',
       descriptions: {
-        createWebsite: 'Custom websites built for your business.',
+        fullStackDevelopment: 'End-to-end web applications with modern technologies.',
+        mobileAppDevelopment: 'Native and cross-platform mobile apps for iOS and Android.',
+        apiDevelopment: 'Robust REST and GraphQL APIs for your applications.',
         fixWebsite: 'Fix, optimize, and enhance your existing site.',
         aiIntegration: 'AI chatbots, automation, and integrations.',
         instagramPost: 'Professional social media content design.',
@@ -28,7 +32,9 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
   id: {
     links: {
       services: 'Layanan',
-      createWebsite: 'Pengembangan Website',
+      fullStackDevelopment: 'Pengembangan Full-Stack',
+      mobileAppDevelopment: 'Pengembangan Aplikasi Mobile',
+      apiDevelopment: 'Pengembangan API',
       fixWebsite: 'Perbaikan Website',
       aiIntegration: 'Solusi AI',
       instagramPost: 'Desain Post Instagram',
@@ -38,7 +44,9 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       blog: 'Blog',
       pricing: 'Tentang saya',
       descriptions: {
-        createWebsite: 'Website kustom yang dibangun untuk bisnis Anda.',
+        fullStackDevelopment: 'Aplikasi web end-to-end dengan teknologi modern.',
+        mobileAppDevelopment: 'Aplikasi mobile native dan cross-platform untuk iOS dan Android.',
+        apiDevelopment: 'API REST dan GraphQL yang handal untuk aplikasi Anda.',
         fixWebsite: 'Perbaiki, optimalkan, dan tingkatkan situs Anda.',
         aiIntegration: 'Chatbot AI, otomatisasi, dan integrasi.',
         instagramPost: 'Desain konten media sosial profesional.',

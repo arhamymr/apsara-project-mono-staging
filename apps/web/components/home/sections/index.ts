@@ -7,6 +7,5 @@ export { Hero } from './Hero';
 export { Integrations } from './Integrations';
 export { OSShowcase } from './OSShowcase';
 export { Pricing } from './Pricing';
-export { Services } from './Services';
 export { Testimonials } from './Testimonials';
 export { TopNav } from './TopNav';

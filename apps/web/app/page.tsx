@@ -11,7 +11,6 @@ import {
   Integrations,
   OSShowcase,
   Pricing,
-  Services,
   TopNav,
 } from '@/components/home/sections';
 
@@ -26,7 +25,6 @@ export default function ApsaraLandingPage() {
         <OSShowcase />
         <Integrations />
         <Pricing />
-        <Services />
         <Blog />
         <CallToAction />
         <FAQ />
