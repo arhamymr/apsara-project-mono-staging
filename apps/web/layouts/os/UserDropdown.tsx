@@ -19,9 +19,9 @@ import { api } from '@/convex/_generated/api';
 
 export default function UserDropdown() {
 
-  const user = useQuery(api.auth.currentUser);
+  const user = useQuery(api.auth.getCurrentUser);
 
-  console.log(user, "use")
+  console.log(user, "useg")
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
