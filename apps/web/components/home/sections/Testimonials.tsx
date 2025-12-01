@@ -49,15 +49,14 @@ export function Testimonials() {
         className="grid gap-6 px-4 md:grid-cols-3 lg:gap-8"
       >
         {TESTIMONIALS.map((testimonial, index) => (
-          <MagicCard
+          <Card
             key={index}
             className="flex flex-col justify-between p-8 shadow-2xl"
-            gradientColor="#262626"
           >
             <div>
               <StarRow />
               <p className="text-muted-foreground mt-6 text-base leading-relaxed">
-                “{testimonial.quote}”
+                &quot;{testimonial.quote}&quot;
               </p>
             </div>
             <div className="mt-8 flex items-center gap-4">
@@ -77,7 +76,7 @@ export function Testimonials() {
                 </div>
               </div>
             </div>
-          </MagicCard>
+          </Card>
         ))}
       </motion.div>
     </Section>

@@ -62,25 +62,25 @@ export function TopNav() {
       label: s.topNav.links.services,
       children: [
         {
-          href: '/services/create-website',
+          href: '/create-website',
           label: s.topNav.links.createWebsite,
           description: s.topNav.links.descriptions.createWebsite,
           icon: Globe,
         },
         {
-          href: '/services/fix-website',
+          href: '/fix-website',
           label: s.topNav.links.fixWebsite,
           description: s.topNav.links.descriptions.fixWebsite,
           icon: Wrench,
         },
         {
-          href: '/services/integrasi-ai',
+          href: '/ai-integration',
           label: s.topNav.links.aiIntegration,
           description: s.topNav.links.descriptions.aiIntegration,
           icon: Bot,
         },
         {
-          href: '/services/instagram-post',
+          href: '/instagram-post',
           label: s.topNav.links.instagramPost,
           description: s.topNav.links.descriptions.instagramPost,
           icon: Image,
@@ -91,13 +91,13 @@ export function TopNav() {
       label: s.topNav.links.products,
       children: [
         {
-          href: '/#unified-platform',
+          href: '/unified-platform',
           label: s.topNav.links.unifiedPlatform,
           description: s.topNav.links.descriptions.unifiedPlatform,
           icon: LayoutDashboard,
         },
         {
-          href: '/products/digital',
+          href: '/digital-products',
           label: s.topNav.links.digitalProducts,
           description: s.topNav.links.descriptions.digitalProducts,
           icon: ShoppingBag,

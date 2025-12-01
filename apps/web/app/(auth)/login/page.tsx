@@ -6,15 +6,17 @@ import {
   GoogleSignInButton,
   LoginForm,
 } from '@/components/auth';
+import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Button } from '@workspace/ui/components/button';
 import { Toaster } from '@workspace/ui/components/sonner';
-import { StatusBanner } from '@workspace/ui/components/status-banner';
 import Link from 'next/link';
 
 export default function SignInPage() {
   return (
     <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-      <StatusBanner message="This page under development" />
+      <Alert className="absolute top-4 left-1/2 -translate-x-1/2 w-auto z-50">
+        <AlertDescription>This page under development</AlertDescription>
+      </Alert>
       <AuthBrandingPanel />
 
       <div className="flex items-center justify-center px-4 py-8 md:py-0">
