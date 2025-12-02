@@ -1,11 +1,11 @@
 'use client';
 
+import { useAuthActions } from '@convex-dev/auth/react';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -16,14 +16,19 @@ interface LoginFormData {
   remember: boolean;
 }
 
-export function LoginForm() {
-  const router = useRouter();
+interface LoginFormProps {
+  redirectTo?: string;
+}
+
+export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
+  const { signIn } = useAuthActions();
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setError,
   } = useForm<LoginFormData>({
     defaultValues: {
       email: '',
@@ -34,20 +39,21 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const formData = new FormData();
+      formData.set('email', data.email);
+      formData.set('password', data.password);
+      formData.set('flow', 'signIn');
+      formData.set('redirectTo', redirectTo);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+      await signIn('password', formData);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      
+      if (errorMessage.includes('Invalid credentials') || errorMessage.includes('password')) {
+        setError('password', { message: 'Invalid email or password' });
+      } else {
+        toast.error('Unable to sign in. Please check your credentials.');
       }
-
-      router.push('/dashboard');
-    } catch {
-      toast.error('Unable to sign in. Please check your credentials.');
       reset({ ...data, password: '' });
     }
   };

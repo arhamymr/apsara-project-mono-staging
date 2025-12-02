@@ -1,12 +1,12 @@
 'use client';
 
+import { useAuthActions } from '@convex-dev/auth/react';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Toaster } from '@workspace/ui/components/sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -19,7 +19,7 @@ interface RegisterFormData {
 }
 
 export default function SignUpPage() {
-  const router = useRouter();
+  const { signIn } = useAuthActions();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
@@ -27,6 +27,7 @@ export default function SignUpPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
+    setError,
   } = useForm<RegisterFormData>({
     defaultValues: {
       name: '',
@@ -40,21 +41,23 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const formData = new FormData();
+      formData.set('name', data.name);
+      formData.set('email', data.email);
+      formData.set('password', data.password);
+      formData.set('flow', 'signUp');
+      formData.set('redirectTo', '/dashboard');
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
-      }
-
+      await signIn('password', formData);
       toast.success('Account created successfully');
-      router.push('/verify-email');
-    } catch {
-      toast.error('Unable to create account. Please review the form.');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      
+      if (errorMessage.includes('already exists') || errorMessage.includes('email')) {
+        setError('email', { message: 'An account with this email already exists' });
+      } else {
+        toast.error('Unable to create account. Please review the form.');
+      }
     }
   };
 

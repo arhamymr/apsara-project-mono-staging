@@ -55,6 +55,6 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       },
     },
     signIn: 'Login',
-    cta: 'Mulai Sekarang',
+    cta: 'Get in Touch',
   },
 };
