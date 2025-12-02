@@ -1,6 +1,56 @@
 import type { Lang } from './types';
 
-export const API_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
+interface ApiDevelopmentStrings {
+  hero: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    whatsapp_message: string;
+  };
+  features: {
+    title: string;
+    subtitle: string;
+    list: Array<{
+      title: string;
+      description: string;
+      icon?: string;
+    }>;
+  };
+  services: {
+    title: string;
+    subtitle: string;
+    list: Array<{
+      title: string;
+      description: string;
+    }>;
+  };
+  pricing: {
+    title: string;
+    subtitle: string;
+    hourly: {
+      title: string;
+      price: string;
+      unit: string;
+      description: string;
+      cta: string;
+    };
+    project: {
+      title: string;
+      price: string;
+      unit: string;
+      description: string;
+      cta: string;
+      note?: string;
+    };
+  };
+  cta: {
+    title: string;
+    subtitle: string;
+    button: string;
+  };
+}
+
+export const API_DEVELOPMENT_STRINGS: Record<Lang, ApiDevelopmentStrings> = {
   en: {
     hero: {
       title: 'API Development & Integration',

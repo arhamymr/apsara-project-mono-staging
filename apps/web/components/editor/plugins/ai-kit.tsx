@@ -11,9 +11,6 @@ import {
 import { getPluginType, KEYS, PathApi } from 'platejs';
 import { usePluginOption } from 'platejs/react';
 
-import { AILoadingBar, AIMenu } from '@workspace/ui/components/ai-menu';
-import { AIAnchorElement, AILeaf } from '@workspace/ui/components/ai-node';
-
 import { useChat } from '../use-chat';
 import { CursorOverlayKit } from './cursor-overlay-kit';
 import { MarkdownKit } from './markdown-kit';
@@ -25,11 +22,6 @@ export const aiChatPlugin: any = AIChatPlugin.extend({
       api: '/api/ai/command',
       body: {},
     },
-  },
-  render: {
-    afterContainer: AILoadingBar,
-    afterEditable: AIMenu,
-    node: AIAnchorElement,
   },
   shortcuts: { show: { keys: 'mod+j' } },
   useHooks: ({ editor, getOption }) => {
@@ -96,6 +88,6 @@ export const aiChatPlugin: any = AIChatPlugin.extend({
 export const AIKit = [
   ...CursorOverlayKit,
   ...MarkdownKit,
-  AIPlugin.withComponent(AILeaf),
+  AIPlugin,
   aiChatPlugin,
 ];

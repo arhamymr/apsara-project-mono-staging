@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CategorySelect } from '@/components/category-select';
 import { ImageUpload } from '@/components/image-upload';
-import TextEditor from '@/components/text-editor';
+import TextEditor from '@/components/texteditor';
 import {
   Form,
   FormControl,
@@ -77,13 +77,12 @@ const ArticleForm = ({ form }: { form: UseFormReturn<ArticleFormData> }) => {
           <FormField
             control={form.control}
             name="description"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
                   <div className="border-border bg-card rounded-md border">
-                    {/* If your editor supports className, pass it through */}
-                    <TextEditor value={field.value} onChange={field.onChange} />
+                    <TextEditor />
                   </div>
                 </FormControl>
                 <FormMessage />

@@ -15,7 +15,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       pricing: 'About Me',
       descriptions: {
         fullStackDevelopment: 'End-to-end web applications with modern technologies.',
-        mobileAppDevelopment: 'Native and cross-platform mobile apps for iOS and Android.',
+        mobileAppDevelopment: 'Cross-platform React Native apps for iOS and Android with native performance.',
         apiDevelopment: 'Robust REST and GraphQL APIs for your applications.',
         fixWebsite: 'Fix, optimize, and enhance your existing site.',
         aiIntegration: 'AI chatbots, automation, and integrations.',
@@ -39,7 +39,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       pricing: 'Tentang saya',
       descriptions: {
         fullStackDevelopment: 'Aplikasi web end-to-end dengan teknologi modern.',
-        mobileAppDevelopment: 'Aplikasi mobile native dan cross-platform untuk iOS dan Android.',
+        mobileAppDevelopment: 'Aplikasi React Native cross-platform untuk iOS dan Android dengan performa native.',
         apiDevelopment: 'API REST dan GraphQL yang handal untuk aplikasi Anda.',
         fixWebsite: 'Perbaiki, optimalkan, dan tingkatkan situs Anda.',
         aiIntegration: 'Chatbot AI, otomatisasi, dan integrasi.',

@@ -38,7 +38,7 @@ export default function NotFound() {
             >
               <span className="bg-destructive h-2 w-2 rounded-full" />
               <Badge variant="outline" className="text-muted-foreground uppercase tracking-wider">
-                404 Error. Page not Found
+                Page Not Found
               </Badge>
             </motion.div>
 
@@ -49,7 +49,7 @@ export default function NotFound() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-foreground mb-10 text-3xl font-normal leading-tight tracking-tight md:text-4xl lg:text-5xl"
             >
-              If you&apos;re reading this, something has gone terribly, terribly wrong.
+              Oops! The page you&apos;re looking for doesn&apos;t exist or has been moved.
             </motion.h1>
 
             {/* CTA Button */}

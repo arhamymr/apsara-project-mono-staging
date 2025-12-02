@@ -1,4 +1,3 @@
-import { MarkdownContent } from '@workspace/ui/components/markdown-content';
 import type { AgentMessage } from '@/types/agent';
 import {
   Eye,
@@ -61,11 +60,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         }`}
       >
         <div className="text-xs">
-          {isUser ? (
-            <p className="whitespace-pre-wrap">{message.content}</p>
-          ) : (
-            <MarkdownContent content={message.content} />
-          )}
+          <p className="whitespace-pre-wrap">{message.content}</p>
         </div>
 
         {/* Tool Calls Display */}

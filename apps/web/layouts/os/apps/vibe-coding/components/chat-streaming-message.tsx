@@ -1,4 +1,3 @@
-import { MarkdownContent } from '@workspace/ui/components/markdown-content';
 import { Loader2, Wrench } from 'lucide-react';
 
 interface ChatStreamingMessageProps {
@@ -20,7 +19,7 @@ export function ChatStreamingMessage({
       </div>
       <div className="bg-muted text-foreground max-w-[70%] rounded-lg px-4 py-2">
         <div className="text-sm">
-          <MarkdownContent content={displayContent} />
+          <p className="whitespace-pre-wrap">{displayContent}</p>
         </div>
 
         {/* Active Tools Display */}

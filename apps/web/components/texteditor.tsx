@@ -2,14 +2,10 @@ import type { Value } from 'platejs';
 
 import { Plate, usePlateEditor } from 'platejs/react';
 
-import { Editor, EditorContainer } from '@workspace/ui/components/editor';
-import { FixedToolbar } from '@workspace/ui/components/fixed-toolbar';
-import { MarkToolbarButton } from '@workspace/ui/components/mark-toolbar-button';
-
+import { Button } from '@workspace/ui/components/button';
 import { BasicBlocksKit } from '@/components/editor/plugins/basic-blocks-kit';
-import { ToolbarButton } from '@workspace/ui/components/toolbar';
 import { AIKit } from './editor/plugins/ai-kit';
-import { AIToolbarButton } from './ui/ai-toolbar-button';
+import { cn } from '@/lib/utils';
 
 const initialValue: Value = [
   {
@@ -50,40 +46,38 @@ export default function App() {
           );
         }}
       >
-        <FixedToolbar className="flex justify-start gap-1 rounded-t-lg">
-          <AIToolbarButton>AI Assistant</AIToolbarButton>
-          <ToolbarButton onClick={() => editor.tf.h1.toggle()}>
+        <div className="flex justify-start gap-1 rounded-t-lg border-b p-2">
+          <Button variant="ghost" size="sm" onClick={() => editor.tf.h1.toggle()}>
             H1
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.tf.h2.toggle()}>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => editor.tf.h2.toggle()}>
             H2
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.tf.h3.toggle()}>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => editor.tf.h3.toggle()}>
             H3
-          </ToolbarButton>
-          <ToolbarButton onClick={() => editor.tf.blockquote.toggle()}>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => editor.tf.blockquote.toggle()}>
             Quote
-          </ToolbarButton>
-          <MarkToolbarButton nodeType="bold" tooltip="Bold (⌘+B)">
-            B
-          </MarkToolbarButton>
-          <MarkToolbarButton nodeType="italic" tooltip="Italic (⌘+I)">
-            I
-          </MarkToolbarButton>
-          <MarkToolbarButton nodeType="underline" tooltip="Underline (⌘+U)">
-            U
-          </MarkToolbarButton>
+          </Button>
           <div className="flex-1" />
-          <ToolbarButton
-            className="px-2"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => editor.tf.setValue(initialValue)}
           >
             Reset
-          </ToolbarButton>
-        </FixedToolbar>
-        <EditorContainer>
-          <Editor placeholder="Type your amazing content here..." />
-        </EditorContainer>
+          </Button>
+        </div>
+        <div className="p-4">
+          <div
+            className={cn(
+              'relative w-full overflow-x-auto',
+              '[&_.slate-SelectionArea]:border [&_.slate-SelectionArea]:border-primary [&_.slate-SelectionArea]:bg-primary/10'
+            )}
+          >
+            <div className="min-h-[200px] w-full" />
+          </div>
+        </div>
       </Plate>
     </div>
   );

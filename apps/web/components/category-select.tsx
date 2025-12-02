@@ -22,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormDescription, FormItem } from './ui/form';
+import { FormDescription, FormItem } from '@workspace/ui/components/form';
 
 interface Category {
   id: string | number;

@@ -1,6 +1,30 @@
 import type { Lang } from './types';
 
-export const SERVICES_STRINGS: Record<Lang, unknown> = {
+interface ServicesStrings {
+  hero: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    whatsapp_message: string;
+  };
+  overview: {
+    title: string;
+    subtitle: string;
+  };
+  serviceCards: Array<{
+    title: string;
+    description: string;
+    href: string;
+    icon: string;
+  }>;
+  cta: {
+    title: string;
+    subtitle: string;
+    button: string;
+  };
+}
+
+export const SERVICES_STRINGS: Record<Lang, ServicesStrings> = {
   en: {
     hero: {
       title: 'Our Services',

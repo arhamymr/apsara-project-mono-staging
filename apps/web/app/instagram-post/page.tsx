@@ -2,7 +2,7 @@
 
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Footer, TopNav } from '@/components/home/sections';
+import { CallToAction, Footer, TopNav } from '@/components/home/sections';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
@@ -21,10 +21,12 @@ import {
 
 function useStrings() {
   const { lang } = useLocale();
-  return INSTAGRAM_POST_STRINGS[lang];
+  return INSTAGRAM_POST_STRINGS[lang as keyof typeof INSTAGRAM_POST_STRINGS];
 }
 
 export default function InstagramPost() {
+  const s = useStrings();
+
   return (
     <div className="bg-background text-foreground min-h-dvh">
       <TopNav />
@@ -34,7 +36,13 @@ export default function InstagramPost() {
         <FeaturesSection />
         <ServicesSection />
         <PricingSection />
-        <CTASection />
+        <CallToAction
+          title={s.cta.title}
+          subtitle={s.cta.subtitle}
+          buttonText={s.cta.button}
+          whatsappMessage={s.hero.whatsapp_message}
+          icon={Sparkles}
+        />
       </main>
       <Footer />
     </div>
@@ -343,45 +351,4 @@ function PricingSection() {
   );
 }
 
-function CTASection() {
-  const s = useStrings();
-  const fadeUp = useFadeUp();
 
-  return (
-    <Section className="py-24 lg:py-32">
-      <div className="container mx-auto px-4">
-        <motion.div
-          {...fadeUp}
-          className="bg-primary relative mx-auto max-w-4xl overflow-hidden rounded-xl px-8 py-16 text-center md:px-16 md:py-24"
-        >
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -right-24 -bottom-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-          </div>
-
-          <div className="relative z-10">
-            <Sparkles className="text-primary-foreground/80 mx-auto mb-8 h-12 w-12" />
-            <h2 className="text-primary-foreground text-3xl font-normal tracking-tight md:text-5xl">
-              {s.cta.title}
-            </h2>
-            <p className="text-primary-foreground/80 mx-auto mt-6 max-w-xl text-lg">
-              {s.cta.subtitle}
-            </p>
-            <div className="mt-10">
-              <Button size="lg" variant="secondary" asChild>
-                <a
-                  href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.cta.button}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </Section>
-  );
-}

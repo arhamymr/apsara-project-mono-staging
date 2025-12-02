@@ -1,146 +1,63 @@
 import type { Lang } from './types';
+import type { TemplateStrings } from '@/components/templates/types';
 
-export const TEMPLATES_STRINGS: Record<Lang, any> = {
+export const TEMPLATES_STRINGS: Record<Lang, TemplateStrings> = {
   en: {
     hero: {
-      title: 'Premium Templates & Design Assets',
-      subtitle:
-        'Professionally crafted templates to accelerate your projects. Save time and launch faster with ready-to-use designs.',
-      cta: 'Browse Templates',
-      whatsapp_message: 'Hi, I am interested in your templates and design assets.',
+      title: 'Templates',
+      subtitle: 'Browse our collection of professionally crafted templates.',
     },
-    categories: {
-      title: 'Template Categories',
-      subtitle: 'Find the perfect template for your next project.',
-      list: [
-        {
-          title: 'Landing Pages',
-          description: 'High-converting landing page templates for startups and businesses.',
-          icon: 'Globe',
-          count: 'Coming Soon',
-        },
-        {
-          title: 'Dashboard UI',
-          description: 'Admin panels and dashboard templates with modern components.',
-          icon: 'Layers',
-          count: 'Coming Soon',
-        },
-        {
-          title: 'E-Commerce',
-          description: 'Online store templates with cart, checkout, and product pages.',
-          icon: 'ShoppingBag',
-          count: 'Coming Soon',
-        },
-        {
-          title: 'Portfolio',
-          description: 'Showcase your work with stunning portfolio templates.',
-          icon: 'Briefcase',
-          count: 'Coming Soon',
-        },
-      ],
-    },
-    features: {
-      title: 'Why Choose Our Templates',
-      subtitle: 'Built with modern technologies and best practices.',
-      list: [
-        {
-          title: 'Modern Tech Stack',
-          description: 'Built with Next.js, React, TypeScript, and Tailwind CSS.',
-          icon: 'Code2',
-        },
-        {
-          title: 'Fully Responsive',
-          description: 'Looks great on all devices from mobile to desktop.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Easy Customization',
-          description: 'Well-organized code that is easy to modify and extend.',
-          icon: 'Settings',
-        },
-        {
-          title: 'Regular Updates',
-          description: 'Continuous improvements and new features added regularly.',
-          icon: 'RefreshCw',
-        },
-      ],
-    },
-    cta: {
+    requestCard: {
       title: 'Need a Custom Template?',
-      subtitle:
-        "Can't find what you're looking for? Let's create a custom template tailored to your needs.",
-      button: 'Contact Me',
+      description: 'Let us create a unique template tailored to your specific needs.',
+      button: 'Request Custom Template',
+      whatsappMessage: 'Hi, I would like to request a custom template.',
+    },
+    modal: {
+      download: 'Download Assets (ZIP)',
+      openPreview: 'Open Preview',
+      copyLink: 'Copy Link',
+      linkCopied: 'Link copied!',
+      previewUnavailable: 'Preview unavailable — open in new tab',
+      author: 'Author',
+      category: 'Category',
+      fileSize: 'File Size',
+      license: 'License',
+    },
+    empty: 'No templates yet. Try refreshing or check back later.',
+    licenses: {
+      free: 'Free',
+      premium: 'Premium',
+      commercial: 'Commercial',
     },
   },
   id: {
     hero: {
-      title: 'Template & Aset Desain Premium',
-      subtitle:
-        'Template profesional untuk mempercepat proyek Anda. Hemat waktu dan luncurkan lebih cepat dengan desain siap pakai.',
-      cta: 'Lihat Template',
-      whatsapp_message: 'Halo, saya tertarik dengan template dan aset desain Anda.',
+      title: 'Template',
+      subtitle: 'Jelajahi koleksi template profesional kami.',
     },
-    categories: {
-      title: 'Kategori Template',
-      subtitle: 'Temukan template yang sempurna untuk proyek Anda.',
-      list: [
-        {
-          title: 'Landing Page',
-          description: 'Template landing page dengan konversi tinggi untuk startup dan bisnis.',
-          icon: 'Globe',
-          count: 'Segera Hadir',
-        },
-        {
-          title: 'Dashboard UI',
-          description: 'Template panel admin dan dashboard dengan komponen modern.',
-          icon: 'Layers',
-          count: 'Segera Hadir',
-        },
-        {
-          title: 'E-Commerce',
-          description: 'Template toko online dengan keranjang, checkout, dan halaman produk.',
-          icon: 'ShoppingBag',
-          count: 'Segera Hadir',
-        },
-        {
-          title: 'Portfolio',
-          description: 'Tampilkan karya Anda dengan template portfolio yang memukau.',
-          icon: 'Briefcase',
-          count: 'Segera Hadir',
-        },
-      ],
-    },
-    features: {
-      title: 'Mengapa Pilih Template Kami',
-      subtitle: 'Dibangun dengan teknologi modern dan praktik terbaik.',
-      list: [
-        {
-          title: 'Tech Stack Modern',
-          description: 'Dibangun dengan Next.js, React, TypeScript, dan Tailwind CSS.',
-          icon: 'Code2',
-        },
-        {
-          title: 'Fully Responsive',
-          description: 'Tampil sempurna di semua perangkat dari mobile hingga desktop.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Mudah Dikustomisasi',
-          description: 'Kode terorganisir dengan baik, mudah dimodifikasi dan dikembangkan.',
-          icon: 'Settings',
-        },
-        {
-          title: 'Update Berkala',
-          description: 'Perbaikan berkelanjutan dan fitur baru ditambahkan secara rutin.',
-          icon: 'RefreshCw',
-        },
-      ],
-    },
-    cta: {
+    requestCard: {
       title: 'Butuh Template Kustom?',
-      subtitle:
-        'Tidak menemukan yang Anda cari? Mari buat template kustom sesuai kebutuhan Anda.',
-      button: 'Hubungi Saya',
+      description: 'Kami dapat membuat template unik sesuai kebutuhan spesifik Anda.',
+      button: 'Minta Template Kustom',
+      whatsappMessage: 'Halo, saya ingin meminta template kustom.',
+    },
+    modal: {
+      download: 'Unduh Aset (ZIP)',
+      openPreview: 'Buka Pratinjau',
+      copyLink: 'Salin Tautan',
+      linkCopied: 'Tautan disalin!',
+      previewUnavailable: 'Pratinjau tidak tersedia — buka di tab baru',
+      author: 'Pembuat',
+      category: 'Kategori',
+      fileSize: 'Ukuran File',
+      license: 'Lisensi',
+    },
+    empty: 'Belum ada template. Coba refresh atau kembali lagi nanti.',
+    licenses: {
+      free: 'Gratis',
+      premium: 'Premium',
+      commercial: 'Komersial',
     },
   },
 };

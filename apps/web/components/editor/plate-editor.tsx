@@ -6,9 +6,9 @@ import { createContext, useContext } from 'react';
 
 import { EditorKit } from '@/components/editor/editor-kit';
 import { SettingsDialog } from '@/components/editor/settings-dialog';
-import { Editor, EditorContainer } from '@workspace/ui/components/editor';
 import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
 import { normalizeNodeId } from 'platejs';
+import { cn } from '@/lib/utils';
 
 // Create context for portal container
 const EditorPortalContext = createContext<HTMLElement | undefined>(undefined);
@@ -32,17 +32,17 @@ export function PlateEditor({
   const portalRef = useWindowPortalContainer();
   const portalContainer = portalRef?.current ?? undefined;
 
-  // editor.onChange = () => {
-  //   const { value } = editor;
-  //   onChange?.(value);
-  // };
-
   return (
     <EditorPortalContext.Provider value={portalContainer}>
       <Plate editor={editor}>
-        <EditorContainer>
-          <Editor variant="fullWidth" />
-        </EditorContainer>
+        <div
+          className={cn(
+            'relative w-full overflow-x-auto',
+            '[&_.slate-SelectionArea]:border [&_.slate-SelectionArea]:border-primary [&_.slate-SelectionArea]:bg-primary/10'
+          )}
+        >
+          <div className="min-h-[500px] w-full p-4" />
+        </div>
         <SettingsDialog />
       </Plate>
     </EditorPortalContext.Provider>

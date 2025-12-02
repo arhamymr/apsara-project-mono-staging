@@ -2,7 +2,7 @@
 
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Footer, TopNav } from '@/components/home/sections';
+import { CallToAction, Footer, TopNav } from '@/components/home/sections';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
@@ -16,7 +16,6 @@ import {
   Layers,
   MessageCircle,
   Palette,
-  Rocket,
   Server,
   Shield,
   Smartphone,
@@ -28,10 +27,12 @@ import {
 
 function useStrings() {
   const { lang } = useLocale();
-  return MOBILE_APP_DEVELOPMENT_STRINGS[lang];
+  return MOBILE_APP_DEVELOPMENT_STRINGS[lang as keyof typeof MOBILE_APP_DEVELOPMENT_STRINGS];
 }
 
 export default function MobileAppDevelopment() {
+  const s = useStrings();
+
   return (
     <div className="bg-background text-foreground min-h-dvh">
       <TopNav />
@@ -42,7 +43,12 @@ export default function MobileAppDevelopment() {
         <ServicesSection />
         <WorkflowSection />
         <PricingSection />
-        <CTASection />
+        <CallToAction
+          title={s.cta.title}
+          subtitle={s.cta.subtitle}
+          buttonText={s.cta.button}
+          whatsappMessage={s.hero.whatsapp_message}
+        />
       </main>
       <Footer />
     </div>
@@ -149,7 +155,7 @@ function FeaturesSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const iconMap: Record<string, any> = {
+  const iconMap: Record<string, unknown> = {
     Smartphone,
     Layers,
     Store,
@@ -168,8 +174,8 @@ function FeaturesSection() {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {s.features.list.map((feature: any, i: number) => {
-            const Icon = iconMap[feature.icon] || Smartphone;
+          {s.features.list.map((feature: { title: string; description: string; icon?: string }, i: number) => {
+            const Icon = iconMap[feature.icon || ''] || Smartphone;
             return (
               <motion.div
                 key={feature.title}
@@ -214,7 +220,7 @@ function ServicesSection() {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {s.services.list.map((service: unknown, i: number) => {
+          {s.services.list.map((service: { title: string; description: string }, i: number) => {
             const Icon = icons[i] || Smartphone;
             return (
               <motion.div
@@ -445,45 +451,4 @@ function PricingSection() {
   );
 }
 
-function CTASection() {
-  const s = useStrings();
-  const fadeUp = useFadeUp();
 
-  return (
-    <Section className="py-24 lg:py-32">
-      <div className="container mx-auto px-4">
-        <motion.div
-          {...fadeUp}
-          className="bg-primary relative mx-auto max-w-4xl overflow-hidden rounded-xl px-8 py-16 text-center md:px-16 md:py-24"
-        >
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -right-24 -bottom-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-          </div>
-
-          <div className="relative z-10">
-            <Rocket className="text-primary-foreground/80 mx-auto mb-8 h-12 w-12" />
-            <h2 className="text-primary-foreground text-3xl font-normal tracking-tight md:text-5xl">
-              {s.cta.title}
-            </h2>
-            <p className="text-primary-foreground/80 mx-auto mt-6 max-w-xl text-lg">
-              {s.cta.subtitle}
-            </p>
-            <div className="mt-10">
-              <Button size="lg" variant="secondary" asChild>
-                <a
-                  href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.cta.button}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </Section>
-  );
-}

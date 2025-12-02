@@ -2,7 +2,7 @@
 
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Footer, TopNav } from '@/components/home/sections';
+import { CallToAction, Footer, TopNav } from '@/components/home/sections';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
@@ -20,35 +20,131 @@ import {
   Layers,
   Lock,
   MessageCircle,
-  Rocket,
   Server,
   Shield,
   Sparkles,
   Zap,
+  type LucideIcon,
 } from 'lucide-react';
 
-function useStrings() {
-  const { lang } = useLocale();
-  return FULL_STACK_DEVELOPMENT_STRINGS[lang];
+// Types
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
 }
 
+interface Service {
+  title: string;
+  description: string;
+}
+
+interface TechItem {
+  name: string;
+  category: string;
+}
+
+interface PricingTier {
+  title: string;
+  price: string;
+  unit: string;
+  description: string;
+  cta: string;
+  note?: string;
+}
+
+interface Strings {
+  hero: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    whatsapp_message: string;
+  };
+  features: {
+    title: string;
+    subtitle: string;
+    list: Feature[];
+  };
+  services: {
+    title: string;
+    subtitle: string;
+    list: Service[];
+  };
+  pricing: {
+    title: string;
+    subtitle: string;
+    hourly: PricingTier;
+    project: PricingTier;
+  };
+  techStack: {
+    title: string;
+    subtitle: string;
+    list: TechItem[];
+  };
+  cta: {
+    title: string;
+    subtitle: string;
+    button: string;
+  };
+}
+
+function useStrings(): Strings {
+  const { lang } = useLocale();
+  return FULL_STACK_DEVELOPMENT_STRINGS[lang] as Strings;
+}
+
+// Icon maps
+const featureIconMap: Record<string, LucideIcon> = {
+  Code2,
+  Server,
+  Database,
+  Cloud,
+};
+
+const serviceIcons: LucideIcon[] = [Globe, Server, Database, Lock, Layers, Zap];
+
+// Tech stack icons as simple text badges with colors
+const techColors: Record<string, string> = {
+  React: 'bg-cyan-500/10 text-cyan-600',
+  TypeScript: 'bg-blue-500/10 text-blue-600',
+  JavaScript: 'bg-yellow-500/10 text-yellow-600',
+  'Tailwind CSS': 'bg-teal-500/10 text-teal-600',
+  'shadcn/ui': 'bg-zinc-500/10 text-zinc-600',
+  Expo: 'bg-violet-500/10 text-violet-600',
+  Go: 'bg-sky-500/10 text-sky-600',
+  Laravel: 'bg-red-500/10 text-red-600',
+  Svelte: 'bg-orange-500/10 text-orange-600',
+  'Inertia.js': 'bg-purple-500/10 text-purple-600',
+  Figma: 'bg-pink-500/10 text-pink-600',
+  'AI Integration': 'bg-emerald-500/10 text-emerald-600',
+};
+
 export default function FullStackDevelopment() {
+  const s = useStrings();
+
   return (
     <div className="bg-background text-foreground min-h-dvh">
       <TopNav />
       <main id="main-content">
         <HeroSection />
         <TrustBadges />
+        <TechStackMarquee />
         <FeaturesSection />
         <ServicesSection />
         <WorkflowSection />
         <PricingSection />
-        <CTASection />
+        <CallToAction
+          title={s.cta.title}
+          subtitle={s.cta.subtitle}
+          buttonText={s.cta.button}
+          whatsappMessage={s.hero.whatsapp_message}
+        />
       </main>
       <Footer />
     </div>
   );
 }
+
 
 function HeroSection() {
   const s = useStrings();
@@ -146,16 +242,69 @@ function TrustBadges() {
   );
 }
 
-function FeaturesSection() {
+function TechStackMarquee() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const iconMap: Record<string, any> = {
-    Code2,
-    Server,
-    Database,
-    Cloud,
-  };
+  const techItems = s.techStack.list;
+  const duplicatedItems = [...techItems, ...techItems];
+
+  return (
+    <Section className="py-16 lg:py-20 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
+          <h2 className="text-2xl font-normal tracking-tight md:text-3xl">
+            {s.techStack.title}
+          </h2>
+          <p className="text-muted-foreground mt-4 text-base">
+            {s.techStack.subtitle}
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="relative">
+        <div className="from-background via-transparent to-background pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r" />
+        <div className="from-background via-transparent to-background pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l" />
+
+        <motion.div
+          className="flex gap-6"
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: 'loop',
+              duration: 25,
+              ease: 'linear',
+            },
+          }}
+        >
+          {duplicatedItems.map((tech, i) => {
+            const colorClass = techColors[tech.name] || 'bg-primary/10 text-primary';
+            return (
+              <div
+                key={`${tech.name}-${i}`}
+                className="flex-shrink-0 flex items-center gap-3 px-5 py-3 rounded-xl border border-foreground/10 bg-card/50 hover:border-foreground/20 transition-colors"
+              >
+                <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg', colorClass)}>
+                  {tech.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{tech.name}</p>
+                  <p className="text-muted-foreground text-xs">{tech.category}</p>
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </Section>
+  );
+}
+
+
+function FeaturesSection() {
+  const s = useStrings();
+  const fadeUp = useFadeUp();
 
   return (
     <Section id="features" className="py-24 lg:py-32">
@@ -170,8 +319,8 @@ function FeaturesSection() {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {s.features.list.map((feature: any, i: number) => {
-            const Icon = iconMap[feature.icon] || Code2;
+          {s.features.list.map((feature, i) => {
+            const Icon = featureIconMap[feature.icon] || Code2;
             return (
               <motion.div
                 key={feature.title}
@@ -197,12 +346,9 @@ function FeaturesSection() {
   );
 }
 
-
 function ServicesSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
-
-  const icons = [Globe, Server, Database, Lock, Layers, Zap];
 
   return (
     <Section id="services" className="bg-muted/30 py-24 lg:py-32">
@@ -217,8 +363,8 @@ function ServicesSection() {
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {s.services.list.map((service: unknown, i: number) => {
-            const Icon = icons[i] || Code2;
+          {s.services.list.map((service, i) => {
+            const Icon = serviceIcons[i] || Code2;
             return (
               <motion.div
                 key={service.title}
@@ -444,49 +590,6 @@ function PricingSection() {
             )}
           </motion.div>
         </div>
-      </div>
-    </Section>
-  );
-}
-
-function CTASection() {
-  const s = useStrings();
-  const fadeUp = useFadeUp();
-
-  return (
-    <Section className="py-24 lg:py-32">
-      <div className="container mx-auto px-4">
-        <motion.div
-          {...fadeUp}
-          className="bg-primary relative mx-auto max-w-4xl overflow-hidden rounded-xl px-8 py-16 text-center md:px-16 md:py-24"
-        >
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -right-24 -bottom-24 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-          </div>
-
-          <div className="relative z-10">
-            <Rocket className="text-primary-foreground/80 mx-auto mb-8 h-12 w-12" />
-            <h2 className="text-primary-foreground text-3xl font-normal tracking-tight md:text-5xl">
-              {s.cta.title}
-            </h2>
-            <p className="text-primary-foreground/80 mx-auto mt-6 max-w-xl text-lg">
-              {s.cta.subtitle}
-            </p>
-            <div className="mt-10">
-              <Button size="lg" variant="secondary" asChild>
-                <a
-                  href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.cta.button}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </Section>
   );

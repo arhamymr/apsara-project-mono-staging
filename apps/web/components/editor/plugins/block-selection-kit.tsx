@@ -4,8 +4,6 @@ import { AIChatPlugin } from '@platejs/ai/react';
 import { BlockSelectionPlugin } from '@platejs/selection/react';
 import { getPluginTypes, isHotkey, KEYS } from 'platejs';
 
-import { BlockSelection } from '@workspace/ui/components/block-selection';
-
 export const BlockSelectionKit = [
   BlockSelectionPlugin.configure(({ editor }) => ({
     options: {
@@ -21,14 +19,6 @@ export const BlockSelectionKit = [
         if (isHotkey('mod+j')(e)) {
           editor.getApi(AIChatPlugin).aiChat.show();
         }
-      },
-    },
-    render: {
-      belowRootNodes: (props) => {
-        if (!props.attributes.className?.includes('slate-selectable'))
-          return null;
-
-        return <BlockSelection {...(props as any)} />;
       },
     },
   })),

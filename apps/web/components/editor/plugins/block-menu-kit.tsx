@@ -2,13 +2,9 @@
 
 import { BlockMenuPlugin } from '@platejs/selection/react';
 
-import { BlockContextMenu } from '@workspace/ui/components/block-context-menu';
-
 import { BlockSelectionKit } from './block-selection-kit';
 
 export const BlockMenuKit = [
   ...BlockSelectionKit,
-  BlockMenuPlugin.configure({
-    render: { aboveEditable: BlockContextMenu },
-  }),
+  BlockMenuPlugin,
 ];
