@@ -174,7 +174,7 @@ function TagChips({
           className={cn(base, value === t ? active : idle)}
           aria-pressed={value === t}
         >
-          {t[0].toUpperCase() + t.slice(1)}
+          {t[0]?.toUpperCase() + t.slice(1)}
         </button>
       ))}
     </div>

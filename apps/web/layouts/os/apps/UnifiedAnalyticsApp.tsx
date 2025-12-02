@@ -453,7 +453,7 @@ export default function UnifiedAnalyticsApp() {
                   >
                     <div
                       className="w-full rounded-t bg-green-500"
-                      style={{ height: `${(point.visits / 150) * 100}%` }}
+                      style={{ height: `${((point.visits ?? 0) / 150) * 100}%` }}
                     />
                     <div className="text-muted-foreground mt-1 text-[10px]">
                       {point.label}
