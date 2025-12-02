@@ -20,7 +20,8 @@ export const ListKit = [
       ],
     },
     render: {
-      belowNodes: BlockList,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      belowNodes: BlockList as any,
     },
   }),
 ];

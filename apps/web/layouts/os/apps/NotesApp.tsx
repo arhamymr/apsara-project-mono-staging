@@ -311,10 +311,11 @@ export default function NotesApp() {
     let pos = 0;
     let newContent = '';
     for (let i = 0; i < lines.length; i++) {
+      const line = lines[i] ?? '';
       const lineStart = pos;
-      const lineEnd = pos + lines[i].length;
+      const lineEnd = pos + line.length;
       const within = !(end < lineStart || start > lineEnd + 1);
-      newContent += within ? prefix + lines[i] : lines[i];
+      newContent += within ? prefix + line : line;
       if (i < lines.length - 1) newContent += '\n';
       pos = lineEnd + 1;
     }
@@ -703,8 +704,9 @@ export default function NotesApp() {
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code({ inline, className, children, ...props }) {
-                          return inline ? (
+                        code({ className, children, ...props }) {
+                          const isInline = !className?.includes('language-');
+                          return isInline ? (
                             <code
                               className="rounded bg-white/10 px-1 py-0.5 text-[0.85em]"
                               {...props}
@@ -714,9 +716,8 @@ export default function NotesApp() {
                           ) : (
                             <pre
                               className="overflow-x-auto rounded-md border border-white/10 bg-black/40 p-3 text-[0.85em]"
-                              {...props}
                             >
-                              <code>{children}</code>
+                              <code className={className} {...props}>{children}</code>
                             </pre>
                           );
                         },

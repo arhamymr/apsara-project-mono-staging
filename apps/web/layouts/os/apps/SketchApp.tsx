@@ -5,8 +5,18 @@ import axios from 'axios';
 import { FolderOpen, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+type Tool =
+  | 'select'
+  | 'pen'
+  | 'line'
+  | 'rectangle'
+  | 'circle'
+  | 'arrow'
+  | 'text'
+  | 'eraser';
+
 interface DrawElement {
-  type: string;
+  type: Tool;
   points: { x: number; y: number }[];
   color: string;
   lineWidth: number;

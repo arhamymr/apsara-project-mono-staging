@@ -31,7 +31,6 @@ export function ChunkEditorSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         className="flex w-[720px] max-w-[calc(100%-16px)] flex-col gap-4"
-        portalContainer={portalContainer}
       >
         <SheetHeader>
           <SheetTitle>Clean &amp; Upsert Chunk</SheetTitle>

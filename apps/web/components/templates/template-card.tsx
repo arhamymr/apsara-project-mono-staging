@@ -4,7 +4,7 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Card } from '@workspace/ui/components/card';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import type { Template } from './types';
 
 interface TemplateCardProps {
@@ -13,6 +13,31 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onClick }: TemplateCardProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Set canvas dimensions to match image aspect ratio
+      const aspectRatio = img.width / img.height;
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = (canvas.offsetWidth / aspectRatio) * window.devicePixelRatio;
+      
+      // Draw image to canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      setImageLoaded(true);
+    };
+    img.src = template.thumbnail;
+  }, [template.thumbnail]);
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -36,23 +61,30 @@ export function TemplateCard({ template, onClick }: TemplateCardProps) {
         )}
         aria-label={`View ${template.title} template`}
       >
-        {/* Thumbnail */}
+        {/* Canvas Preview */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <Image
-            src={template.thumbnail}
-            alt={template.title}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            aria-label={`Preview Screenshot of ${template.title}`}
+            role="img"
+            className={cn(
+              'absolute size-full object-cover transition-transform duration-500 group-hover:scale-105',
+              imageLoaded ? 'animate-in fade-in duration-300' : 'opacity-0'
+            )}
+            style={{ width: '100%', height: '100%' }}
           />
+          {/* Loading placeholder */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 animate-pulse bg-muted" />
+          )}
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-primary/0 transition-colors duration-300 group-hover:bg-primary/5" />
           {/* License badge */}
           <Badge
             variant={template.license === 'free' ? 'secondary' : 'default'}
             className={cn(
-              'absolute top-3 right-3 text-xs capitalize',
+              'absolute top-3 right-3 text-xs capitalize z-10',
               template.license === 'premium' && 'bg-amber-500 hover:bg-amber-600',
               template.license === 'commercial' && 'bg-purple-500 hover:bg-purple-600'
             )}

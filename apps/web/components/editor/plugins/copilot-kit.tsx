@@ -45,7 +45,7 @@ export const CopilotKit: any[] = [
         },
       },
       debounceDelay: 500,
-      renderGhostText: GhostText,
+      renderGhostText: () => <GhostText />,
       getPrompt: ({ editor }) => {
         const contextEntry = editor.api.block({ highest: true });
 

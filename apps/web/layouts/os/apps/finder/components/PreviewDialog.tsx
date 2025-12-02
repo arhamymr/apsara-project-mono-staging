@@ -38,7 +38,6 @@ export function PreviewDialog({
       <DialogContent
         className="max-w-3xl"
         portalContainer={portalContainer}
-        overlayClassName="bg-black/60"
       >
         <DialogHeader>
           <DialogTitle className="truncate">

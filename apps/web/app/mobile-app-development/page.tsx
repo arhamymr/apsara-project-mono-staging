@@ -155,7 +155,7 @@ function FeaturesSection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
-  const iconMap: Record<string, unknown> = {
+  const iconMap: Record<string, typeof Smartphone> = {
     Smartphone,
     Layers,
     Store,

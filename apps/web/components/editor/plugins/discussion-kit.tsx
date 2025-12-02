@@ -21,36 +21,14 @@ const discussionsData: TDiscussion[] = [
     comments: [
       {
         id: 'comment1',
-        contentRich: [
-          {
-            children: [
-              {
-                text: 'Comments are a great way to provide feedback and discuss changes.',
-              },
-            ],
-            type: 'p',
-          },
-        ],
-        createdAt: new Date(Date.now() - 600_000),
-        discussionId: 'discussion1',
-        isEdited: false,
+        value: 'Comments are a great way to provide feedback and discuss changes.',
+        createdAt: Date.now() - 600_000,
         userId: 'charlie',
       },
       {
         id: 'comment2',
-        contentRich: [
-          {
-            children: [
-              {
-                text: 'Agreed! The link to the docs makes it easy to learn more.',
-              },
-            ],
-            type: 'p',
-          },
-        ],
-        createdAt: new Date(Date.now() - 500_000),
-        discussionId: 'discussion1',
-        isEdited: false,
+        value: 'Agreed! The link to the docs makes it easy to learn more.',
+        createdAt: Date.now() - 500_000,
         userId: 'bob',
       },
     ],
@@ -64,36 +42,14 @@ const discussionsData: TDiscussion[] = [
     comments: [
       {
         id: 'comment1',
-        contentRich: [
-          {
-            children: [
-              {
-                text: 'Nice demonstration of overlapping annotations with both comments and suggestions!',
-              },
-            ],
-            type: 'p',
-          },
-        ],
-        createdAt: new Date(Date.now() - 300_000),
-        discussionId: 'discussion2',
-        isEdited: false,
+        value: 'Nice demonstration of overlapping annotations with both comments and suggestions!',
+        createdAt: Date.now() - 300_000,
         userId: 'bob',
       },
       {
         id: 'comment2',
-        contentRich: [
-          {
-            children: [
-              {
-                text: 'This helps users understand how powerful the editor can be.',
-              },
-            ],
-            type: 'p',
-          },
-        ],
-        createdAt: new Date(Date.now() - 200_000),
-        discussionId: 'discussion2',
-        isEdited: false,
+        value: 'This helps users understand how powerful the editor can be.',
+        createdAt: Date.now() - 200_000,
         userId: 'charlie',
       },
     ],
@@ -138,7 +94,8 @@ export const discussionPlugin = createPlatePlugin({
   },
 })
   .configure({
-    render: { aboveNodes: BlockDiscussion },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    render: { aboveNodes: BlockDiscussion as any },
   })
   .extendSelectors(({ getOption }) => ({
     currentUser: () => getOption('users')[getOption('currentUserId')],

@@ -40,7 +40,6 @@ export function FolderDialog({
       <DialogContent
         className="max-w-sm"
         portalContainer={portalContainer}
-        overlayClassName="bg-black/60"
       >
         <DialogHeader>
           <DialogTitle>New Folder</DialogTitle>

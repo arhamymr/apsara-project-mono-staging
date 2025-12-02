@@ -137,10 +137,8 @@ export const useChat = () => {
         // Create a new comment
         const newComment = {
           id: nanoid(),
-          contentRich: [{ children: [{ text: aiComment.comment }], type: 'p' }],
-          createdAt: new Date(),
-          discussionId,
-          isEdited: false,
+          value: aiComment.comment,
+          createdAt: Date.now(),
           userId: editor.getOption(discussionPlugin, 'currentUserId'),
         };
 

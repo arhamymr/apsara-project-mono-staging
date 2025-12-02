@@ -34,7 +34,7 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onCancel}>
-      <AlertDialogContent portalContainer={portalContainer}>
+      <AlertDialogContent>
         <AlertDialogHeader>
           <div className="flex items-center justify-center">
             <AlertTriangle className="h-12 w-12 text-yellow-500" />

@@ -19,7 +19,8 @@ export const DndKit = [
       },
     },
     render: {
-      aboveNodes: BlockDraggable,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      aboveNodes: BlockDraggable as any,
       aboveSlate: ({ children }) => (
         <DndProvider backend={HTML5Backend}>{children}</DndProvider>
       ),

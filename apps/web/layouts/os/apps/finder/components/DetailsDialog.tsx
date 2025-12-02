@@ -67,7 +67,6 @@ export function DetailsDialog({
       <DialogContent
         className="h-full max-h-[600px] max-w-lg overflow-x-auto p-2"
         portalContainer={portalContainer}
-        overlayClassName="bg-black/60"
       >
         <ScrollArea>
           <DialogHeader>
@@ -186,7 +185,7 @@ export function DetailsDialog({
                               }
                             />
                           </SelectTrigger>
-                          <SelectContent portalContainer={portalContainer}>
+                          <SelectContent>
                             {knowledgeBases.map((kb) => (
                               <SelectItem key={kb.id} value={String(kb.id)}>
                                 {kb.title}
@@ -243,7 +242,7 @@ export function DetailsDialog({
                               }
                             />
                           </SelectTrigger>
-                          <SelectContent portalContainer={portalContainer}>
+                          <SelectContent>
                             <SelectItem value="__none">
                               No collection
                             </SelectItem>

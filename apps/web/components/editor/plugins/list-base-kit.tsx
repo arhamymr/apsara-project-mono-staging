@@ -17,7 +17,8 @@ export const BaseListKit = [
       ],
     },
     render: {
-      belowNodes: BlockListStatic,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      belowNodes: BlockListStatic as any,
     },
   }),
 ];

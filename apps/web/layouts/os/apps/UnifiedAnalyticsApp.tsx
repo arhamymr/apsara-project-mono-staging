@@ -106,15 +106,15 @@ export default function UnifiedAnalyticsApp() {
   const series = useMemo(() => DATASETS[period], [period]);
 
   const kpi = useMemo(() => {
-    const total = series.reduce((acc, n) => acc + n.visits, 0);
-    const unique = series.reduce((acc, n) => acc + n.unique, 0);
-    const conversions = series.reduce((acc, n) => acc + n.conversions, 0);
-    const revenue = series.reduce((acc, n) => acc + n.revenue, 0);
+    const total = series.reduce((acc, n) => acc + (n.visits ?? 0), 0);
+    const unique = series.reduce((acc, n) => acc + (n.unique ?? 0), 0);
+    const conversions = series.reduce((acc, n) => acc + (n.conversions ?? 0), 0);
+    const revenue = series.reduce((acc, n) => acc + (n.revenue ?? 0), 0);
     const avg = Math.round(total / series.length);
-    const peak = Math.max(...series.map((s) => s.visits));
+    const peak = Math.max(...series.map((s) => s.visits ?? 0));
     const bounceRate =
       Math.round(
-        (series.reduce((acc, n) => acc + n.bounce, 0) / series.length) * 100,
+        (series.reduce((acc, n) => acc + (n.bounce ?? 0), 0) / series.length) * 100,
       ) / 100;
     const conversionRate = Math.round((conversions / total) * 10000) / 100;
     return {

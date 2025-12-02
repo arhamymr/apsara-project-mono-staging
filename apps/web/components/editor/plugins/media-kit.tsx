@@ -23,7 +23,8 @@ import { VideoElement } from '@workspace/ui/components/media-video-node';
 export const MediaKit = [
   ImagePlugin.configure({
     options: { disableUploadInsert: true },
-    render: { afterEditable: MediaPreviewDialog, node: ImageElement },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    render: { afterEditable: MediaPreviewDialog as any, node: ImageElement },
   }),
   MediaEmbedPlugin.withComponent(MediaEmbedElement),
   VideoPlugin.withComponent(VideoElement),
@@ -31,7 +32,8 @@ export const MediaKit = [
   FilePlugin.withComponent(FileElement),
   PlaceholderPlugin.configure({
     options: { disableEmptyPlaceholder: true },
-    render: { afterEditable: MediaUploadToast, node: PlaceholderElement },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    render: { afterEditable: MediaUploadToast as any, node: PlaceholderElement },
   }),
   CaptionPlugin.configure({
     options: {
