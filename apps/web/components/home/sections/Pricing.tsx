@@ -22,7 +22,7 @@ export function Pricing() {
         <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
           {s.pricing.title}
         </h2>
-        <p className="text-muted-foreground mt-6 text-lg">
+        <p className="text-muted-foreground mt-6 text-lg md:text-xl">
           {s.pricing.subtitle}
         </p>
       </motion.div>

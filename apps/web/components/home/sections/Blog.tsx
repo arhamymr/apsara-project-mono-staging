@@ -30,7 +30,7 @@ export function Blog() {
         <h2 className="text-2xl tracking-tight md:text-4xl lg:text-5xl">
           {s.blog.title}
         </h2>
-        <p className="text-muted-foreground mt-3">{s.blog.subtitle}</p>
+        <p className="text-muted-foreground mt-3 text-lg md:text-xl">{s.blog.subtitle}</p>
       </motion.div>
 
       <motion.div

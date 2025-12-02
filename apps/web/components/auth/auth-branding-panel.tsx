@@ -10,17 +10,17 @@ export function AuthBrandingPanel({
   tagline = 'Build, automate, and manage your workspace—beautifully.',
 }: AuthBrandingPanelProps) {
   return (
-    <div
-      className="bg-background relative m-4 hidden overflow-hidden rounded-lg md:block"
-      style={{
-        backgroundImage: `url(/hero-bg.png)`,
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-tr from-black/50 via-black/20 to-transparent" />
-      <div className="absolute right-8 bottom-8 left-8 text-white">
+    <div className="bg-card border relative m-4 hidden overflow-hidden rounded-lg md:block">
+      {/* Spinning Logo */}
+      <Image
+        src="/logo.svg"
+        alt="Logo"
+        width={512}
+        height={512}
+        className="absolute -right-[150px] -bottom-[200px] size-128 w-auto animate-spin opacity-50 [animation-duration:30s]"
+      />
+      
+      <div className="absolute right-8 bottom-8 left-8">
         <Image
           src="https://assets.apsaradigital.com/logo.png"
           alt="logo"
@@ -35,7 +35,7 @@ export function AuthBrandingPanel({
           height={40}
           className="mb-4 hidden dark:block"
         />
-        <p className="text-md mt-2 max-w-md opacity-90">{tagline}</p>
+        <p className="text-muted-foreground text-md mt-2 max-w-md">{tagline}</p>
       </div>
     </div>
   );

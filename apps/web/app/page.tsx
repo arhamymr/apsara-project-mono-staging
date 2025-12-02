@@ -8,7 +8,7 @@ import {
   Features,
   Footer,
   Hero,
-  Integrations,
+  // Integrations,
   OSShowcase,
   Pricing,
   TopNav,
@@ -23,7 +23,7 @@ export default function ApsaraLandingPage() {
         <Hero />
         <Features />
         <OSShowcase />
-        <Integrations />
+        {/* <Integrations /> */}
         <Pricing />
         <Blog />
         <CallToAction />

@@ -27,7 +27,7 @@ export function Integrations() {
         <h3 className="text-2xl tracking-tight md:text-4xl lg:text-5xl">
           {s.integrations.title}
         </h3>
-        <p className="text-muted-foreground mt-3">{s.integrations.subtitle}</p>
+        <p className="text-muted-foreground mt-3 text-lg md:text-xl">{s.integrations.subtitle}</p>
       </motion.div>
       <motion.div
         {...fadeUp}
