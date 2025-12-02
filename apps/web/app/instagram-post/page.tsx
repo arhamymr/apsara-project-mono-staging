@@ -145,7 +145,7 @@ function FeaturesSection() {
     <Section className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             {s.features.title}
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -186,7 +186,7 @@ function ServicesSection() {
     <Section id="services" className="bg-muted/30 py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             {s.services.title}
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -233,7 +233,7 @@ function PricingSection() {
     <Section className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             {s.pricing.title}
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -361,7 +361,7 @@ function CTASection() {
 
           <div className="relative z-10">
             <Sparkles className="text-primary-foreground/80 mx-auto mb-8 h-12 w-12" />
-            <h2 className="text-primary-foreground text-3xl font-medium tracking-tight md:text-5xl">
+            <h2 className="text-primary-foreground text-3xl font-normal tracking-tight md:text-5xl">
               {s.cta.title}
             </h2>
             <p className="text-primary-foreground/80 mx-auto mt-6 max-w-xl text-lg">

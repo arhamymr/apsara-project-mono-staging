@@ -36,7 +36,7 @@ export function Testimonials() {
   return (
     <Section className="py-24">
       <motion.div {...fadeUp} className="mx-auto mb-16 max-w-2xl text-center">
-        <h3 className="from-foreground to-foreground/70 bg-gradient-to-b bg-clip-text text-3xl font-medium tracking-tight text-transparent md:text-5xl lg:text-6xl">
+        <h3 className="from-foreground to-foreground/70 bg-gradient-to-b bg-clip-text text-3xl font-normal tracking-tight text-transparent md:text-5xl lg:text-6xl">
           {s.testimonials.title}
         </h3>
         <p className="text-muted-foreground mx-auto mt-6 max-w-xl text-lg md:text-xl">

@@ -19,7 +19,7 @@ export function Pricing() {
   return (
     <Section id="pricing" className="py-24 lg:py-32">
       <motion.div {...fadeUp} className="mx-auto mb-16 max-w-2xl text-center">
-        <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+        <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
           {s.pricing.title}
         </h2>
         <p className="text-muted-foreground mt-6 text-lg">

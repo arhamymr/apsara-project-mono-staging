@@ -78,7 +78,7 @@ function HeroSection() {
 
           <motion.h1
             {...fadeUp}
-            className="text-foreground text-4xl leading-[1.1] font-medium tracking-tight md:text-6xl lg:text-7xl"
+            className="text-foreground text-4xl leading-[1.1] font-normal tracking-tight md:text-6xl lg:text-7xl"
           >
             {s.hero.title}
           </motion.h1>
@@ -162,7 +162,7 @@ function ServicesSection() {
     <Section id="services" className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             {s.services.title}
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -228,7 +228,7 @@ function WorkflowSection() {
     <Section className="bg-muted/30 py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             How It Works
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -284,7 +284,7 @@ function PricingSection() {
     <Section className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             {s.pricing.title}
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -425,7 +425,7 @@ function TestimonialsSection() {
     <Section className="bg-muted/30 py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-medium tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
             What Clients Say
           </h2>
           <p className="text-muted-foreground mt-6 text-lg">
@@ -476,7 +476,7 @@ function CTASection() {
 
           <div className="relative z-10">
             <Rocket className="text-primary-foreground/80 mx-auto mb-8 h-12 w-12" />
-            <h2 className="text-primary-foreground text-3xl font-medium tracking-tight md:text-5xl">
+            <h2 className="text-primary-foreground text-3xl font-normal tracking-tight md:text-5xl">
               {s.cta.title}
             </h2>
             <p className="text-primary-foreground/80 mx-auto mt-6 max-w-xl text-lg">

@@ -19,7 +19,7 @@ export const Features = () => {
           <h2 className="text-2xl tracking-tight md:text-4xl lg:text-5xl">
             {s.features.heading}
           </h2>
-          <p className="text-muted-foreground mt-3">
+          <p className="text-muted-foreground mt-3 text-lg md:text-xl">
             {s.features.subheading}
           </p>
         </motion.div>
