@@ -19,10 +19,8 @@ import {
   ChevronDown,
   Code2,
   Image,
-  LayoutDashboard,
   Menu,
   Server,
-  ShoppingBag,
   Smartphone,
   Wrench,
   X,
@@ -101,23 +99,7 @@ export function TopNav() {
         },
       ],
     },
-    {
-      label: s.topNav.links.products,
-      children: [
-        {
-          href: '/unified-platform',
-          label: s.topNav.links.unifiedPlatform,
-          description: s.topNav.links.descriptions.unifiedPlatform,
-          icon: LayoutDashboard,
-        },
-        {
-          href: '/digital-products',
-          label: s.topNav.links.digitalProducts,
-          description: s.topNav.links.descriptions.digitalProducts,
-          icon: ShoppingBag,
-        },
-      ],
-    },
+    { href: '/templates', label: s.topNav.links.templates },
     { href: '/blog', label: s.topNav.links.blog },
     { href: '/me', label: s.topNav.links.pricing },
   ];
@@ -130,7 +112,7 @@ export function TopNav() {
     >
       <div
         className={cn(
-          'mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between transition-all duration-300',
+          'mx-auto flex h-16 w-full items-center justify-between transition-all duration-300',
         )}
       >
         <div className="flex items-center gap-3">
@@ -157,31 +139,33 @@ export function TopNav() {
                     {item.label}
                     <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-[320px] p-2">
-                    {item.children.map((child) => (
-                      <DropdownMenuItem key={child.href} asChild>
-                        <Link
-                          href={child.href}
-                          className="hover:bg-accent flex w-full cursor-pointer items-start gap-3 rounded-md p-3"
-                        >
-                          {child.icon && (
-                            <div className="bg-primary/10 text-primary mt-1 rounded-md p-2">
-                              <child.icon className="h-5 w-5" />
-                            </div>
-                          )}
-                          <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium">
-                              {child.label}
-                            </span>
-                            {child.description && (
-                              <span className="text-muted-foreground text-xs leading-snug">
-                                {child.description}
-                              </span>
+                  <DropdownMenuContent align="center" className="w-[580px] p-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {item.children.map((child) => (
+                        <DropdownMenuItem key={child.href} asChild>
+                          <Link
+                            href={child.href}
+                            className="hover:bg-accent group flex w-full cursor-pointer items-start gap-3 rounded-lg p-3 transition-colors"
+                          >
+                            {child.icon && (
+                              <div className="bg-primary/10 text-primary shrink-0 rounded-lg p-2.5">
+                                <child.icon className="h-5 w-5" />
+                              </div>
                             )}
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sm font-medium">
+                                {child.label}
+                              </span>
+                              {child.description && (
+                                <span className="text-muted-foreground text-xs leading-snug line-clamp-2">
+                                  {child.description}
+                                </span>
+                              )}
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (

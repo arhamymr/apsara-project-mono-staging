@@ -29,12 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning className="w-full">
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
+        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased w-full min-w-full max-w-full`}
       >
         <ConvexAuthNextjsServerProvider>
-          <Providers>{children}</Providers>
+          <Providers>
+            <main className="w-full min-w-full">{children}</main>
+          </Providers>
         </ConvexAuthNextjsServerProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 import type { Lang } from './types';
 
-export const API_DEVELOPMENT_STRINGS: Record<Lang, any> = {
+export const API_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
   en: {
     hero: {
       title: 'API Development & Integration',
@@ -80,39 +80,39 @@ export const API_DEVELOPMENT_STRINGS: Record<Lang, any> = {
   },
   id: {
     hero: {
-      title: 'Pengembangan & Integrasi API',
+      title: 'Pembuatan & Integrasi API',
       subtitle:
-        'Bangun API yang robust, aman, dan scalable untuk mendukung aplikasi Anda. Kami ahli dalam REST, GraphQL, dan API real-time dengan dokumentasi lengkap dan keamanan.',
-      cta: 'Bangun API Anda',
-      whatsapp_message: 'Halo, saya butuh bantuan untuk membangun atau mengintegrasikan API.',
+        'Kami membangun API yang handal, aman, dan siap untuk skala besar. Berpengalaman dalam REST, GraphQL, dan API real-time dengan dokumentasi lengkap.',
+      cta: 'Buat API Sekarang',
+      whatsapp_message: 'Halo, saya butuh bantuan untuk membuat atau mengintegrasikan API.',
     },
     features: {
-      title: 'Mengapa Memilih Layanan API Kami',
+      title: 'Kenapa Pilih Layanan API Kami',
       subtitle:
-        'Pengembangan API ahli dengan fokus pada keamanan, performa, dan pengalaman developer.',
+        'Tim berpengalaman yang mengutamakan keamanan, performa, dan kemudahan integrasi.',
       list: [
         {
-          title: 'REST APIs',
+          title: 'REST API',
           description:
-            'API RESTful yang dirancang dengan baik mengikuti best practices dan standar industri.',
+            'API RESTful yang dirancang sesuai standar industri dan mudah diintegrasikan.',
           icon: 'Globe',
         },
         {
-          title: 'GraphQL APIs',
+          title: 'GraphQL API',
           description:
-            'API GraphQL yang fleksibel untuk pengambilan data efisien dan subscription real-time.',
+            'API GraphQL yang fleksibel untuk pengambilan data yang efisien dan real-time.',
           icon: 'GitBranch',
         },
         {
-          title: 'Keamanan Utama',
+          title: 'Keamanan Terjamin',
           description:
-            'OAuth 2.0, autentikasi JWT, rate limiting, dan langkah keamanan komprehensif.',
+            'Dilengkapi OAuth 2.0, JWT, rate limiting, dan standar keamanan terbaik.',
           icon: 'Shield',
         },
         {
-          title: 'Dokumentasi',
+          title: 'Dokumentasi Lengkap',
           description:
-            'Dokumentasi API yang di-generate otomatis dengan OpenAPI/Swagger untuk integrasi mudah.',
+            'Dokumentasi otomatis dengan OpenAPI/Swagger untuk kemudahan integrasi.',
           icon: 'FileText',
         },
       ],
@@ -120,39 +120,39 @@ export const API_DEVELOPMENT_STRINGS: Record<Lang, any> = {
     services: {
       title: 'Layanan API Kami',
       subtitle:
-        'Solusi API lengkap dari desain hingga deployment dan maintenance.',
+        'Solusi API menyeluruh dari perancangan hingga deployment dan pemeliharaan.',
       list: [
-        { title: 'Desain API', description: 'Desain arsitektur API yang scalable mengikuti best practices REST atau GraphQL.' },
-        { title: 'Pengembangan API', description: 'Bangun API berperforma tinggi dengan Node.js, Python, atau stack pilihan Anda.' },
-        { title: 'Autentikasi & Keamanan', description: 'Implementasi OAuth 2.0, JWT, API keys, dan best practices keamanan.' },
-        { title: 'Integrasi Pihak Ketiga', description: 'Koneksi dengan payment gateway, platform sosial, dan layanan eksternal.' },
-        { title: 'Dokumentasi API', description: 'Dokumentasi komprehensif dengan spesifikasi Swagger/OpenAPI.' },
-        { title: 'Optimasi Performa', description: 'Caching, rate limiting, dan optimasi untuk API dengan traffic tinggi.' },
+        { title: 'Perancangan API', description: 'Arsitektur API yang terstruktur dan siap untuk berkembang.' },
+        { title: 'Pembuatan API', description: 'API berkinerja tinggi dengan Node.js, Python, atau teknologi pilihan Anda.' },
+        { title: 'Keamanan & Autentikasi', description: 'Implementasi OAuth 2.0, JWT, API keys, dan standar keamanan terbaik.' },
+        { title: 'Integrasi Layanan Lain', description: 'Koneksi dengan payment gateway, media sosial, dan layanan pihak ketiga.' },
+        { title: 'Dokumentasi API', description: 'Dokumentasi lengkap dengan spesifikasi Swagger/OpenAPI.' },
+        { title: 'Optimasi Performa', description: 'Caching, rate limiting, dan optimasi untuk traffic tinggi.' },
       ],
     },
     pricing: {
-      title: 'Harga Pengembangan API',
-      subtitle: 'Harga fleksibel untuk kebutuhan pengembangan dan integrasi API Anda.',
+      title: 'Biaya Pembuatan API',
+      subtitle: 'Pilihan harga yang fleksibel sesuai kebutuhan proyek Anda.',
       hourly: {
-        title: 'Tarif Per Jam',
+        title: 'Per Jam',
         price: 'Rp 150 Ribu',
         unit: '/jam',
-        description: 'Ideal untuk integrasi API, peningkatan, dan maintenance.',
-        cta: 'Pesan Jam',
+        description: 'Cocok untuk integrasi, perbaikan, dan pemeliharaan API.',
+        cta: 'Pesan Sekarang',
       },
       project: {
-        title: 'Proyek API',
+        title: 'Per Proyek',
         price: 'Rp 3 Juta',
         unit: 'mulai dari',
-        description: 'Pengembangan API lengkap dengan desain, implementasi, dan dokumentasi.',
-        cta: 'Dapatkan Penawaran',
-        note: '* Harga tergantung pada kompleksitas API, endpoints, dan kebutuhan integrasi',
+        description: 'Pembuatan API lengkap termasuk perancangan, implementasi, dan dokumentasi.',
+        cta: 'Minta Penawaran',
+        note: '* Harga disesuaikan dengan kompleksitas dan kebutuhan integrasi',
       },
     },
     cta: {
-      title: 'Siap Membangun API Anda?',
-      subtitle: 'Mari buat API yang powerful untuk menghubungkan sistem Anda dan memungkinkan pertumbuhan.',
-      button: 'Mulai Proyek API',
+      title: 'Siap Membuat API?',
+      subtitle: 'Wujudkan API yang menghubungkan sistem Anda dan mendukung pertumbuhan bisnis.',
+      button: 'Mulai Proyek',
     },
   },
 };

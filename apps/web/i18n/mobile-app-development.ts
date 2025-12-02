@@ -1,158 +1,186 @@
 import type { Lang } from './types';
 
-export const MOBILE_APP_DEVELOPMENT_STRINGS: Record<Lang, any> = {
+export const MOBILE_APP_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
   en: {
     hero: {
-      title: 'Mobile App Development',
+      title: 'React Native Mobile Development',
       subtitle:
-        'Create stunning mobile applications for iOS, Android, or both platforms. We build native and cross-platform apps using React Native, Flutter, and modern mobile technologies.',
+        'Build powerful, cross-platform mobile apps with React Native. One codebase for iOS and Android with native performance, faster development cycles, and cost-effective solutions.',
       cta: 'Start Your App',
-      whatsapp_message: 'Hi, I need help building a mobile application.',
+      whatsapp_message: 'Hi, I need help building a React Native mobile application.',
     },
     features: {
-      title: 'Why Choose Our Mobile Development',
+      title: 'Why Choose React Native',
       subtitle:
-        'Expert mobile development with focus on performance, user experience, and cross-platform compatibility.',
+        'Leverage the power of React Native for efficient, high-quality mobile app development.',
       list: [
         {
-          title: 'iOS Development',
+          title: 'Cross-Platform Excellence',
           description:
-            'Native iOS apps with Swift or cross-platform solutions optimized for iPhone and iPad.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Android Development',
-          description:
-            'Native Android apps with Kotlin or cross-platform solutions for all Android devices.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Cross-Platform',
-          description:
-            'Build once, deploy everywhere with React Native or Flutter for maximum efficiency.',
+            'Write once, run on both iOS and Android with up to 90% code sharing between platforms.',
           icon: 'Layers',
         },
         {
-          title: 'App Store Ready',
+          title: 'Native Performance',
           description:
-            'Complete submission support for Apple App Store and Google Play Store.',
-          icon: 'Store',
+            'React Native compiles to native code, delivering smooth 60fps animations and fast load times.',
+          icon: 'Zap',
+        },
+        {
+          title: 'Hot Reloading',
+          description:
+            'Faster development with instant preview of changes without rebuilding the entire app.',
+          icon: 'RefreshCw',
+        },
+        {
+          title: 'Rich Ecosystem',
+          description:
+            'Access thousands of npm packages and native modules for any functionality you need.',
+          icon: 'Package',
         },
       ],
     },
     services: {
-      title: 'Our Mobile Services',
+      title: 'Our React Native Services',
       subtitle:
-        'End-to-end mobile app development from concept to launch and beyond.',
+        'End-to-end React Native development from concept to App Store and Play Store launch.',
       list: [
-        { title: 'UI/UX Design', description: 'Beautiful, intuitive interfaces designed for mobile-first experiences.' },
-        { title: 'Native Development', description: 'High-performance native apps using Swift, Kotlin, or platform-specific tools.' },
-        { title: 'Cross-Platform Apps', description: 'Cost-effective solutions with React Native or Flutter for iOS and Android.' },
-        { title: 'Backend Integration', description: 'Connect your app to APIs, databases, and cloud services.' },
-        { title: 'Push Notifications', description: 'Engage users with targeted push notifications and in-app messaging.' },
-        { title: 'App Maintenance', description: 'Ongoing updates, bug fixes, and feature enhancements post-launch.' },
+        { title: 'Custom App Development', description: 'Tailored React Native apps built from scratch to match your unique requirements.' },
+        { title: 'UI/UX Implementation', description: 'Pixel-perfect designs with smooth animations using React Native Reanimated and Gesture Handler.' },
+        { title: 'Expo & Bare Workflow', description: 'Choose between Expo for rapid development or bare workflow for full native control.' },
+        { title: 'State Management', description: 'Scalable architecture with Redux, Zustand, or React Query for optimal data flow.' },
+        { title: 'Native Module Integration', description: 'Bridge native iOS/Android code when you need platform-specific features.' },
+        { title: 'App Store Deployment', description: 'Complete submission and approval process for Apple App Store and Google Play Store.' },
+      ],
+    },
+    techStack: {
+      title: 'Our React Native Tech Stack',
+      subtitle: 'Modern tools and libraries for robust mobile development.',
+      list: [
+        { name: 'React Native', category: 'Framework' },
+        { name: 'Expo', category: 'Development Platform' },
+        { name: 'TypeScript', category: 'Language' },
+        { name: 'React Navigation', category: 'Navigation' },
+        { name: 'Reanimated', category: 'Animations' },
+        { name: 'React Query', category: 'Data Fetching' },
+        { name: 'Zustand', category: 'State Management' },
+        { name: 'NativeWind', category: 'Styling' },
       ],
     },
     pricing: {
-      title: 'Mobile App Pricing',
+      title: 'React Native App Pricing',
       subtitle: 'Transparent pricing for your mobile development needs.',
       hourly: {
         title: 'Hourly Rate',
         price: 'IDR 175K',
         unit: '/hour',
-        description: 'Flexible engagement for feature development and maintenance.',
+        description: 'Flexible engagement for feature development, bug fixes, and maintenance.',
         cta: 'Book Hours',
       },
       project: {
         title: 'Full App Project',
-        price: 'IDR 15M',
+        price: 'IDR 12M',
         unit: 'starting from',
-        description: 'Complete mobile app development with design, development, and deployment.',
+        description: 'Complete React Native app with design implementation, development, and deployment.',
         cta: 'Get Quote',
-        note: '* Pricing varies based on app complexity, features, and platform requirements',
+        note: '* Pricing varies based on app complexity, features, and third-party integrations',
       },
     },
     cta: {
-      title: 'Ready to Launch Your Mobile App?',
-      subtitle: 'Transform your idea into a beautiful, functional mobile application.',
+      title: 'Ready to Build with React Native?',
+      subtitle: 'Launch your app on iOS and Android simultaneously with a single codebase.',
       button: 'Discuss Your App',
     },
   },
   id: {
     hero: {
-      title: 'Pengembangan Aplikasi Mobile',
+      title: 'Pembuatan Aplikasi React Native',
       subtitle:
-        'Buat aplikasi mobile yang menakjubkan untuk iOS, Android, atau kedua platform. Kami membangun aplikasi native dan cross-platform menggunakan React Native, Flutter, dan teknologi mobile modern.',
-      cta: 'Mulai Aplikasi Anda',
-      whatsapp_message: 'Halo, saya butuh bantuan untuk membangun aplikasi mobile.',
+        'Bangun aplikasi mobile cross-platform dengan React Native. Satu codebase untuk iOS dan Android dengan performa native, pengembangan lebih cepat, dan biaya lebih hemat.',
+      cta: 'Buat Aplikasi Sekarang',
+      whatsapp_message: 'Halo, saya ingin membuat aplikasi mobile dengan React Native.',
     },
     features: {
-      title: 'Mengapa Memilih Pengembangan Mobile Kami',
+      title: 'Kenapa Pilih React Native',
       subtitle:
-        'Pengembangan mobile ahli dengan fokus pada performa, pengalaman pengguna, dan kompatibilitas cross-platform.',
+        'Manfaatkan keunggulan React Native untuk pengembangan aplikasi mobile yang efisien dan berkualitas.',
       list: [
         {
-          title: 'Pengembangan iOS',
+          title: 'Cross-Platform Unggul',
           description:
-            'Aplikasi iOS native dengan Swift atau solusi cross-platform yang dioptimalkan untuk iPhone dan iPad.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Pengembangan Android',
-          description:
-            'Aplikasi Android native dengan Kotlin atau solusi cross-platform untuk semua perangkat Android.',
-          icon: 'Smartphone',
-        },
-        {
-          title: 'Cross-Platform',
-          description:
-            'Bangun sekali, deploy di mana saja dengan React Native atau Flutter untuk efisiensi maksimal.',
+            'Tulis sekali, jalankan di iOS dan Android dengan hingga 90% kode yang sama.',
           icon: 'Layers',
         },
         {
-          title: 'Siap App Store',
+          title: 'Performa Native',
           description:
-            'Dukungan submission lengkap untuk Apple App Store dan Google Play Store.',
-          icon: 'Store',
+            'React Native dikompilasi ke kode native, menghasilkan animasi 60fps dan loading cepat.',
+          icon: 'Zap',
+        },
+        {
+          title: 'Hot Reloading',
+          description:
+            'Pengembangan lebih cepat dengan preview instan tanpa rebuild seluruh aplikasi.',
+          icon: 'RefreshCw',
+        },
+        {
+          title: 'Ekosistem Lengkap',
+          description:
+            'Akses ribuan package npm dan modul native untuk berbagai kebutuhan fitur.',
+          icon: 'Package',
         },
       ],
     },
     services: {
-      title: 'Layanan Mobile Kami',
+      title: 'Layanan React Native Kami',
       subtitle:
-        'Pengembangan aplikasi mobile end-to-end dari konsep hingga peluncuran dan seterusnya.',
+        'Pengembangan React Native dari konsep hingga peluncuran di App Store dan Play Store.',
       list: [
-        { title: 'Desain UI/UX', description: 'Interface yang indah dan intuitif yang dirancang untuk pengalaman mobile-first.' },
-        { title: 'Pengembangan Native', description: 'Aplikasi native berperforma tinggi menggunakan Swift, Kotlin, atau tools platform-specific.' },
-        { title: 'Aplikasi Cross-Platform', description: 'Solusi hemat biaya dengan React Native atau Flutter untuk iOS dan Android.' },
-        { title: 'Integrasi Backend', description: 'Hubungkan aplikasi Anda ke API, database, dan layanan cloud.' },
-        { title: 'Push Notifications', description: 'Libatkan pengguna dengan push notification tertarget dan in-app messaging.' },
-        { title: 'Maintenance Aplikasi', description: 'Update berkelanjutan, perbaikan bug, dan peningkatan fitur pasca-peluncuran.' },
+        { title: 'Pembuatan Aplikasi Custom', description: 'Aplikasi React Native yang dibuat khusus sesuai kebutuhan unik Anda.' },
+        { title: 'Implementasi UI/UX', description: 'Desain pixel-perfect dengan animasi halus menggunakan Reanimated dan Gesture Handler.' },
+        { title: 'Expo & Bare Workflow', description: 'Pilih Expo untuk pengembangan cepat atau bare workflow untuk kontrol native penuh.' },
+        { title: 'State Management', description: 'Arsitektur scalable dengan Redux, Zustand, atau React Query untuk alur data optimal.' },
+        { title: 'Integrasi Native Module', description: 'Bridge kode native iOS/Android saat butuh fitur spesifik platform.' },
+        { title: 'Deployment App Store', description: 'Proses submission lengkap ke Apple App Store dan Google Play Store.' },
+      ],
+    },
+    techStack: {
+      title: 'Tech Stack React Native Kami',
+      subtitle: 'Tools dan library modern untuk pengembangan mobile yang solid.',
+      list: [
+        { name: 'React Native', category: 'Framework' },
+        { name: 'Expo', category: 'Platform Pengembangan' },
+        { name: 'TypeScript', category: 'Bahasa' },
+        { name: 'React Navigation', category: 'Navigasi' },
+        { name: 'Reanimated', category: 'Animasi' },
+        { name: 'React Query', category: 'Data Fetching' },
+        { name: 'Zustand', category: 'State Management' },
+        { name: 'NativeWind', category: 'Styling' },
       ],
     },
     pricing: {
-      title: 'Harga Aplikasi Mobile',
-      subtitle: 'Harga transparan untuk kebutuhan pengembangan mobile Anda.',
+      title: 'Biaya Aplikasi React Native',
+      subtitle: 'Harga transparan sesuai kebutuhan proyek Anda.',
       hourly: {
-        title: 'Tarif Per Jam',
+        title: 'Per Jam',
         price: 'Rp 175 Ribu',
         unit: '/jam',
-        description: 'Engagement fleksibel untuk pengembangan fitur dan maintenance.',
-        cta: 'Pesan Jam',
+        description: 'Fleksibel untuk pengembangan fitur, perbaikan bug, dan pemeliharaan.',
+        cta: 'Pesan Sekarang',
       },
       project: {
-        title: 'Proyek Aplikasi Lengkap',
-        price: 'Rp 15 Juta',
+        title: 'Per Proyek',
+        price: 'Rp 12 Juta',
         unit: 'mulai dari',
-        description: 'Pengembangan aplikasi mobile lengkap dengan desain, development, dan deployment.',
-        cta: 'Dapatkan Penawaran',
-        note: '* Harga bervariasi berdasarkan kompleksitas aplikasi, fitur, dan kebutuhan platform',
+        description: 'Aplikasi React Native lengkap dengan implementasi desain, pengembangan, dan deployment.',
+        cta: 'Minta Penawaran',
+        note: '* Harga disesuaikan dengan kompleksitas dan integrasi pihak ketiga',
       },
     },
     cta: {
-      title: 'Siap Meluncurkan Aplikasi Mobile Anda?',
-      subtitle: 'Ubah ide Anda menjadi aplikasi mobile yang indah dan fungsional.',
-      button: 'Diskusikan Aplikasi Anda',
+      title: 'Siap Membangun dengan React Native?',
+      subtitle: 'Luncurkan aplikasi Anda di iOS dan Android secara bersamaan dengan satu codebase.',
+      button: 'Konsultasi Gratis',
     },
   },
 };

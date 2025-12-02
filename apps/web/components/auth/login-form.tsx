@@ -6,72 +6,60 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-interface LoginFormData {
-  email: string;
-  password: string;
-  remember: boolean;
-}
-
-interface LoginFormProps {
-  redirectTo?: string;
-}
-
-export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
+export function LoginForm() {
   const { signIn } = useAuthActions();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-    setError,
-  } = useForm<LoginFormData>({
-    defaultValues: {
-      email: '',
-      password: '',
-      remember: false,
-    },
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (data: LoginFormData) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    const formData = new FormData(event.currentTarget);
+    formData.set('flow', 'signIn');
+
     try {
-      const formData = new FormData();
-      formData.set('email', data.email);
-      formData.set('password', data.password);
-      formData.set('flow', 'signIn');
-      formData.set('redirectTo', redirectTo);
-
       await signIn('password', formData);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      window.location.href = '/dashboard';
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      console.error('Login error:', errorMessage);
       
-      if (errorMessage.includes('Invalid credentials') || errorMessage.includes('password')) {
-        setError('password', { message: 'Invalid email or password' });
+      if (errorMessage.includes('InvalidAccountId')) {
+        setError('No account found with this email');
+      } else if (errorMessage.includes('InvalidSecret')) {
+        setError('Invalid password');
       } else {
         toast.error('Unable to sign in. Please check your credentials.');
       }
-      reset({ ...data, password: '' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      {error && (
+        <p className="text-destructive text-sm text-center">{error}</p>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
+          name="email"
           type="email"
           autoComplete="email"
-          {...register('email', { required: 'Email is required' })}
+          required
         />
-        {errors.email && (
-          <p className="text-destructive text-sm">{errors.email.message}</p>
-        )}
       </div>
 
       <div className="space-y-2">
@@ -79,9 +67,10 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
         <div className="relative">
           <Input
             id="password"
+            name="password"
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
-            {...register('password', { required: 'Password is required' })}
+            required
             className="pr-10"
           />
           <button
@@ -96,21 +85,9 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
             )}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-destructive text-sm">{errors.password.message}</p>
-        )}
       </div>
 
-      <div className="flex items-center justify-between">
-        <label className="text-muted-foreground flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="border-muted-foreground/30 h-4 w-4 rounded"
-            {...register('remember')}
-          />
-          Remember me
-        </label>
-
+      <div className="flex items-center justify-end">
         <Link
           href="/register"
           className="text-primary text-sm font-medium hover:underline"
@@ -119,9 +96,9 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
         </Link>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isSubmitting ? 'Signing in…' : 'Sign in'}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isLoading ? 'Signing in…' : 'Sign in'}
       </Button>
     </form>
   );

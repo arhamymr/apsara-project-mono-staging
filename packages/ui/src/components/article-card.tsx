@@ -76,33 +76,33 @@ function ArticleCard({
           />
         </div>
       )}
-      <CardHeader className="p-6">
-        <div className="mb-4 flex items-center justify-between">
+      <CardHeader className="p-4">
+        <div className="mb-2 flex items-center justify-between">
           <Badge
             variant="secondary"
             className="bg-primary/10 text-primary hover:bg-primary/20"
           >
             {category}
           </Badge>
-          <div className="text-muted-foreground flex items-center text-xs">
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
             {dateIcon}
             {date}
           </div>
         </div>
-        <CardTitle className="line-clamp-2 text-xl leading-tight font-semibold">
+        <CardTitle className="line-clamp-2 text-lg leading-tight font-semibold">
           <LinkWrapper href={href} className="hover:text-primary transition-colors">
             {title}
           </LinkWrapper>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 px-6 pb-6">
+      <CardContent className="flex-1 px-4 pb-4 pt-0">
         <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
           {excerpt}
         </p>
       </CardContent>
-      <CardFooter className="border-border border-t px-6 py-4">
+      <CardFooter className="border-border border-t px-4 py-3">
         <div className="flex w-full items-center justify-between">
-          <div className="text-muted-foreground flex items-center text-xs">
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
             {authorIcon}
             {author}
           </div>

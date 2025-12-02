@@ -4,16 +4,20 @@ import { Button } from '@workspace/ui/components/button';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
+import Image from 'next/image';
 
 export function Hero() {
   const fadeUp = useFadeUp();
   const s = useStrings();
 
   return (
-    <Section className="bg-card relative mt-8 overflow-hidden rounded-none border md:mt-24 md:rounded-xl">
-      <img
+    <div className='md:px-6'>
+        <Section className="bg-card relative mt-8 overflow-hidden rounded-none border md:mt-24 md:rounded-xl">
+      <Image
         src="/logo.svg"
         alt="Logo"
+        width={512}
+        height={512}
         className="absolute -right-[150px] -bottom-[200px] mb-8 size-128 w-auto animate-spin opacity-50 [animation-duration:30s]"
       />
       <div className="@container flex h-[65vh] items-center justify-center gap-10">
@@ -55,5 +59,7 @@ export function Hero() {
         </motion.div>
       </div>
     </Section>
+      </div>
+  
   );
 }

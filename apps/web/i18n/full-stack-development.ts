@@ -1,6 +1,6 @@
 import type { Lang } from './types';
 
-export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, any> = {
+export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
   en: {
     hero: {
       title: 'Full-Stack Web Development',
@@ -72,6 +72,24 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, any> = {
         note: '* Final pricing depends on project complexity and requirements',
       },
     },
+    techStack: {
+      title: 'Technologies We Use',
+      subtitle: 'Modern tools and frameworks to build robust applications.',
+      list: [
+        { name: 'React', category: 'Frontend' },
+        { name: 'TypeScript', category: 'Language' },
+        { name: 'JavaScript', category: 'Language' },
+        { name: 'Tailwind CSS', category: 'Styling' },
+        { name: 'shadcn/ui', category: 'UI Library' },
+        { name: 'Expo', category: 'Mobile' },
+        { name: 'Go', category: 'Backend' },
+        { name: 'Laravel', category: 'Backend' },
+        { name: 'Svelte', category: 'Frontend' },
+        { name: 'Inertia.js', category: 'Framework' },
+        { name: 'Figma', category: 'Design' },
+        { name: 'AI Integration', category: 'AI' },
+      ],
+    },
     cta: {
       title: 'Ready to Build Your Application?',
       subtitle: 'Let\'s discuss your project requirements and create a roadmap for success.',
@@ -80,79 +98,97 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, any> = {
   },
   id: {
     hero: {
-      title: 'Pengembangan Web Full-Stack',
+      title: 'Full-Stack Web Development',
       subtitle:
-        'Bangun aplikasi web yang powerful dan scalable dari frontend hingga backend. Kami memberikan solusi lengkap menggunakan teknologi modern seperti React, Next.js, Node.js, dan infrastruktur cloud.',
-      cta: 'Mulai Proyek Anda',
-      whatsapp_message: 'Halo, saya butuh bantuan untuk membangun aplikasi web full-stack.',
+        'Kami membangun aplikasi web lengkap dari tampilan depan hingga sistem backend. Menggunakan teknologi terkini seperti React, Next.js, Node.js, dan cloud infrastructure.',
+      cta: 'Mulai Proyek',
+      whatsapp_message: 'Halo, saya ingin membuat aplikasi web full-stack.',
     },
     features: {
-      title: 'Mengapa Memilih Layanan Full-Stack Kami',
+      title: 'Kenapa Pilih Kami',
       subtitle:
-        'Keahlian pengembangan end-to-end dengan fokus pada performa, skalabilitas, dan pengalaman pengguna.',
+        'Tim berpengalaman yang fokus pada performa, skalabilitas, dan pengalaman pengguna terbaik.',
       list: [
         {
-          title: 'Tech Stack Modern',
+          title: 'Teknologi Terkini',
           description:
-            'React, Next.js, TypeScript, Node.js, dan teknologi cloud-native untuk aplikasi yang robust.',
+            'React, Next.js, TypeScript, Node.js, dan teknologi cloud untuk aplikasi yang handal.',
           icon: 'Code2',
         },
         {
-          title: 'Arsitektur Scalable',
+          title: 'Siap Berkembang',
           description:
-            'Bangun aplikasi yang berkembang bersama bisnis Anda menggunakan microservices dan pola serverless.',
+            'Arsitektur yang dirancang untuk tumbuh bersama bisnis Anda dengan microservices dan serverless.',
           icon: 'Server',
         },
         {
-          title: 'Desain Database',
+          title: 'Database Optimal',
           description:
-            'Pemodelan database ahli dengan PostgreSQL, MongoDB, dan Redis untuk manajemen data optimal.',
+            'Perancangan database dengan PostgreSQL, MongoDB, dan Redis untuk performa maksimal.',
           icon: 'Database',
         },
         {
-          title: 'Deployment Cloud',
+          title: 'Deploy ke Cloud',
           description:
-            'Deploy ke AWS, Vercel, atau cloud pilihan Anda dengan CI/CD pipelines dan monitoring.',
+            'Deployment ke AWS, Vercel, atau cloud pilihan Anda dengan CI/CD dan monitoring.',
           icon: 'Cloud',
         },
       ],
     },
     services: {
-      title: 'Layanan Full-Stack Kami',
+      title: 'Layanan Kami',
       subtitle:
-        'Solusi pengembangan komprehensif yang mencakup setiap aspek aplikasi web Anda.',
+        'Solusi lengkap untuk setiap kebutuhan aplikasi web Anda.',
       list: [
-        { title: 'Pengembangan Frontend', description: 'UI yang indah dan responsif dengan React, Next.js, dan framework CSS modern.' },
-        { title: 'Pengembangan Backend', description: 'API dan logika server-side yang robust dengan Node.js, Express, dan serverless functions.' },
-        { title: 'Arsitektur Database', description: 'Desain dan implementasi skema database dan data access layer yang efisien.' },
-        { title: 'Autentikasi & Keamanan', description: 'Autentikasi pengguna yang aman, otorisasi, dan perlindungan data.' },
-        { title: 'Integrasi Pihak Ketiga', description: 'Koneksi dengan payment gateway, CRM, analytics, dan layanan lainnya.' },
-        { title: 'Optimasi Performa', description: 'Optimasi waktu loading, strategi caching, dan performa aplikasi secara keseluruhan.' },
+        { title: 'Frontend', description: 'Tampilan menarik dan responsif dengan React, Next.js, dan CSS framework modern.' },
+        { title: 'Backend', description: 'API dan logika server yang handal dengan Node.js, Express, dan serverless.' },
+        { title: 'Database', description: 'Perancangan dan implementasi database yang efisien dan terstruktur.' },
+        { title: 'Keamanan', description: 'Sistem login yang aman, otorisasi, dan perlindungan data pengguna.' },
+        { title: 'Integrasi', description: 'Koneksi dengan payment gateway, CRM, analytics, dan layanan lainnya.' },
+        { title: 'Optimasi', description: 'Percepat loading, caching, dan tingkatkan performa aplikasi secara keseluruhan.' },
       ],
     },
     pricing: {
-      title: 'Opsi Harga Fleksibel',
-      subtitle: 'Pilih model engagement yang paling cocok untuk proyek Anda.',
+      title: 'Pilihan Harga',
+      subtitle: 'Pilih model kerja sama yang paling sesuai untuk proyek Anda.',
       hourly: {
-        title: 'Tarif Per Jam',
+        title: 'Per Jam',
         price: 'Rp 150 Ribu',
         unit: '/jam',
-        description: 'Ideal untuk pengembangan berkelanjutan, maintenance, dan penambahan fitur.',
-        cta: 'Pesan Jam',
+        description: 'Cocok untuk pengembangan berkelanjutan, perbaikan, dan penambahan fitur.',
+        cta: 'Pesan Sekarang',
       },
       project: {
-        title: 'Berbasis Proyek',
+        title: 'Per Proyek',
         price: 'Rp 5 Juta',
         unit: 'mulai dari',
-        description: 'Proyek dengan harga tetap dengan scope, timeline, dan deliverables yang jelas.',
-        cta: 'Dapatkan Penawaran',
-        note: '* Harga akhir tergantung pada kompleksitas dan kebutuhan proyek',
+        description: 'Harga tetap dengan scope, timeline, dan hasil yang jelas.',
+        cta: 'Minta Penawaran',
+        note: '* Harga disesuaikan dengan kompleksitas dan kebutuhan proyek',
       },
     },
+    techStack: {
+      title: 'Teknologi yang Kami Gunakan',
+      subtitle: 'Tools dan framework modern untuk membangun aplikasi yang handal.',
+      list: [
+        { name: 'React', category: 'Frontend' },
+        { name: 'TypeScript', category: 'Bahasa' },
+        { name: 'JavaScript', category: 'Bahasa' },
+        { name: 'Tailwind CSS', category: 'Styling' },
+        { name: 'shadcn/ui', category: 'UI Library' },
+        { name: 'Expo', category: 'Mobile' },
+        { name: 'Go', category: 'Backend' },
+        { name: 'Laravel', category: 'Backend' },
+        { name: 'Svelte', category: 'Frontend' },
+        { name: 'Inertia.js', category: 'Framework' },
+        { name: 'Figma', category: 'Desain' },
+        { name: 'AI Integration', category: 'AI' },
+      ],
+    },
     cta: {
-      title: 'Siap Membangun Aplikasi Anda?',
-      subtitle: 'Mari diskusikan kebutuhan proyek Anda dan buat roadmap menuju kesuksesan.',
-      button: 'Jadwalkan Konsultasi',
+      title: 'Siap Membuat Aplikasi?',
+      subtitle: 'Konsultasikan kebutuhan proyek Anda dan mari wujudkan bersama.',
+      button: 'Konsultasi Gratis',
     },
   },
 };

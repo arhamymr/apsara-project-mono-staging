@@ -1,6 +1,6 @@
 import type { Lang } from './types';
 
-export const SERVICES_STRINGS: Record<Lang, any> = {
+export const SERVICES_STRINGS: Record<Lang, unknown> = {
   en: {
     hero: {
       title: 'Our Services',
@@ -73,67 +73,67 @@ export const SERVICES_STRINGS: Record<Lang, any> = {
     hero: {
       title: 'Layanan Kami',
       subtitle:
-        'Solusi digital komprehensif untuk membantu bisnis Anda berkembang. Dari pengembangan web hingga integrasi AI, kami memberikan hasil berkualitas.',
+        'Solusi digital lengkap untuk mengembangkan bisnis Anda. Mulai dari pembuatan website hingga integrasi AI, kami siap membantu.',
       cta: 'Mulai Sekarang',
-      whatsapp_message: 'Halo, saya ingin mengetahui lebih lanjut tentang layanan Anda.',
+      whatsapp_message: 'Halo, saya tertarik untuk mengetahui lebih lanjut tentang layanan yang tersedia.',
     },
     overview: {
-      title: 'Yang Kami Tawarkan',
-      subtitle: 'Jelajahi berbagai layanan profesional kami yang dirancang untuk memenuhi kebutuhan digital Anda.',
+      title: 'Apa yang Kami Tawarkan',
+      subtitle: 'Temukan berbagai layanan profesional yang kami sediakan untuk kebutuhan digital Anda.',
     },
     serviceCards: [
       {
-        title: 'Pengembangan Full-Stack',
-        description: 'Bangun aplikasi web yang powerful dari frontend hingga backend dengan teknologi modern.',
+        title: 'Full-Stack Development',
+        description: 'Pembuatan aplikasi web lengkap dari tampilan depan hingga sistem backend dengan teknologi terkini.',
         href: '/full-stack-development',
         icon: 'Code2',
       },
       {
-        title: 'Pengembangan Aplikasi Mobile',
-        description: 'Buat aplikasi iOS dan Android yang menakjubkan dengan solusi native atau cross-platform.',
+        title: 'Aplikasi Mobile',
+        description: 'Pembuatan aplikasi iOS dan Android berkualitas tinggi, baik native maupun cross-platform.',
         href: '/mobile-app-development',
         icon: 'Smartphone',
       },
       {
-        title: 'Pengembangan API',
-        description: 'Bangun API REST dan GraphQL yang aman dan scalable untuk aplikasi Anda.',
+        title: 'Pembuatan API',
+        description: 'API REST dan GraphQL yang aman, cepat, dan siap untuk skala besar.',
         href: '/api-development',
         icon: 'Server',
       },
       {
-        title: 'Pengembangan Website',
-        description: 'Website profesional yang mengubah pengunjung menjadi pelanggan.',
+        title: 'Pembuatan Website',
+        description: 'Website profesional yang dirancang untuk mengubah pengunjung menjadi pelanggan.',
         href: '/create-website',
         icon: 'Globe',
       },
       {
         title: 'Perbaikan Website',
-        description: 'Perbaiki dan optimalkan website hasil AI atau website yang sudah ada untuk produksi.',
+        description: 'Perbaikan dan optimasi website hasil AI atau website lama agar siap digunakan.',
         href: '/fix-website',
         icon: 'Wrench',
       },
       {
         title: 'Integrasi AI',
-        description: 'Integrasikan kemampuan AI ke dalam aplikasi dan workflow Anda.',
+        description: 'Tambahkan kemampuan AI ke aplikasi dan alur kerja bisnis Anda.',
         href: '/ai-integration',
         icon: 'Bot',
       },
       {
-        title: 'Desain Post Instagram',
-        description: 'Konten media sosial yang menarik perhatian dan melibatkan audiens Anda.',
+        title: 'Desain Konten Instagram',
+        description: 'Konten visual menarik yang mampu meningkatkan engagement audiens Anda.',
         href: '/instagram-post',
         icon: 'Image',
       },
       {
         title: 'Produk Digital',
-        description: 'Luncurkan dan jual produk digital dengan solusi platform kami.',
+        description: 'Buat dan jual produk digital dengan platform yang kami sediakan.',
         href: '/digital-products',
         icon: 'Package',
       },
     ],
     cta: {
-      title: 'Tidak Yakin Layanan Mana yang Anda Butuhkan?',
-      subtitle: 'Hubungi kami untuk konsultasi gratis dan kami akan membantu Anda menemukan solusi yang tepat.',
+      title: 'Bingung Memilih Layanan?',
+      subtitle: 'Konsultasikan kebutuhan Anda secara gratis, kami bantu carikan solusi terbaik.',
       button: 'Hubungi Kami',
     },
   },

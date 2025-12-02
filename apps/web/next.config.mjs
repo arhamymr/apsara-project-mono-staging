@@ -12,6 +12,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'assets.apsaradigital.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.prod.website-files.com',
+      },
     ],
   },
 }
