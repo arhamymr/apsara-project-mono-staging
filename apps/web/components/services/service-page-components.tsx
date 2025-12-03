@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { Section } from '@/components/home/components';
-import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { Badge } from '@workspace/ui/components/badge';
-import { Button } from '@workspace/ui/components/button';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
-import { ArrowRight, Check, type LucideIcon } from 'lucide-react';
-
+import { Section } from "@/components/home/components";
+import { useFadeUp } from "@/components/home/hooks/useFadeUp";
+import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ArrowRight, Check, type LucideIcon } from "lucide-react";
+import Image from "next/image";
 
 // Types
 export interface Feature {
@@ -24,6 +24,7 @@ export interface Service {
 export interface TechItem {
   name: string;
   category: string;
+  icon?: string;
 }
 
 export interface PricingTier {
@@ -65,8 +66,8 @@ export function ServiceHeroSection({
   subtitle,
   ctaText,
   whatsappMessage,
-  secondaryCtaText = 'View Features',
-  secondaryCtaHref = '#features',
+  secondaryCtaText = "View Features",
+  secondaryCtaHref = "#features",
 }: HeroSectionProps) {
   const fadeUp = useFadeUp();
 
@@ -77,7 +78,7 @@ export function ServiceHeroSection({
         className="pointer-events-none absolute inset-0 opacity-[0.015]"
         style={{
           backgroundImage: `linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)`,
-          backgroundSize: '64px 64px',
+          backgroundSize: "64px 64px",
         }}
       />
 
@@ -131,7 +132,6 @@ export function ServiceHeroSection({
   );
 }
 
-
 // Trust Badges Section
 interface TrustBadgesSectionProps {
   badges: TrustBadge[];
@@ -182,9 +182,9 @@ export function FeaturesSection({
 }: FeaturesSectionProps) {
   const fadeUp = useFadeUp();
   const gridCols = {
-    2: 'md:grid-cols-2',
-    3: 'md:grid-cols-2 lg:grid-cols-3',
-    4: 'md:grid-cols-2 lg:grid-cols-4',
+    2: "md:grid-cols-2",
+    3: "md:grid-cols-2 lg:grid-cols-3",
+    4: "md:grid-cols-2 lg:grid-cols-4",
   };
 
   return (
@@ -197,7 +197,7 @@ export function FeaturesSection({
           <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
         </motion.div>
 
-        <div className={cn('grid gap-6', gridCols[columns])}>
+        <div className={cn("grid gap-6", gridCols[columns])}>
           {features.map((feature, i) => {
             const Icon = iconMap[feature.icon] || defaultIcon;
             return (
@@ -277,7 +277,6 @@ export function ServicesSection({
   );
 }
 
-
 // Workflow Section
 interface WorkflowSectionProps {
   title?: string;
@@ -286,8 +285,8 @@ interface WorkflowSectionProps {
 }
 
 export function WorkflowSection({
-  title = 'How It Works',
-  subtitle = 'A structured approach to building your application.',
+  title = "How It Works",
+  subtitle = "A structured approach to building your application.",
   steps,
 }: WorkflowSectionProps) {
   const fadeUp = useFadeUp();
@@ -463,37 +462,79 @@ export function PricingSection({
   );
 }
 
-
 // Tech Stack Marquee Section
 interface TechStackMarqueeProps {
   title: string;
   subtitle: string;
   techItems: TechItem[];
-  techColors?: Record<string, string>;
 }
 
-const defaultTechColors: Record<string, string> = {
-  React: 'bg-cyan-500/10 text-cyan-600',
-  TypeScript: 'bg-blue-500/10 text-blue-600',
-  JavaScript: 'bg-yellow-500/10 text-yellow-600',
-  'Tailwind CSS': 'bg-teal-500/10 text-teal-600',
-  'shadcn/ui': 'bg-zinc-500/10 text-zinc-600',
-  Expo: 'bg-violet-500/10 text-violet-600',
-  Go: 'bg-sky-500/10 text-sky-600',
-  Laravel: 'bg-red-500/10 text-red-600',
-  Svelte: 'bg-orange-500/10 text-orange-600',
-  'Inertia.js': 'bg-purple-500/10 text-purple-600',
-  Figma: 'bg-pink-500/10 text-pink-600',
-  'AI Integration': 'bg-emerald-500/10 text-emerald-600',
-};
+// Dummy tech stack data with icons - replace icon URLs as needed
+export const DUMMY_TECH_STACK: TechItem[] = [
+  {
+    name: "React",
+    category: "Frontend",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  },
+  {
+    name: "TypeScript",
+    category: "Language",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+  },
+  {
+    name: "Next.js",
+    category: "Framework",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+  },
+  {
+    name: "Tailwind CSS",
+    category: "Styling",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg",
+  },
+  {
+    name: "Node.js",
+    category: "Backend",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  },
+  {
+    name: "PostgreSQL",
+    category: "Database",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svghttps://assets.apsaradigital.com/apsara-assets/laravel.png",
+  },
+  {
+    name: "Laravel",
+    category: "framework",
+    icon: "https://assets.apsaradigital.com/apsara-assets/laravel.png",
+  },
+  {
+    name: "Go",
+    category: "Backend",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg",
+  },
+  {
+    name: "Docker",
+    category: "DevOps",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+  },
+  {
+    name: "AWS",
+    category: "Cloud",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+  },
+  {
+    name: "Figma",
+    category: "Design",
+    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+  },
+];
 
 export function TechStackMarquee({
   title,
   subtitle,
   techItems,
-  techColors = defaultTechColors,
 }: TechStackMarqueeProps) {
   const fadeUp = useFadeUp();
+  // Duplicate items for seamless infinite scroll
   const duplicatedItems = [...techItems, ...techItems];
 
   return (
@@ -509,42 +550,30 @@ export function TechStackMarquee({
 
       <div className="relative">
         <motion.div
-          className="flex gap-6"
-          animate={{ x: ['0%', '-50%'] }}
+          className="flex gap-12"
+          animate={{ x: ["0%", "-50%"] }}
           transition={{
             x: {
               repeat: Infinity,
-              repeatType: 'loop',
+              repeatType: "loop",
               duration: 25,
-              ease: 'linear',
+              ease: "linear",
             },
           }}
         >
-          {duplicatedItems.map((tech, i) => {
-            const colorClass =
-              techColors[tech.name] || 'bg-primary/10 text-primary';
-            return (
-              <div
+          {duplicatedItems.map((tech, i) =>
+            tech.icon ? (
+              <Image
                 key={`${tech.name}-${i}`}
-                className="bg-card/50 border-foreground/10 hover:border-foreground/20 flex flex-shrink-0 items-center gap-3 rounded-xl border px-5 py-3 transition-colors"
-              >
-                <div
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-lg text-lg font-bold',
-                    colorClass
-                  )}
-                >
-                  {tech.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{tech.name}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {tech.category}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+                src={tech.icon}
+                alt={tech.name}
+                width={80}
+                height={80}
+                className="h-16 w-16 flex-shrink-0 object-contain"
+                unoptimized
+              />
+            ) : null
+          )}
         </motion.div>
       </div>
     </Section>

@@ -14,6 +14,7 @@ interface Service {
 interface TechItem {
   name: string;
   category: string;
+  icon?: string;
 }
 
 interface PricingTier {
@@ -172,18 +173,16 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, FullStackDevelopmentSt
       title: 'Technologies We Use',
       subtitle: 'Modern tools and frameworks to build robust applications.',
       list: [
-        { name: 'React', category: 'Frontend' },
-        { name: 'TypeScript', category: 'Language' },
-        { name: 'JavaScript', category: 'Language' },
-        { name: 'Tailwind CSS', category: 'Styling' },
-        { name: 'shadcn/ui', category: 'UI Library' },
-        { name: 'Expo', category: 'Mobile' },
-        { name: 'Go', category: 'Backend' },
-        { name: 'Laravel', category: 'Backend' },
-        { name: 'Svelte', category: 'Frontend' },
-        { name: 'Inertia.js', category: 'Framework' },
-        { name: 'Figma', category: 'Design' },
-        { name: 'AI Integration', category: 'AI' },
+        { name: 'React', category: 'Frontend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+        { name: 'TypeScript', category: 'Language', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' },
+        { name: 'Next.js', category: 'Framework', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg' },
+        { name: 'Tailwind CSS', category: 'Styling', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg' },
+        { name: 'Node.js', category: 'Backend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' },
+        { name: 'Go', category: 'Backend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg' },
+        { name: 'PostgreSQL', category: 'Database', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+        { name: 'Docker', category: 'DevOps', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+        { name: 'Figma', category: 'Design', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' },
+        { name: 'GraphQL', category: 'API', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg' },
       ],
     },
     cta: {
@@ -285,18 +284,16 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, FullStackDevelopmentSt
       title: 'Teknologi yang Kami Gunakan',
       subtitle: 'Tools dan framework modern untuk membangun aplikasi yang handal.',
       list: [
-        { name: 'React', category: 'Frontend' },
-        { name: 'TypeScript', category: 'Bahasa' },
-        { name: 'JavaScript', category: 'Bahasa' },
-        { name: 'Tailwind CSS', category: 'Styling' },
-        { name: 'shadcn/ui', category: 'UI Library' },
-        { name: 'Expo', category: 'Mobile' },
-        { name: 'Go', category: 'Backend' },
-        { name: 'Laravel', category: 'Backend' },
-        { name: 'Svelte', category: 'Frontend' },
-        { name: 'Inertia.js', category: 'Framework' },
-        { name: 'Figma', category: 'Desain' },
-        { name: 'AI Integration', category: 'AI' },
+        { name: 'React', category: 'Frontend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+        { name: 'TypeScript', category: 'Bahasa', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg' },
+        { name: 'Next.js', category: 'Framework', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg' },
+        { name: 'Tailwind CSS', category: 'Styling', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg' },
+        { name: 'Node.js', category: 'Backend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' },
+        { name: 'Go', category: 'Backend', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg' },
+        { name: 'PostgreSQL', category: 'Database', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+        { name: 'Docker', category: 'DevOps', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+        { name: 'Figma', category: 'Desain', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' },
+        { name: 'GraphQL', category: 'API', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg' },
       ],
     },
     cta: {
