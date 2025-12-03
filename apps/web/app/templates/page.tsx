@@ -61,13 +61,10 @@ function CTASection() {
             className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Button asChild size="lg" className="gap-2">
-              <Link href="/register">
-                {s.cta.primaryButton}
+              <Link href="/contact">
+                {s.cta.secondaryButton}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/contact">{s.cta.secondaryButton}</Link>
             </Button>
           </motion.div>
         </div>
