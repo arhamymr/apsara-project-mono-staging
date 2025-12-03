@@ -2,146 +2,72 @@
 
 import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { CallToAction, Footer, TopNav } from '@/components/home/sections';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { useLocale } from '@/i18n/LocaleContext';
-import { MOBILE_APP_DEVELOPMENT_STRINGS } from '@/i18n/mobile-app-development';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight,
-  Check,
-  Clock,
-  Layers,
-  MessageCircle,
-  Palette,
-  Server,
-  Shield,
-  Smartphone,
-  Sparkles,
-  Store,
-  Bell,
-  Wrench,
-} from 'lucide-react';
+import { ArrowRight, Check, type LucideIcon } from 'lucide-react';
 
-function useStrings() {
-  const { lang } = useLocale();
-  return MOBILE_APP_DEVELOPMENT_STRINGS[lang as keyof typeof MOBILE_APP_DEVELOPMENT_STRINGS];
+
+// Types
+export interface Feature {
+  title: string;
+  description: string;
+  icon: string;
 }
 
-// React Native brand blue theme (#61DAFB)
-const reactNativeTheme = {
-  '--primary': '#61DAFB',
-  '--ring': '#61DAFB',
-} as React.CSSProperties;
-
-export default function MobileAppDevelopment() {
-  const s = useStrings();
-
-  return (
-    <div className="bg-background text-foreground min-h-dvh" style={reactNativeTheme}>
-      <TopNav />
-      <main id="main-content">
-        <HeroSection />
-        <TrustBadges />
-        <FeaturesSection />
-        <ServicesSection />
-        <WorkflowSection />
-        <PricingSection />
-        <CallToAction
-          title={s.cta.title}
-          subtitle={s.cta.subtitle}
-          buttonText={s.cta.button}
-          whatsappMessage={s.hero.whatsapp_message}
-        />
-      </main>
-      <Footer />
-    </div>
-  );
+export interface Service {
+  title: string;
+  description: string;
 }
 
-function PhoneMockup({ className }: { className?: string }) {
-  return (
-    <div className={cn('relative', className)}>
-      <svg
-        width="240"
-        height="480"
-        viewBox="0 0 240 480"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="stroke-[#61DAFB]"
-      >
-        {/* Phone frame */}
-        <rect
-          x="4"
-          y="4"
-          width="232"
-          height="472"
-          rx="36"
-          strokeWidth="2"
-          fill="none"
-        />
-        {/* Screen */}
-        <rect
-          x="16"
-          y="16"
-          width="208"
-          height="448"
-          rx="28"
-          strokeWidth="1.5"
-          fill="none"
-        />
-        {/* Notch */}
-        <rect
-          x="80"
-          y="24"
-          width="80"
-          height="24"
-          rx="12"
-          strokeWidth="1.5"
-          fill="none"
-        />
-        {/* Status bar elements */}
-        <text x="28" y="62" fontSize="12" fill="#61DAFB" className="font-mono">
-          9:41
-        </text>
-        <rect x="180" y="52" width="28" height="12" rx="3" strokeWidth="1" fill="none" />
-        <rect x="210" y="55" width="2" height="6" rx="1" fill="#61DAFB" />
-        {/* Header card */}
-        <rect
-          x="28"
-          y="80"
-          width="184"
-          height="100"
-          rx="16"
-          strokeWidth="1.5"
-          fill="none"
-        />
-        {/* Simple decorative lines inside header */}
-        <line x1="60" y1="115" x2="180" y2="115" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="60" y1="135" x2="150" y2="135" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
-        <line x1="60" y1="155" x2="120" y2="155" strokeWidth="1" strokeLinecap="round" opacity="0.3" />
-        {/* Text lines */}
-        <line x1="28" y1="200" x2="160" y2="200" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="28" y1="220" x2="120" y2="220" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
-        {/* Grid cards */}
-        <rect x="28" y="250" width="84" height="70" rx="12" strokeWidth="1.5" fill="none" />
-        <rect x="128" y="250" width="84" height="70" rx="12" strokeWidth="1.5" fill="none" />
-        <rect x="28" y="336" width="84" height="70" rx="12" strokeWidth="1.5" fill="none" />
-        <rect x="128" y="336" width="84" height="70" rx="12" strokeWidth="1.5" fill="none" />
-        {/* Bottom nav */}
-        <line x1="28" y1="430" x2="212" y2="430" strokeWidth="1" opacity="0.3" />
-        <circle cx="60" cy="450" r="8" strokeWidth="1.5" fill="none" />
-        <circle cx="120" cy="450" r="8" strokeWidth="1.5" fill="none" />
-        <circle cx="180" cy="450" r="8" strokeWidth="1.5" fill="none" />
-      </svg>
-    </div>
-  );
+export interface TechItem {
+  name: string;
+  category: string;
 }
 
-function HeroSection() {
-  const s = useStrings();
+export interface PricingTier {
+  title: string;
+  price: string;
+  unit: string;
+  description: string;
+  cta: string;
+  note?: string;
+}
+
+export interface WorkflowStep {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface TrustBadge {
+  icon: LucideIcon;
+  label: string;
+}
+
+// Hero Section
+interface HeroSectionProps {
+  badge: string;
+  badgeIcon: LucideIcon;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  whatsappMessage: string;
+  secondaryCtaText?: string;
+  secondaryCtaHref?: string;
+}
+
+export function ServiceHeroSection({
+  badge,
+  badgeIcon: BadgeIcon,
+  title,
+  subtitle,
+  ctaText,
+  whatsappMessage,
+  secondaryCtaText = 'View Features',
+  secondaryCtaHref = '#features',
+}: HeroSectionProps) {
   const fadeUp = useFadeUp();
 
   return (
@@ -155,24 +81,6 @@ function HeroSection() {
         }}
       />
 
-      {/* Phone mockups on edges - hidden on mobile */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/3 hidden xl:block"
-      >
-        <PhoneMockup className="rotate-[-8deg]" />
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/3 hidden xl:block"
-      >
-        <PhoneMockup className="rotate-[8deg]" />
-      </motion.div>
-
       <div className="relative container mx-auto px-4">
         <div className="mx-auto max-w-4xl text-center">
           <motion.div {...fadeUp}>
@@ -180,8 +88,8 @@ function HeroSection() {
               variant="outline"
               className="border-primary/20 bg-primary/5 text-primary mb-8 px-4 py-2 text-sm font-medium"
             >
-              <Smartphone className="mr-2 h-4 w-4" />
-              Mobile App Development
+              <BadgeIcon className="mr-2 h-4 w-4" />
+              {badge}
             </Badge>
           </motion.div>
 
@@ -189,14 +97,14 @@ function HeroSection() {
             {...fadeUp}
             className="text-foreground text-4xl leading-[1.1] font-normal tracking-tight md:text-6xl lg:text-7xl"
           >
-            {s.hero.title}
+            {title}
           </motion.h1>
 
           <motion.p
             {...fadeUp}
             className="text-muted-foreground mx-auto mt-8 max-w-2xl text-lg leading-relaxed md:text-xl"
           >
-            {s.hero.subtitle}
+            {subtitle}
           </motion.p>
 
           <motion.div
@@ -205,16 +113,16 @@ function HeroSection() {
           >
             <Button size="lg" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.hero.cta}
+                {ctaText}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href="#features">View Features</a>
+              <a href={secondaryCtaHref}>{secondaryCtaText}</a>
             </Button>
           </motion.div>
         </div>
@@ -223,14 +131,14 @@ function HeroSection() {
   );
 }
 
-function TrustBadges() {
+
+// Trust Badges Section
+interface TrustBadgesSectionProps {
+  badges: TrustBadge[];
+}
+
+export function TrustBadgesSection({ badges }: TrustBadgesSectionProps) {
   const fadeUp = useFadeUp();
-  const badges = [
-    { icon: Clock, label: '24-48h Response' },
-    { icon: Shield, label: 'Secure Development' },
-    { icon: MessageCircle, label: 'Free Consultation' },
-    { icon: Sparkles, label: 'Modern Tech Stack' },
-  ];
 
   return (
     <Section className="border-border border-y py-8">
@@ -254,14 +162,29 @@ function TrustBadges() {
   );
 }
 
-function FeaturesSection() {
-  const s = useStrings();
-  const fadeUp = useFadeUp();
+// Features Section
+interface FeaturesSectionProps {
+  title: string;
+  subtitle: string;
+  features: Feature[];
+  iconMap: Record<string, LucideIcon>;
+  defaultIcon: LucideIcon;
+  columns?: 2 | 3 | 4;
+}
 
-  const iconMap: Record<string, typeof Smartphone> = {
-    Smartphone,
-    Layers,
-    Store,
+export function FeaturesSection({
+  title,
+  subtitle,
+  features,
+  iconMap,
+  defaultIcon,
+  columns = 4,
+}: FeaturesSectionProps) {
+  const fadeUp = useFadeUp();
+  const gridCols = {
+    2: 'md:grid-cols-2',
+    3: 'md:grid-cols-2 lg:grid-cols-3',
+    4: 'md:grid-cols-2 lg:grid-cols-4',
   };
 
   return (
@@ -269,24 +192,20 @@ function FeaturesSection() {
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
-            {s.features.title}
+            {title}
           </h2>
-          <p className="text-muted-foreground mt-6 text-lg">
-            {s.features.subtitle}
-          </p>
+          <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
         </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {s.features.list.map((feature: { title: string; description: string; icon?: string }, i: number) => {
-            const Icon = iconMap[feature.icon || ''] || Smartphone;
+        <div className={cn('grid gap-6', gridCols[columns])}>
+          {features.map((feature, i) => {
+            const Icon = iconMap[feature.icon] || defaultIcon;
             return (
               <motion.div
                 key={feature.title}
                 {...fadeUp}
                 transition={{ delay: i * 0.1 }}
-                className={cn(
-                  'group border-foreground/20 hover:border-foreground/30 bg-card/50 relative rounded-xl border p-8 transition-all duration-300',
-                )}
+                className="group border-foreground/20 hover:border-foreground/30 bg-card/50 relative rounded-xl border p-8 transition-all duration-300"
               >
                 <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl">
                   <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -304,35 +223,43 @@ function FeaturesSection() {
   );
 }
 
-function ServicesSection() {
-  const s = useStrings();
-  const fadeUp = useFadeUp();
+// Services Section
+interface ServicesSectionProps {
+  title: string;
+  subtitle: string;
+  services: Service[];
+  icons: LucideIcon[];
+  defaultIcon: LucideIcon;
+}
 
-  const icons = [Palette, Smartphone, Layers, Server, Bell, Wrench];
+export function ServicesSection({
+  title,
+  subtitle,
+  services,
+  icons,
+  defaultIcon,
+}: ServicesSectionProps) {
+  const fadeUp = useFadeUp();
 
   return (
     <Section id="services" className="bg-muted/30 py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
-            {s.services.title}
+            {title}
           </h2>
-          <p className="text-muted-foreground mt-6 text-lg">
-            {s.services.subtitle}
-          </p>
+          <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
         </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {s.services.list.map((service: { title: string; description: string }, i: number) => {
-            const Icon = icons[i] || Smartphone;
+          {services.map((service, i) => {
+            const Icon = icons[i] || defaultIcon;
             return (
               <motion.div
                 key={service.title}
                 {...fadeUp}
                 transition={{ delay: i * 0.1 }}
-                className={cn(
-                  'group border-foreground/20 hover:border-foreground/30 bg-card relative rounded-xl border p-8 transition-all duration-300',
-                )}
+                className="group border-foreground/20 hover:border-foreground/30 bg-card relative rounded-xl border p-8 transition-all duration-300"
               >
                 <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl">
                   <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -350,45 +277,29 @@ function ServicesSection() {
   );
 }
 
-function WorkflowSection() {
+
+// Workflow Section
+interface WorkflowSectionProps {
+  title?: string;
+  subtitle?: string;
+  steps: WorkflowStep[];
+}
+
+export function WorkflowSection({
+  title = 'How It Works',
+  subtitle = 'A structured approach to building your application.',
+  steps,
+}: WorkflowSectionProps) {
   const fadeUp = useFadeUp();
-  const steps = [
-    {
-      number: '01',
-      title: 'Discovery',
-      description:
-        'We analyze your app requirements, target audience, and define the project scope and features.',
-    },
-    {
-      number: '02',
-      title: 'Design',
-      description:
-        'UI/UX design with wireframes, prototypes, and user flow optimization for mobile experience.',
-    },
-    {
-      number: '03',
-      title: 'Development',
-      description:
-        'Agile development with regular builds, testing on real devices, and continuous integration.',
-    },
-    {
-      number: '04',
-      title: 'Launch',
-      description:
-        'App store submission, launch support, and ongoing maintenance and updates.',
-    },
-  ];
 
   return (
     <Section className="py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
-            How It Works
+            {title}
           </h2>
-          <p className="text-muted-foreground mt-6 text-lg">
-            A structured approach to building your mobile application.
-          </p>
+          <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
         </motion.div>
 
         <div className="mx-auto max-w-4xl">
@@ -416,34 +327,36 @@ function WorkflowSection() {
   );
 }
 
-function PricingSection() {
-  const s = useStrings();
+// Pricing Section
+interface PricingSectionProps {
+  title: string;
+  subtitle: string;
+  hourly: PricingTier;
+  project: PricingTier;
+  hourlyFeatures: string[];
+  projectFeatures: string[];
+  whatsappMessage: string;
+}
+
+export function PricingSection({
+  title,
+  subtitle,
+  hourly,
+  project,
+  hourlyFeatures,
+  projectFeatures,
+  whatsappMessage,
+}: PricingSectionProps) {
   const fadeUp = useFadeUp();
-
-  const hourlyFeatures = [
-    'Flexible scheduling',
-    'Direct communication',
-    'Detailed time tracking',
-    'No minimum hours',
-  ];
-
-  const projectFeatures = [
-    'Fixed project scope',
-    'Milestone payments',
-    'Priority support',
-    'Revision rounds included',
-  ];
 
   return (
     <Section className="bg-muted/30 py-24 lg:py-32">
       <div className="container mx-auto px-4">
         <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
           <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
-            {s.pricing.title}
+            {title}
           </h2>
-          <p className="text-muted-foreground mt-6 text-lg">
-            {s.pricing.subtitle}
-          </p>
+          <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
         </motion.div>
 
         <div className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-2">
@@ -454,20 +367,18 @@ function PricingSection() {
           >
             <div className="mb-8">
               <h3 className="text-muted-foreground mb-2 text-sm font-medium tracking-wider uppercase">
-                {s.pricing.hourly.title}
+                {hourly.title}
               </h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-medium tracking-tight">
-                  {s.pricing.hourly.price}
+                  {hourly.price}
                 </span>
-                <span className="text-muted-foreground">
-                  {s.pricing.hourly.unit}
-                </span>
+                <span className="text-muted-foreground">{hourly.unit}</span>
               </div>
             </div>
 
             <p className="text-muted-foreground mb-8 text-lg">
-              {s.pricing.hourly.description}
+              {hourly.description}
             </p>
 
             <ul className="mb-10 space-y-4">
@@ -483,11 +394,11 @@ function PricingSection() {
 
             <Button size="lg" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.pricing.hourly.cta}
+                {hourly.cta}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
@@ -504,20 +415,18 @@ function PricingSection() {
 
             <div className="mb-8">
               <h3 className="text-background/60 mb-2 text-sm font-medium tracking-wider uppercase">
-                {s.pricing.project.title}
+                {project.title}
               </h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-medium tracking-tight">
-                  {s.pricing.project.price}
+                  {project.price}
                 </span>
-                <span className="text-background/60">
-                  {s.pricing.project.unit}
-                </span>
+                <span className="text-background/60">{project.unit}</span>
               </div>
             </div>
 
             <p className="text-background/70 mb-8 text-lg">
-              {s.pricing.project.description}
+              {project.description}
             </p>
 
             <ul className="mb-10 space-y-4">
@@ -533,18 +442,18 @@ function PricingSection() {
 
             <Button size="lg" variant="secondary" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.pricing.project.cta}
+                {project.cta}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
 
-            {s.pricing.project.note && (
+            {project.note && (
               <p className="text-background/50 mt-6 text-center text-xs">
-                {s.pricing.project.note}
+                {project.note}
               </p>
             )}
           </motion.div>
@@ -555,3 +464,89 @@ function PricingSection() {
 }
 
 
+// Tech Stack Marquee Section
+interface TechStackMarqueeProps {
+  title: string;
+  subtitle: string;
+  techItems: TechItem[];
+  techColors?: Record<string, string>;
+}
+
+const defaultTechColors: Record<string, string> = {
+  React: 'bg-cyan-500/10 text-cyan-600',
+  TypeScript: 'bg-blue-500/10 text-blue-600',
+  JavaScript: 'bg-yellow-500/10 text-yellow-600',
+  'Tailwind CSS': 'bg-teal-500/10 text-teal-600',
+  'shadcn/ui': 'bg-zinc-500/10 text-zinc-600',
+  Expo: 'bg-violet-500/10 text-violet-600',
+  Go: 'bg-sky-500/10 text-sky-600',
+  Laravel: 'bg-red-500/10 text-red-600',
+  Svelte: 'bg-orange-500/10 text-orange-600',
+  'Inertia.js': 'bg-purple-500/10 text-purple-600',
+  Figma: 'bg-pink-500/10 text-pink-600',
+  'AI Integration': 'bg-emerald-500/10 text-emerald-600',
+};
+
+export function TechStackMarquee({
+  title,
+  subtitle,
+  techItems,
+  techColors = defaultTechColors,
+}: TechStackMarqueeProps) {
+  const fadeUp = useFadeUp();
+  const duplicatedItems = [...techItems, ...techItems];
+
+  return (
+    <Section className="overflow-hidden py-16 lg:py-20">
+      <div className="container mx-auto px-4">
+        <motion.div {...fadeUp} className="mx-auto mb-12 max-w-2xl text-center">
+          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
+            {title}
+          </h2>
+          <p className="text-muted-foreground mt-6 text-lg">{subtitle}</p>
+        </motion.div>
+      </div>
+
+      <div className="relative">
+        <motion.div
+          className="flex gap-6"
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: 'loop',
+              duration: 25,
+              ease: 'linear',
+            },
+          }}
+        >
+          {duplicatedItems.map((tech, i) => {
+            const colorClass =
+              techColors[tech.name] || 'bg-primary/10 text-primary';
+            return (
+              <div
+                key={`${tech.name}-${i}`}
+                className="bg-card/50 border-foreground/10 hover:border-foreground/20 flex flex-shrink-0 items-center gap-3 rounded-xl border px-5 py-3 transition-colors"
+              >
+                <div
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-lg text-lg font-bold',
+                    colorClass
+                  )}
+                >
+                  {tech.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{tech.name}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {tech.category}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+      </div>
+    </Section>
+  );
+}

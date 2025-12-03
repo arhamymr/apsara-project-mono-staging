@@ -108,8 +108,8 @@ export const API_DEVELOPMENT_STRINGS: Record<Lang, ApiDevelopmentStrings> = {
       subtitle: 'Flexible pricing for your API development and integration needs.',
       hourly: {
         title: 'Hourly Rate',
-        price: 'IDR 150K',
-        unit: '/hour',
+        price: 'IDR 1M',
+        unit: 'starting from',
         description: 'Ideal for API integrations, enhancements, and maintenance.',
         cta: 'Book Hours',
       },
@@ -185,8 +185,8 @@ export const API_DEVELOPMENT_STRINGS: Record<Lang, ApiDevelopmentStrings> = {
       subtitle: 'Pilihan harga yang fleksibel sesuai kebutuhan proyek Anda.',
       hourly: {
         title: 'Per Jam',
-        price: 'Rp 150 Ribu',
-        unit: '/jam',
+        price: 'Rp 1 Juta',
+        unit: 'mulai dari',
         description: 'Cocok untuk integrasi, perbaikan, dan pemeliharaan API.',
         cta: 'Pesan Sekarang',
       },

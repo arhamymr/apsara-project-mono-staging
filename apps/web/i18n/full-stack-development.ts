@@ -1,7 +1,101 @@
 import type { Lang } from './types';
 
-export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface Service {
+  title: string;
+  description: string;
+}
+
+interface TechItem {
+  name: string;
+  category: string;
+}
+
+interface PricingTier {
+  title: string;
+  price: string;
+  unit: string;
+  description: string;
+  cta: string;
+  note?: string;
+  features: string[];
+}
+
+interface TrustBadge {
+  label: string;
+  icon: string;
+}
+
+interface WorkflowStep {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface FullStackDevelopmentStrings {
+  trustBadges: TrustBadge[];
+  workflow: {
+    title: string;
+    subtitle: string;
+    steps: WorkflowStep[];
+  };
+  hero: {
+    title: string;
+    subtitle: string;
+    cta: string;
+    whatsapp_message: string;
+  };
+  features: {
+    title: string;
+    subtitle: string;
+    list: Feature[];
+  };
+  services: {
+    title: string;
+    subtitle: string;
+    list: Service[];
+  };
+  pricing: {
+    title: string;
+    subtitle: string;
+    hourly: PricingTier;
+    project: PricingTier;
+  };
+  techStack: {
+    title: string;
+    subtitle: string;
+    list: TechItem[];
+  };
+  cta: {
+    title: string;
+    subtitle: string;
+    button: string;
+  };
+}
+
+export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, FullStackDevelopmentStrings> = {
   en: {
+    trustBadges: [
+      { icon: 'Clock', label: '24-48h Response' },
+      { icon: 'Shield', label: 'Secure Development' },
+      { icon: 'MessageCircle', label: 'Free Consultation' },
+      { icon: 'Sparkles', label: 'Modern Tech Stack' },
+    ],
+    workflow: {
+      title: 'Our Development Process',
+      subtitle: 'A proven methodology to deliver quality results.',
+      steps: [
+        { number: '01', title: 'Discovery', description: 'We analyze your requirements, define project scope, and create a detailed technical roadmap.' },
+        { number: '02', title: 'Design', description: 'Architecture planning, database design, and UI/UX wireframes for your application.' },
+        { number: '03', title: 'Development', description: 'Agile development with regular updates, code reviews, and continuous integration.' },
+        { number: '04', title: 'Deployment', description: 'Launch to production with monitoring, documentation, and ongoing support.' },
+      ],
+    },
     hero: {
       title: 'Full-Stack Web Development',
       subtitle:
@@ -58,10 +152,11 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
       subtitle: 'Choose the engagement model that works best for your project.',
       hourly: {
         title: 'Hourly Rate',
-        price: 'IDR 150K',
-        unit: '/hour',
+        price: 'IDR 1M',
+        unit: 'starting from',
         description: 'Ideal for ongoing development, maintenance, and feature additions.',
         cta: 'Book Hours',
+        features: ['Flexible scheduling', 'Direct communication', 'Detailed time tracking', 'No minimum hours'],
       },
       project: {
         title: 'Project-Based',
@@ -70,6 +165,7 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
         description: 'Fixed-price projects with clear scope, timeline, and deliverables.',
         cta: 'Get Quote',
         note: '* Final pricing depends on project complexity and requirements',
+        features: ['Fixed project scope', 'Milestone payments', 'Priority support', 'Revision rounds included'],
       },
     },
     techStack: {
@@ -97,6 +193,22 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
     },
   },
   id: {
+    trustBadges: [
+      { icon: 'Clock', label: 'Respon 24-48 Jam' },
+      { icon: 'Shield', label: 'Pengembangan Aman' },
+      { icon: 'MessageCircle', label: 'Konsultasi Gratis' },
+      { icon: 'Sparkles', label: 'Teknologi Modern' },
+    ],
+    workflow: {
+      title: 'Proses Pengembangan Kami',
+      subtitle: 'Metodologi terbukti untuk hasil berkualitas.',
+      steps: [
+        { number: '01', title: 'Analisis', description: 'Kami menganalisis kebutuhan Anda, menentukan scope proyek, dan membuat roadmap teknis.' },
+        { number: '02', title: 'Desain', description: 'Perencanaan arsitektur, desain database, dan wireframe UI/UX untuk aplikasi Anda.' },
+        { number: '03', title: 'Pengembangan', description: 'Pengembangan agile dengan update rutin, code review, dan continuous integration.' },
+        { number: '04', title: 'Deployment', description: 'Peluncuran ke production dengan monitoring, dokumentasi, dan dukungan berkelanjutan.' },
+      ],
+    },
     hero: {
       title: 'Full-Stack Web Development',
       subtitle:
@@ -153,10 +265,11 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
       subtitle: 'Pilih model kerja sama yang paling sesuai untuk proyek Anda.',
       hourly: {
         title: 'Per Jam',
-        price: 'Rp 150 Ribu',
-        unit: '/jam',
+        price: 'Rp 1 Juta',
+        unit: 'mulai dari',
         description: 'Cocok untuk pengembangan berkelanjutan, perbaikan, dan penambahan fitur.',
         cta: 'Pesan Sekarang',
+        features: ['Jadwal fleksibel', 'Komunikasi langsung', 'Tracking waktu detail', 'Tanpa minimum jam'],
       },
       project: {
         title: 'Per Proyek',
@@ -165,6 +278,7 @@ export const FULL_STACK_DEVELOPMENT_STRINGS: Record<Lang, unknown> = {
         description: 'Harga tetap dengan scope, timeline, dan hasil yang jelas.',
         cta: 'Minta Penawaran',
         note: '* Harga disesuaikan dengan kompleksitas dan kebutuhan proyek',
+        features: ['Scope proyek tetap', 'Pembayaran per milestone', 'Dukungan prioritas', 'Revisi termasuk'],
       },
     },
     techStack: {

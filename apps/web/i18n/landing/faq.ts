@@ -14,6 +14,7 @@ export const FAQ_STRINGS: Record<Lang, FAQStrings> = {
   en: {
     title: 'Frequently Asked Questions',
     items: [
+      { q: 'What is Apsara Digital?', a: 'Apsara Digital is an all-in-one application and set of tools for building your online presence. From professional websites and AI automation to operations, marketing tools, and custom applications — everything you need to establish and grow your business online.' },
       { q: 'Who are you and what do you do?', a: 'I\'m a solo developer specializing in web development, AI integration, and automation solutions. I work directly with clients to deliver high-quality, personalized digital solutions without the overhead of a large agency.' },
       { q: 'Why should I hire a solo developer instead of an agency?', a: 'Working with me means direct communication, faster turnaround, competitive pricing, and personalized attention to your project. You\'ll always know who\'s working on your project and can reach me directly for any questions or updates.' },
       { q: 'How long does it take to build a website?', a: 'Timeline depends on complexity. Simple landing pages can be delivered in 3-5 days, while full websites typically take 1-2 weeks. Custom web applications may require 4-8 weeks. I\'ll provide a clear timeline estimate during our initial consultation.' },
@@ -27,6 +28,7 @@ export const FAQ_STRINGS: Record<Lang, FAQStrings> = {
   id: {
     title: 'Pertanyaan yang Sering Diajukan',
     items: [
+      { q: 'Apa itu Apsara Digital?', a: 'Apsara Digital adalah aplikasi dan seperangkat tools lengkap untuk membangun kehadiran online Anda. Dari website profesional dan otomatisasi AI hingga operasional, tools marketing, dan aplikasi kustom — semua yang Anda butuhkan untuk membangun dan mengembangkan bisnis online Anda.' },
       { q: 'Siapa Anda dan apa yang Anda kerjakan?', a: 'Saya adalah solo developer yang mengkhususkan diri dalam pengembangan web, integrasi AI, dan solusi otomatisasi. Saya bekerja langsung dengan klien untuk memberikan solusi digital berkualitas tinggi dan personal tanpa biaya overhead agensi besar.' },
       { q: 'Mengapa saya harus menyewa solo developer daripada agensi?', a: 'Bekerja dengan saya berarti komunikasi langsung, penyelesaian lebih cepat, harga kompetitif, dan perhatian personal untuk proyek Anda. Anda akan selalu tahu siapa yang mengerjakan proyek Anda dan bisa menghubungi saya langsung untuk pertanyaan atau update.' },
       { q: 'Berapa lama waktu yang dibutuhkan untuk membuat website?', a: 'Timeline tergantung pada kompleksitas. Landing page sederhana dapat diselesaikan dalam 3-5 hari, sementara website lengkap biasanya membutuhkan 1-2 minggu. Aplikasi web kustom mungkin memerlukan 4-8 minggu. Saya akan memberikan estimasi timeline yang jelas saat konsultasi awal.' },

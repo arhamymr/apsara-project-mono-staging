@@ -4,7 +4,8 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Card } from '@workspace/ui/components/card';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import Image from 'next/image';
 import type { Template } from './types';
 
 interface TemplateCardProps {
@@ -13,30 +14,7 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onClick }: TemplateCardProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      // Set canvas dimensions to match image aspect ratio
-      const aspectRatio = img.width / img.height;
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = (canvas.offsetWidth / aspectRatio) * window.devicePixelRatio;
-      
-      // Draw image to canvas
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      setImageLoaded(true);
-    };
-    img.src = template.thumbnail;
-  }, [template.thumbnail]);
 
   return (
     <motion.div
@@ -61,18 +39,18 @@ export function TemplateCard({ template, onClick }: TemplateCardProps) {
         )}
         aria-label={`View ${template.title} template`}
       >
-        {/* Canvas Preview */}
+        {/* Image Preview */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <canvas
-            ref={canvasRef}
-            aria-hidden="true"
-            aria-label={`Preview Screenshot of ${template.title}`}
-            role="img"
+          <Image
+            src={template.thumbnail}
+            alt={`Preview of ${template.title}`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={cn(
-              'absolute size-full object-cover transition-transform duration-500 group-hover:scale-105',
+              'object-cover transition-transform duration-500 group-hover:scale-105',
               imageLoaded ? 'animate-in fade-in duration-300' : 'opacity-0'
             )}
-            style={{ width: '100%', height: '100%' }}
+            onLoad={() => setImageLoaded(true)}
           />
           {/* Loading placeholder */}
           {!imageLoaded && (
@@ -98,6 +76,11 @@ export function TemplateCard({ template, onClick }: TemplateCardProps) {
           <h3 className="font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors">
             {template.title}
           </h3>
+          {template.description && (
+            <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2">
+              {template.description}
+            </p>
+          )}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {template.tags.slice(0, 3).map((tag) => (
               <Badge

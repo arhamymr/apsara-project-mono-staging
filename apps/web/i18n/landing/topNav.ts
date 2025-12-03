@@ -12,6 +12,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       instagramPost: 'Instagram Post Design',
       templates: 'Templates',
       blog: 'Blog',
+      faq: 'FAQ',
       pricing: 'About Me',
       descriptions: {
         fullStackDevelopment: 'End-to-end web applications with modern technologies.',
@@ -36,6 +37,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       instagramPost: 'Desain Post Instagram',
       templates: 'Template',
       blog: 'Blog',
+      faq: 'FAQ',
       pricing: 'Tentang saya',
       descriptions: {
         fullStackDevelopment: 'Aplikasi web end-to-end dengan teknologi modern.',

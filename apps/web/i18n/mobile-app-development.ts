@@ -130,8 +130,8 @@ export const MOBILE_APP_DEVELOPMENT_STRINGS: Record<Lang, MobileAppDevelopmentSt
       subtitle: 'Transparent pricing for your mobile development needs.',
       hourly: {
         title: 'Hourly Rate',
-        price: 'IDR 175K',
-        unit: '/hour',
+        price: 'IDR 1M',
+        unit: 'starting from',
         description: 'Flexible engagement for feature development, bug fixes, and maintenance.',
         cta: 'Book Hours',
       },
@@ -221,8 +221,8 @@ export const MOBILE_APP_DEVELOPMENT_STRINGS: Record<Lang, MobileAppDevelopmentSt
       subtitle: 'Harga transparan sesuai kebutuhan proyek Anda.',
       hourly: {
         title: 'Per Jam',
-        price: 'Rp 175 Ribu',
-        unit: '/jam',
+        price: 'Rp 1 Juta',
+        unit: 'mulai dari',
         description: 'Fleksibel untuk pengembangan fitur, perbaikan bug, dan pemeliharaan.',
         cta: 'Pesan Sekarang',
       },

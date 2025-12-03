@@ -24,6 +24,12 @@ export const TEMPLATES_STRINGS: Record<Lang, TemplateStrings> = {
       fileSize: 'File Size',
       license: 'License',
     },
+    cta: {
+      title: 'Ready to Build Something Amazing?',
+      subtitle: 'Start with our templates or let us create a custom solution for your business.',
+      primaryButton: 'Get Started Free',
+      secondaryButton: 'Contact Us',
+    },
     empty: 'No templates yet. Try refreshing or check back later.',
     licenses: {
       free: 'Free',
@@ -52,6 +58,12 @@ export const TEMPLATES_STRINGS: Record<Lang, TemplateStrings> = {
       category: 'Kategori',
       fileSize: 'Ukuran File',
       license: 'Lisensi',
+    },
+    cta: {
+      title: 'Siap Membangun Sesuatu yang Luar Biasa?',
+      subtitle: 'Mulai dengan template kami atau biarkan kami membuat solusi khusus untuk bisnis Anda.',
+      primaryButton: 'Mulai Gratis',
+      secondaryButton: 'Hubungi Kami',
     },
     empty: 'Belum ada template. Coba refresh atau kembali lagi nanti.',
     licenses: {

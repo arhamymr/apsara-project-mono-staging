@@ -27,6 +27,12 @@ export interface TemplateStrings {
     fileSize: string;
     license: string;
   };
+  cta: {
+    title: string;
+    subtitle: string;
+    primaryButton: string;
+    secondaryButton: string;
+  };
   empty: string;
   licenses: { free: string; premium: string; commercial: string };
 }

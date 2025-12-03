@@ -4,11 +4,12 @@ import { Section } from '@/components/home/components';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { Footer, TopNav } from '@/components/home/sections';
 import { TemplatesGrid } from '@/components/templates';
-import { Badge } from '@workspace/ui/components/badge';
+import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
 import { TEMPLATES_STRINGS } from '@/i18n/templates';
 import { motion } from 'framer-motion';
-import { Package } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 function useStrings() {
   const { lang } = useLocale();
@@ -22,48 +23,53 @@ export default function TemplatesPage() {
     <div className="bg-background text-foreground min-h-dvh">
       <TopNav />
       <main id="main-content">
-        <HeroSection />
         <Section className="py-16 lg:py-24">
           <TemplatesGrid strings={s} />
         </Section>
+        <CTASection />
       </main>
       <Footer />
     </div>
   );
 }
 
-function HeroSection() {
+function CTASection() {
   const s = useStrings();
   const fadeUp = useFadeUp();
 
   return (
-    <Section className="relative overflow-hidden pt-32 pb-16 lg:pt-40 lg:pb-20">
-      <div className="from-primary/5 via-background to-background pointer-events-none absolute inset-0 bg-gradient-to-b" />
+    <Section className="relative overflow-hidden py-20 lg:py-28">
+      <div className="from-primary/5 via-primary/10 to-primary/5 pointer-events-none absolute inset-0 bg-gradient-to-r" />
       <div className="relative container mx-auto px-4">
-        <div className="mx-auto max-w-4xl text-center">
-          <motion.div {...fadeUp}>
-            <Badge
-              variant="outline"
-              className="border-primary/20 bg-primary/5 text-primary mb-8 px-4 py-2 text-sm font-medium"
-            >
-              <Package className="mr-2 h-4 w-4" />
-              Templates
-            </Badge>
-          </motion.div>
-
-          <motion.h1
+        <div className="mx-auto max-w-3xl text-center">
+          <motion.h2
             {...fadeUp}
-            className="text-foreground text-4xl leading-[1.1] font-normal tracking-tight md:text-5xl lg:text-6xl"
+            className="text-foreground text-3xl tracking-tight md:text-4xl lg:text-5xl"
           >
-            {s.hero.title}
-          </motion.h1>
+            {s.cta.title}
+          </motion.h2>
 
           <motion.p
             {...fadeUp}
-            className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg leading-relaxed"
+            className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg"
           >
-            {s.hero.subtitle}
+            {s.cta.subtitle}
           </motion.p>
+
+          <motion.div
+            {...fadeUp}
+            className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
+            <Button asChild size="lg" className="gap-2">
+              <Link href="/register">
+                {s.cta.primaryButton}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/contact">{s.cta.secondaryButton}</Link>
+            </Button>
+          </motion.div>
         </div>
       </div>
     </Section>

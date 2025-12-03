@@ -24,11 +24,17 @@ function useStrings() {
   return INSTAGRAM_POST_STRINGS[lang as keyof typeof INSTAGRAM_POST_STRINGS];
 }
 
+// Instagram purple/gradient theme
+const instagramTheme = {
+  '--primary': '#C13584',
+  '--ring': '#C13584',
+} as React.CSSProperties;
+
 export default function InstagramPost() {
   const s = useStrings();
 
   return (
-    <div className="bg-background text-foreground min-h-dvh">
+    <div className="bg-background text-foreground min-h-dvh" style={instagramTheme}>
       <TopNav />
       <main id="main-content">
         <HeroSection />

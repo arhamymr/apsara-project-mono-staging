@@ -101,6 +101,7 @@ export function TopNav() {
     },
     { href: '/templates', label: s.topNav.links.templates },
     { href: '/blog', label: s.topNav.links.blog },
+    { href: '/faq', label: s.topNav.links.faq },
     { href: '/me', label: s.topNav.links.pricing },
   ];
 
