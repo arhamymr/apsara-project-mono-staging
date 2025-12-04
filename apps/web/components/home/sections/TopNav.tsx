@@ -24,8 +24,10 @@ import {
   Smartphone,
   Wrench,
   X,
+  Loader2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
 
 export function TopNav() {
   const s = useStrings();
@@ -191,12 +193,30 @@ export function TopNav() {
                 {s.topNav.cta} <Kbd>T</Kbd>
               </Button>
             </a>
-            <Link href="/login">
-              <Button className="hidden md:inline-flex">
-                {s.topNav.signIn}{' '}
-                <Kbd className="text-primary-900 bg-black/20">G</Kbd>
+            
+            <AuthLoading>
+              <Button className="hidden md:inline-flex" disabled>
+                <Loader2 className="h-4 w-4 animate-spin" />
               </Button>
-            </Link>
+            </AuthLoading>
+            
+            <Unauthenticated>
+              <Link href="/login">
+                <Button className="hidden md:inline-flex">
+                  {s.topNav.signIn}{' '}
+                  <Kbd className="text-primary-900 bg-black/20">G</Kbd>
+                </Button>
+              </Link>
+            </Unauthenticated>
+            
+            <Authenticated>
+              <Link href="/os">
+                <Button className="hidden md:inline-flex">
+                  Dashboard{' '}
+                  <Kbd className="text-primary-900 bg-black/20">G</Kbd>
+                </Button>
+              </Link>
+            </Authenticated>
           </div>
 
           {/* Burger button + mobile menu */}
@@ -250,11 +270,27 @@ export function TopNav() {
                     </Button>
                   </a>
 
-                  <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full">
-                      {s.topNav.signIn} <Kbd>G</Kbd>
+                  <AuthLoading>
+                    <Button className="w-full" disabled>
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     </Button>
-                  </Link>
+                  </AuthLoading>
+
+                  <Unauthenticated>
+                    <Link href="/login" onClick={() => setOpen(false)}>
+                      <Button className="w-full">
+                        {s.topNav.signIn} <Kbd>G</Kbd>
+                      </Button>
+                    </Link>
+                  </Unauthenticated>
+
+                  <Authenticated>
+                    <Link href="/os" onClick={() => setOpen(false)}>
+                      <Button className="w-full">
+                        Dashboard <Kbd>G</Kbd>
+                      </Button>
+                    </Link>
+                  </Authenticated>
                 </div>
               </div>
             </SheetContent>

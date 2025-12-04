@@ -19,9 +19,7 @@ export default function PortfolioPage() {
   const { showFloatingBar, contactRef } = useFloatingBar();
 
   return (
-    <>
-      <title>Arham - Frontend Developer & UI/UX Designer | Portfolio</title>
-      <div className="bg-background text-foreground relative min-h-dvh overflow-hidden">
+    <div className="bg-background text-foreground relative min-h-dvh overflow-hidden">
         <Background />
 
         <FloatingBar
@@ -51,6 +49,5 @@ export default function PortfolioPage() {
           </div>
         </main>
       </div>
-    </>
   );
 }

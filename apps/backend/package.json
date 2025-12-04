@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "go run server.go",
+    "dev": "node run-go.js",
     "env-check": "node -e \"console.log('LOCALAPPDATA=', process.env.LOCALAPPDATA, 'GOCACHE=', process.env.GOCACHE)\""
   },
   "author": "",
