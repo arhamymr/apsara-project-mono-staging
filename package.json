@@ -11,7 +11,8 @@
     "build": "turbo build",
     "dev": "turbo watch dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",    
+    "env-check": "node -e \"console.log('LOCALAPPDATA=', process.env.LOCALAPPDATA, 'GOCACHE=', process.env.GOCACHE)\""
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
