@@ -185,6 +185,24 @@ setup_ssl() {
     
     mkdir -p certbot/www certbot/conf
     
+    # Stop any existing containers using port 80
+    print_step "Freeing up port 80..."
+    docker stop nginx-init 2>/dev/null || true
+    docker rm nginx-init 2>/dev/null || true
+    docker stop nginx-proxy 2>/dev/null || true
+    docker rm nginx-proxy 2>/dev/null || true
+    
+    # Stop any container using port 80
+    PORT_80_CONTAINER=$(docker ps -q --filter "publish=80" 2>/dev/null)
+    if [ -n "$PORT_80_CONTAINER" ]; then
+        print_step "Stopping container using port 80..."
+        docker stop $PORT_80_CONTAINER 2>/dev/null || true
+    fi
+    
+    # Also stop docker-compose services that might use port 80
+    docker-compose -f docker-compose.prod.yml down 2>/dev/null || true
+    docker-compose down 2>/dev/null || true
+    
     # Create temporary nginx config
     print_step "Creating temporary nginx for verification..."
     cat > nginx/nginx-init.conf << EOF
@@ -351,3 +369,12 @@ else
     echo -e "  • Backend: http://localhost:\${BACKEND_PORT:-8080}"
     echo -e "  • Mastra:  http://localhost:\${MASTRA_PORT:-4111}"
 fi
+
+# ===========================================
+# Quick Deploy Command
+# ===========================================
+# To deploy to apsaradigital.com, run:
+#   sudo ./scripts/build.sh --prod --domain apsaradigital.com --email admin@apsaradigital.com
+#
+# For testing SSL first (staging):
+#   sudo ./scripts/build.sh --prod --domain apsaradigital.com --email admin@apsaradigital.com --staging
