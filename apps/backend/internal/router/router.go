@@ -21,6 +21,7 @@ func Setup(e *echo.Echo, client *livekit.Client) {
 
 	// Health check
 	e.GET("/", handler.HealthCheck)
+	e.GET("/health", handler.HealthCheck)
 
 	// Swagger UI (single source from docs/swagger.json)
 	e.GET("/docs", handler.SwaggerUIHandler)
