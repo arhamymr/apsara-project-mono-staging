@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import { Authenticated, Unauthenticated, AuthLoading, useConvexAuth } from 'convex/react';
+import { Loader2, User } from 'lucide-react';
+import { Authenticated, Unauthenticated, AuthLoading, useConvexAuth, useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 
 type AuthButtonsProps = {
   signInLabel: string;
@@ -18,6 +20,7 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
   const buttonClass = isMobile ? 'w-full' : 'hidden md:inline-flex';
   const router = useRouter();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const user = useQuery(api.user.profile);
 
   // Keyboard shortcut: G to go to login/dashboard
   useEffect(() => {
@@ -61,7 +64,13 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
       </Unauthenticated>
       <Authenticated>
         <Link href="/dashboard" onClick={onClose}>
-          <Button className={buttonClass}>
+          <Button variant="outline" className={buttonClass}>
+            <Avatar className="h-5 w-5">
+              <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
+              <AvatarFallback className="text-xs">
+                {user?.name?.charAt(0)?.toUpperCase() ?? <User className="h-3 w-3" />}
+              </AvatarFallback>
+            </Avatar>
             Dashboard <Kbd className="bg-black/20 text-primary-900">G</Kbd>
           </Button>
         </Link>

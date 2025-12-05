@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Next.js Web Application
   web:
     build:
       context: .
@@ -9,7 +8,7 @@ services:
     container_name: web-app
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-3000}:3000"
+      - "80:3000"
     environment:
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
@@ -21,10 +20,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    networks:
-      - app-network
 
-  # Go Backend API
   backend:
     build:
       context: .
@@ -32,7 +28,7 @@ services:
     container_name: go-backend
     restart: unless-stopped
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "8080:8080"
     env_file:
       - .env
     healthcheck:
@@ -41,32 +37,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    networks:
-      - app-network
-
-  # Mastra AI Backend
-  mastra:
-    build:
-      context: .
-      dockerfile: Dockerfile.mastra
-    container_name: mastra-backend
-    restart: unless-stopped
-    ports:
-      - "${MASTRA_PORT:-4111}:4111"
-    environment:
-      - NODE_ENV=production
-      - HOSTNAME=0.0.0.0
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4111/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
