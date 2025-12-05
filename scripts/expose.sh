@@ -28,7 +28,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Default values
-DOMAIN=""
+DOMAIN="apsaradigital.com"
 EMAIL=""
 STAGING=false
 RENEW_ONLY=false
