@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL}
+        - NEXT_PUBLIC_CONVEX_URL=https://focused-salamander-537.convex.cloud
     container_name: web-app
     restart: unless-stopped
     ports:
@@ -14,9 +12,6 @@ services:
     environment:
       - NODE_ENV=production
       - HOSTNAME=0.0.0.0
-      - NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL}
-      - AUTH_SECRET=${AUTH_SECRET}
-      - CONVEX_SITE_URL=${CONVEX_SITE_URL}
     env_file:
       - apps/web/.env.prod
     healthcheck:
