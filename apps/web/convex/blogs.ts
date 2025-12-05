@@ -109,9 +109,10 @@ export const update = mutation({
 
     // Check slug uniqueness if changing
     if (args.slug && args.slug !== blog.slug) {
+      const newSlug = args.slug;
       const existing = await ctx.db
         .query("blogs")
-        .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+        .withIndex("by_slug", (q) => q.eq("slug", newSlug))
         .first();
       if (existing) throw new Error("Slug already exists");
     }
