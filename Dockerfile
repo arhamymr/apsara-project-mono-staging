@@ -1,7 +1,7 @@
 # ================================
 # Stage 1: Base image with pnpm
 # ================================
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # Enable corepack for pnpm
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
@@ -15,16 +15,18 @@ WORKDIR /app
 FROM base AS deps
 
 # Install build dependencies for native modules (canvas, etc.)
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
-    cairo-dev \
-    pango-dev \
-    jpeg-dev \
-    giflib-dev \
-    librsvg-dev \
-    pixman-dev
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    libpixman-1-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files for dependency installation
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -35,7 +37,8 @@ COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 # Install dependencies with frozen lockfile
-RUN pnpm install --frozen-lockfile
+# Increase network timeout for native module compilation
+RUN pnpm install --frozen-lockfile --network-timeout 600000
 
 # ================================
 # Stage 3: Build the application
@@ -45,13 +48,15 @@ FROM base AS builder
 WORKDIR /app
 
 # Install runtime dependencies for canvas (needed during build)
-RUN apk add --no-cache \
-    cairo \
-    pango \
-    jpeg \
-    giflib \
-    librsvg \
-    pixman
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libjpeg62-turbo \
+    libgif7 \
+    librsvg2-2 \
+    libpixman-1-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -68,7 +73,7 @@ RUN pnpm turbo build --filter=web
 # ================================
 # Stage 4: Production runner
 # ================================
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
