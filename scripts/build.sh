@@ -29,6 +29,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Default options
 BUILD_WEB=true
+BUILD_BACKEND=true
 BUILD_MASTRA=true
 SKIP_CLEANUP=false
 CLEAN_ONLY=false
@@ -39,10 +40,17 @@ for arg in "$@"; do
     case $arg in
         --web)
             BUILD_WEB=true
+            BUILD_BACKEND=false
+            BUILD_MASTRA=false
+            ;;
+        --backend)
+            BUILD_WEB=false
+            BUILD_BACKEND=true
             BUILD_MASTRA=false
             ;;
         --mastra)
             BUILD_WEB=false
+            BUILD_BACKEND=false
             BUILD_MASTRA=true
             ;;
         --no-cleanup)
@@ -59,6 +67,7 @@ for arg in "$@"; do
             echo ""
             echo "Options:"
             echo "  --web          Build only web application"
+            echo "  --backend      Build only Go backend"
             echo "  --mastra       Build only mastra backend"
             echo "  --no-cleanup   Skip Docker cleanup"
             echo "  --clean-only   Only run cleanup, no build"
@@ -162,15 +171,28 @@ fi
 print_header "Building Docker Images"
 
 # Build services
-if [ "$BUILD_WEB" == true ] && [ "$BUILD_MASTRA" == true ]; then
-    print_step "Building all services..."
-    docker-compose build --no-cache
-elif [ "$BUILD_WEB" == true ]; then
-    print_step "Building web service..."
-    docker-compose build --no-cache web
-elif [ "$BUILD_MASTRA" == true ]; then
-    print_step "Building mastra service..."
-    docker-compose build --no-cache mastra
+SERVICES_TO_BUILD=""
+
+if [ "$BUILD_WEB" == true ]; then
+    SERVICES_TO_BUILD="$SERVICES_TO_BUILD web"
+fi
+
+if [ "$BUILD_BACKEND" == true ]; then
+    SERVICES_TO_BUILD="$SERVICES_TO_BUILD backend"
+fi
+
+if [ "$BUILD_MASTRA" == true ]; then
+    SERVICES_TO_BUILD="$SERVICES_TO_BUILD mastra"
+fi
+
+# Trim leading space
+SERVICES_TO_BUILD=$(echo "$SERVICES_TO_BUILD" | xargs)
+
+if [ -n "$SERVICES_TO_BUILD" ]; then
+    print_step "Building services: $SERVICES_TO_BUILD"
+    docker-compose build --no-cache $SERVICES_TO_BUILD
+else
+    print_step "No services selected to build"
 fi
 
 print_success "Build complete!"
@@ -190,3 +212,7 @@ echo -e "\n${BLUE}Next steps:${NC}"
 echo -e "  • Run ${YELLOW}docker-compose up -d${NC} to start containers"
 echo -e "  • Run ${YELLOW}./scripts/deploy.sh${NC} for full deployment"
 echo -e "  • Run ${YELLOW}docker-compose ps${NC} to check status"
+echo -e "\n${BLUE}Services:${NC}"
+echo -e "  • Web:     http://localhost:\${WEB_PORT:-3000}"
+echo -e "  • Backend: http://localhost:\${BACKEND_PORT:-8080}"
+echo -e "  • Mastra:  http://localhost:\${MASTRA_PORT:-4111}"

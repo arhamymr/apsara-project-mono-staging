@@ -1,10 +1,10 @@
 # ================================
-# Stage 1: Base image with yarn
+# Stage 1: Base image with pnpm
 # ================================
 FROM node:20-alpine AS base
 
-# Enable corepack for yarn
-RUN corepack enable && corepack prepare yarn@4.5.1 --activate
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Set working directory
 WORKDIR /app
@@ -14,8 +14,20 @@ WORKDIR /app
 # ================================
 FROM base AS deps
 
+# Install build dependencies for native modules (canvas, etc.)
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    pixman-dev
+
 # Copy package files for dependency installation
-COPY package.json yarn.lock .yarnrc.yml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/mastra/package.json ./apps/mastra/
 COPY packages/ui/package.json ./packages/ui/
@@ -23,7 +35,7 @@ COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 # Install dependencies with frozen lockfile
-RUN yarn install --immutable
+RUN pnpm install --frozen-lockfile
 
 # ================================
 # Stage 3: Build the application
@@ -31,6 +43,15 @@ RUN yarn install --immutable
 FROM base AS builder
 
 WORKDIR /app
+
+# Install runtime dependencies for canvas (needed during build)
+RUN apk add --no-cache \
+    cairo \
+    pango \
+    jpeg \
+    giflib \
+    librsvg \
+    pixman
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -42,7 +63,7 @@ COPY . .
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN yarn turbo build --filter=web
+RUN pnpm turbo build --filter=web
 
 # ================================
 # Stage 4: Production runner
