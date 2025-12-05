@@ -187,21 +187,31 @@ setup_ssl() {
     
     # Stop any existing containers using port 80
     print_step "Freeing up port 80..."
-    docker stop nginx-init 2>/dev/null || true
-    docker rm nginx-init 2>/dev/null || true
-    docker stop nginx-proxy 2>/dev/null || true
-    docker rm nginx-proxy 2>/dev/null || true
     
-    # Stop any container using port 80
-    PORT_80_CONTAINER=$(docker ps -q --filter "publish=80" 2>/dev/null)
-    if [ -n "$PORT_80_CONTAINER" ]; then
-        print_step "Stopping container using port 80..."
-        docker stop $PORT_80_CONTAINER 2>/dev/null || true
-    fi
+    # Stop known nginx containers
+    docker stop nginx-init nginx-proxy apsara-nginx 2>/dev/null || true
+    docker rm nginx-init nginx-proxy apsara-nginx 2>/dev/null || true
     
-    # Also stop docker-compose services that might use port 80
+    # Stop ALL running containers (aggressive)
+    print_step "Stopping all running containers..."
+    docker stop $(docker ps -aq) 2>/dev/null || true
+    
+    # Also stop docker-compose services
     docker-compose -f docker-compose.prod.yml down 2>/dev/null || true
     docker-compose down 2>/dev/null || true
+    
+    # Check if port 80 is still in use by non-docker process
+    if command -v lsof &> /dev/null; then
+        PORT_80_PID=$(lsof -t -i:80 2>/dev/null)
+        if [ -n "$PORT_80_PID" ]; then
+            echo -e "${YELLOW}Port 80 is in use by PID: $PORT_80_PID${NC}"
+            echo -e "${YELLOW}Attempting to stop...${NC}"
+            kill -9 $PORT_80_PID 2>/dev/null || true
+        fi
+    fi
+    
+    # Wait a moment for ports to be released
+    sleep 2
     
     # Create temporary nginx config
     print_step "Creating temporary nginx for verification..."
