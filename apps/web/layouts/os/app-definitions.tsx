@@ -1,6 +1,6 @@
 'use client';
 
-import ArticleManagerApp from '@/layouts/os/apps/article-manager';
+import ArticleManagerApp from '@/layouts/os/apps/blogs';
 import BroadcastEmailApp from '@/layouts/os/apps/BroadcastEmailApp';
 import CalculatorApp from '@/layouts/os/apps/CalculatorApp';
 import ChatbotApp from '@/layouts/os/apps/ChatbotApp';

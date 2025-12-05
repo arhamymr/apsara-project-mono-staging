@@ -83,7 +83,8 @@ export default function WebsiteBuilderApp() {
 
   const handleTemplateSelection = useCallback(
     (template: TemplateDefinition) => {
-      const site = handleSelectTemplate(template);
+      // Cast template to any since normalizeWebsite in store handles the conversion
+      const site = handleSelectTemplate(template as unknown as Parameters<typeof handleSelectTemplate>[0]);
       prepareFormForCreate(site, template.name ?? 'Simple Website');
       openBuilderWindow(`Template: ${template.name}`);
     },
