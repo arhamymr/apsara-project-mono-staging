@@ -37,8 +37,7 @@ COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 # Install dependencies with frozen lockfile
-# Increase network timeout for native module compilation
-RUN pnpm install --frozen-lockfile --network-timeout 600000
+RUN pnpm install --frozen-lockfile
 
 # ================================
 # Stage 3: Build the application
