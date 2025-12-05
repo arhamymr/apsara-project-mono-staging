@@ -45,10 +45,7 @@ export function useBlogBySlug(slug: string | undefined) {
 }
 
 export function useSearchBlogs(query: string, limit?: number) {
-  return useQuery(
-    api.blogs.search,
-    query ? { query, limit } : "skip"
-  );
+  return useQuery(api.blogs.search, query ? { query, limit } : "skip");
 }
 
 // Mutation hooks
@@ -62,23 +59,4 @@ export function useUpdateBlog() {
 
 export function useDeleteBlog() {
   return useMutation(api.blogs.remove);
-}
-
-// Combined hook for blog management
-export function useBlogActions() {
-  const createBlog = useCreateBlog();
-  const updateBlog = useUpdateBlog();
-  const deleteBlog = useDeleteBlog();
-
-  return {
-    create: async (input: BlogInput) => {
-      return await createBlog(input);
-    },
-    update: async (id: Id<"blogs">, input: BlogUpdateInput) => {
-      return await updateBlog({ id, ...input });
-    },
-    delete: async (id: Id<"blogs">) => {
-      return await deleteBlog({ id });
-    },
-  };
 }

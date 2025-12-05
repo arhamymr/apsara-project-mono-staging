@@ -27,6 +27,7 @@ type ArticleCardProps = {
 
 const STATUS_STYLES: Record<string, string> = {
   publish: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/40',
+  published: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/40',
   draft: 'bg-amber-500/15 text-amber-600 border-amber-500/40',
 };
 
@@ -40,14 +41,14 @@ export function ArticleCard({
 }: ArticleCardProps) {
   const statusClass = STATUS_STYLES[post.status] ?? 'bg-muted text-foreground';
   const statusLabel =
-    post.status === 'publish'
+    post.status === 'publish' || post.status === 'published'
       ? 'Published'
       : post.status === 'draft'
         ? 'Draft'
         : post.status;
   const emoji = React.useMemo(() => {
     const category = post.category?.name?.toLowerCase() ?? '';
-    if (post.status === 'publish') return '📰';
+    if (post.status === 'publish' || post.status === 'published') return '📰';
     if (post.status === 'draft') return '✏️';
     if (category.includes('guide') || category.includes('how')) return '📘';
     if (category.includes('news') || category.includes('announce')) return '📢';

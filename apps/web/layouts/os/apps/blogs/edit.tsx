@@ -5,73 +5,78 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import React from 'react';
 import { toast } from 'sonner';
-import { useArticle, useDeleteArticle, useUpdateArticle } from './hooks';
-import type { Category } from './types';
+import { useBlog, useUpdateBlog, useDeleteBlog } from './hooks';
+import type { Id } from '@/convex/_generated/dataModel';
 
 export default function EditArticleWindow({
-  slug,
+  id,
   onUpdated,
 }: {
-  slug: string;
+  id: Id<"blogs">;
   onUpdated?: () => void;
 }) {
-  const [post, setPost] = React.useState<any>(null);
-  const [categories, setCategories] = React.useState<Category[]>([]);
+  const blog = useBlog(id);
+  const updateBlog = useUpdateBlog();
+  const deleteBlog = useDeleteBlog();
+
+  const [title, setTitle] = React.useState('');
+  const [content, setContent] = React.useState('');
+  const [coverImage, setCoverImage] = React.useState<string | undefined>();
+  const [status, setStatus] = React.useState<'draft' | 'published'>('draft');
   const [busy, setBusy] = React.useState(false);
   const [isPickerOpen, setPickerOpen] = React.useState(false);
-  const [coverAttribution, setCoverAttribution] = React.useState<{
-    label: string;
-    url?: string;
-  } | null>(null);
 
-  const { data, isLoading } = useArticle(slug);
+  // Sync state when blog loads
   React.useEffect(() => {
-    if (data) {
-      setPost(data.post);
-      setCategories(data.categories);
-      if (data.post?.cover_credit) {
-        setCoverAttribution({ label: data.post.cover_credit });
-      }
+    if (blog) {
+      setTitle(blog.title);
+      setContent(blog.content);
+      setCoverImage(blog.coverImage);
+      setStatus(blog.status);
     }
-  }, [data]);
+  }, [blog]);
 
-  const updateMut = useUpdateArticle(slug);
-  const update = async () => {
-    if (!post) return;
+  const handleUpdate = async () => {
+    if (!blog) return;
     setBusy(true);
     try {
-      await updateMut.mutateAsync({
-        title: post.title,
-        category: post.category?.id ?? post.category_id,
-        description: post.content ?? post.description ?? '',
-        status: post.status,
-        image_url: post.image_url,
+      await updateBlog({
+        id: blog._id,
+        title,
+        content,
+        coverImage,
+        status,
       });
       onUpdated?.();
       toast.success('Article updated');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to update');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to update';
+      toast.error(message);
     } finally {
       setBusy(false);
     }
   };
 
-  const deleteMut = useDeleteArticle(slug);
-  const del = async () => {
+  const handleDelete = async () => {
+    if (!blog) return;
+    const ok = window.confirm('Delete this article? This cannot be undone.');
+    if (!ok) return;
+    
     setBusy(true);
     try {
-      await deleteMut.mutateAsync();
+      await deleteBlog({ id: blog._id });
       onUpdated?.();
       toast.success('Article deleted');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to delete');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to delete';
+      toast.error(message);
     } finally {
       setBusy(false);
     }
   };
 
-  if (isLoading) return <div className="p-4 text-sm">Loading…</div>;
-  if (!post) return <div className="p-4 text-sm">Not found</div>;
+  if (blog === undefined) return <div className="p-4 text-sm">Loading…</div>;
+  if (blog === null) return <div className="p-4 text-sm">Not found</div>;
 
   return (
     <div className="space-y-4 p-4 text-sm">
@@ -86,13 +91,13 @@ export default function EditArticleWindow({
         <div className="flex items-center gap-2">
           <select
             className="bg-background border-border rounded-md border px-2 py-1 text-xs"
-            value={post.status}
-            onChange={(e) => setPost({ ...post, status: e.target.value })}
+            value={status}
+            onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
           >
             <option value="draft">Draft</option>
-            <option value="publish">Publish</option>
+            <option value="published">Published</option>
           </select>
-          <Button size="sm" onClick={update} disabled={busy}>
+          <Button size="sm" onClick={handleUpdate} disabled={busy}>
             {busy ? 'Saving…' : 'Save'}
           </Button>
         </div>
@@ -102,85 +107,44 @@ export default function EditArticleWindow({
         <div className="space-y-3 md:col-span-2">
           <label className="text-xs">Title</label>
           <Input
-            value={post.title}
-            onChange={(e) => setPost({ ...post, title: e.target.value })}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <label className="text-xs">Content</label>
-          <div className="border-border h-60 overflow-hidden rounded-md border">
-            
-          </div>
+          <textarea
+            className="border-border bg-background h-60 w-full rounded-md border p-2 text-sm"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
 
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="destructive"
-              onClick={del}
+              onClick={handleDelete}
               disabled={busy}
             >
               Delete
             </Button>
             <div className="text-muted-foreground flex-1 text-xs">
-              Last updated: {post.updated_at ?? post.updatedAt ?? '—'}
+              Last updated: {new Date(blog.updatedAt).toLocaleString()}
             </div>
           </div>
         </div>
 
         <aside className="space-y-3">
           <div>
-            <label className="text-xs">Category</label>
-            <select
-              className="bg-background border-border w-full rounded-md border px-2 py-2 text-sm"
-              value={post.category?.id ?? post.category_id ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                setPost((prev: any) => {
-                  if (!prev) return prev;
-                  const nextCategoryId =
-                    value === '' ? undefined : Number(value);
-                  const matched =
-                    nextCategoryId == null
-                      ? null
-                      : (categories.find((c) => c.id === nextCategoryId) ??
-                        prev.category);
-                  return {
-                    ...prev,
-                    category_id: nextCategoryId,
-                    category: matched ?? null,
-                  };
-                });
-              }}
-            >
-              <option value="">Select category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
             <label className="text-xs">Cover Image</label>
             <div className="mt-2">
-              {post.image_url ? (
+              {coverImage ? (
                 <div className="flex items-start gap-3">
                   <img
-                    src={post.image_url}
+                    src={coverImage}
                     alt="Cover preview"
                     className="h-24 w-24 rounded-md object-cover"
                   />
                   <div className="flex-1">
-                    {coverAttribution ? (
-                      <a
-                        href={coverAttribution.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-muted-foreground text-xs underline"
-                      >
-                        {coverAttribution.label}
-                      </a>
-                    ) : null}
                     <div className="mt-2 flex gap-2">
                       <Button
                         size="sm"
@@ -192,12 +156,7 @@ export default function EditArticleWindow({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => {
-                          setPost((prev: any) =>
-                            prev ? { ...prev, image_url: undefined } : prev,
-                          );
-                          setCoverAttribution(null);
-                        }}
+                        onClick={() => setCoverImage(undefined)}
                       >
                         Remove
                       </Button>
@@ -220,13 +179,22 @@ export default function EditArticleWindow({
             <div className="text-muted-foreground text-xs">Preview</div>
             <div className="border-border mt-2 h-28 overflow-hidden rounded-md border p-2 text-xs">
               <div className="line-clamp-2 font-semibold">
-                {post.title || 'Title preview'}
+                {title || 'Title preview'}
               </div>
               <div className="text-muted-foreground mt-1 line-clamp-3 text-xs">
-                {(post.content ?? post.description ?? '')
-                  .replace(/<[^>]+>/g, '')
-                  .slice(0, 200) || 'Content preview...'}
+                {content.replace(/<[^>]+>/g, '').slice(0, 200) || 'Content preview...'}
               </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-muted-foreground text-xs">Tags</div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {blog.tags?.map((tag) => (
+                <span key={tag} className="bg-muted rounded px-2 py-0.5 text-xs">
+                  {tag}
+                </span>
+              )) ?? <span className="text-muted-foreground text-xs">No tags</span>}
             </div>
           </div>
         </aside>
@@ -237,17 +205,12 @@ export default function EditArticleWindow({
         onOpenChange={setPickerOpen}
         kindFilter="image"
         onSelect={(path) => {
-          setPost((prev: any) => (prev ? { ...prev, image_url: path } : prev));
-          setCoverAttribution(null);
+          setCoverImage(path);
           setPickerOpen(false);
         }}
         onSelectUnsplash={(photo) => {
           const url = photo.urls.regular ?? photo.urls.full;
-          setPost((prev: any) => (prev ? { ...prev, image_url: url } : prev));
-          setCoverAttribution({
-            label: `Photo by ${photo.user?.name ?? 'Unsplash'}`,
-            url: photo.links?.html,
-          });
+          setCoverImage(url);
           setPickerOpen(false);
         }}
       />

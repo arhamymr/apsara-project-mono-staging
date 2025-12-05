@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { PlateEditor } from '@/components/editor/plate-editor';
@@ -16,15 +15,15 @@ import {
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import React from 'react';
 import { toast } from 'sonner';
-import { CategorySelector } from './components/category-selector';
 import { CoverImagePicker } from './components/upload-cover';
-import {
-  useCategories,
-  useCreateArticle,
-  useCreateCategory,
-  useDeleteCategory,
-} from './hooks';
-import type { Category } from './types';
+import { useCreateBlog } from './hooks';
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
 
 export default function CreateArticleWindow({
   onCreated,
@@ -32,66 +31,50 @@ export default function CreateArticleWindow({
   onCreated?: () => void;
 }) {
   const [title, setTitle] = React.useState('');
-  const [status, setStatus] = React.useState<'draft' | 'publish'>('draft');
-  const [imageUrl, setImageUrl] = React.useState<string | undefined>(undefined);
-  const [content, setContent] = React.useState([]);
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = React.useState<number | ''>(
-    '',
-  );
+  const [slug, setSlug] = React.useState('');
+  const [status, setStatus] = React.useState<'draft' | 'published'>('draft');
+  const [coverImage, setCoverImage] = React.useState<string | undefined>(undefined);
+  const [content, setContent] = React.useState<unknown[]>([]);
+  const [tags, setTags] = React.useState('');
   const [busy, setBusy] = React.useState(false);
-  const [newCategory, setNewCategory] = React.useState('');
 
-  const { data: catsData } = useCategories();
+  const createBlog = useCreateBlog();
+
+  // Auto-generate slug from title
   React.useEffect(() => {
-    setCategories(catsData?.categories ?? []);
-  }, [catsData]);
-
-  const createMut = useCreateArticle();
-  const createCategoryMut = useCreateCategory();
-  const deleteCategoryMut = useDeleteCategory();
-
-  const addCategory = async () => {
-    if (!newCategory.trim()) return;
-    try {
-      const cat = await createCategoryMut.mutateAsync(newCategory.trim());
-      setNewCategory('');
-      setSelectedCategory(cat.id);
-      toast.success('Category added');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to add category');
+    if (!slug || slug === slugify(title.slice(0, -1))) {
+      setSlug(slugify(title));
     }
-  };
-
-  const handleDeleteCategory = async (id: number) => {
-    try {
-      // optimistic UI update
-      setCategories((prev) => prev.filter((c) => c.id !== id));
-      await deleteCategoryMut.mutateAsync(String(id));
-      if (selectedCategory === id) setSelectedCategory('');
-      toast.success('Category removed');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to remove category');
-    }
-  };
+  }, [title, slug]);
 
   const save = async () => {
     setBusy(true);
     try {
-      if (!title.trim() || !selectedCategory) {
-        throw new Error('Please fill all required fields.');
+      if (!title.trim()) {
+        throw new Error('Title is required.');
       }
-      await createMut.mutateAsync({
-        title,
-        category: selectedCategory,
+      if (!slug.trim()) {
+        throw new Error('Slug is required.');
+      }
+
+      const contentString = JSON.stringify(content);
+      const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+
+      await createBlog({
+        title: title.trim(),
+        slug: slug.trim(),
+        content: contentString,
+        excerpt: contentString.slice(0, 200),
+        coverImage,
         status,
-        content,
-        image_url: imageUrl,
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
       });
+
       onCreated?.();
       toast.success('Article created');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to create post');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to create post';
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -103,34 +86,45 @@ export default function CreateArticleWindow({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <aside className="space-y-3">
           <div>
-            <div>
-              <h2 className="text-base font-semibold">Create Article</h2>
-              <p className="text-muted-foreground text-xs">
-                Fill in the details to publish a new article.
-              </p>
-            </div>
+            <h2 className="text-base font-semibold">Create Article</h2>
+            <p className="text-muted-foreground text-xs">
+              Fill in the details to publish a new article.
+            </p>
+          </div>
 
+          <div>
             <label className="text-xs">Title</label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-
-            <CategorySelector
-              categories={categories}
-              selectedCategory={selectedCategory}
-              newCategory={newCategory}
-              setNewCategory={setNewCategory}
-              setSelectedCategory={setSelectedCategory}
-              addCategory={addCategory}
-              handleDeleteCategory={handleDeleteCategory}
+            <Input 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+              placeholder="Article title"
             />
           </div>
 
-          <CoverImagePicker setImageUrl={setImageUrl} imageUrl={imageUrl} />
+          <div>
+            <label className="text-xs">Slug</label>
+            <Input 
+              value={slug} 
+              onChange={(e) => setSlug(e.target.value)} 
+              placeholder="article-slug"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs">Tags (comma separated)</label>
+            <Input 
+              value={tags} 
+              onChange={(e) => setTags(e.target.value)} 
+              placeholder="tech, news, tutorial"
+            />
+          </div>
+
+          <CoverImagePicker setImageUrl={setCoverImage} imageUrl={coverImage} />
 
           <div className="flex items-center gap-2">
             <Select
-              onValueChange={(value) => {
-                setStatus(value as 'draft' | 'publish');
-              }}
+              value={status}
+              onValueChange={(value) => setStatus(value as 'draft' | 'published')}
             >
               <SelectTrigger className="h-8 w-[180px]">
                 <SelectValue placeholder="Draft" />
@@ -138,7 +132,7 @@ export default function CreateArticleWindow({
               <SelectContent className="z-[99999]">
                 <SelectGroup>
                   <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="publish">Publish</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -148,6 +142,7 @@ export default function CreateArticleWindow({
             </Button>
           </div>
         </aside>
+
         <div className="relative max-h-[calc(100vh-64px)] space-y-3 overflow-hidden rounded-md border md:col-span-2">
           <ScrollArea className="h-full w-full">
             <PlateEditor value={content} onChange={setContent} />
