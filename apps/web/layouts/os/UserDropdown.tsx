@@ -18,7 +18,7 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export default function UserDropdown() {
-  const user = useQuery(api.auth.getCurrentUser);
+  const user = useQuery(api.user.profile);
   const { signOut } = useAuthActions();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
@@ -47,6 +47,7 @@ export default function UserDropdown() {
     [apps, openApp],
   );
 
+  console.log(user, "user")
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

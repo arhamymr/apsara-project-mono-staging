@@ -1,0 +1,427 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LiveKit Backend API",
+    "description": "REST API for LiveKit video conferencing integration",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:1323",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns server status",
+        "responses": {
+          "200": {
+            "description": "Server is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/token": {
+      "post": {
+        "tags": ["Token"],
+        "summary": "Generate access token",
+        "description": "Generate a JWT token for joining a LiveKit room",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/rooms": {
+      "get": {
+        "tags": ["Rooms"],
+        "summary": "List rooms",
+        "description": "List all active LiveKit rooms",
+        "responses": {
+          "200": {
+            "description": "List of rooms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Room"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Rooms"],
+        "summary": "Create room",
+        "description": "Create a new LiveKit room",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Room created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Room"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/rooms/{room}": {
+      "delete": {
+        "tags": ["Rooms"],
+        "summary": "Delete room",
+        "description": "Delete a LiveKit room by name",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Room name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Room deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/rooms/{room}/participants": {
+      "get": {
+        "tags": ["Participants"],
+        "summary": "List participants",
+        "description": "List all participants in a room",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Room name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of participants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Participant"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/rooms/{room}/participants/{identity}": {
+      "delete": {
+        "tags": ["Participants"],
+        "summary": "Remove participant",
+        "description": "Remove a participant from a room",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Room name"
+          },
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Participant identity"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Participant removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/rooms/{room}/participants/{identity}/mute": {
+      "post": {
+        "tags": ["Participants"],
+        "summary": "Mute track",
+        "description": "Mute or unmute a participant's track",
+        "parameters": [
+          {
+            "name": "room",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Room name"
+          },
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Participant identity"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MuteTrackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Track muted/unmuted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livekit/webhook": {
+      "post": {
+        "tags": ["Webhook"],
+        "summary": "LiveKit webhook",
+        "description": "Webhook endpoint for LiveKit events (room started, participant joined, etc.)",
+        "responses": {
+          "200": {
+            "description": "Webhook received",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TokenRequest": {
+        "type": "object",
+        "required": ["room", "identity"],
+        "properties": {
+          "room": {
+            "type": "string",
+            "example": "my-room"
+          },
+          "identity": {
+            "type": "string",
+            "example": "user-123"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      },
+      "CreateRoomRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "my-room"
+          },
+          "emptyTimeout": {
+            "type": "integer",
+            "example": 300
+          },
+          "maxParticipants": {
+            "type": "integer",
+            "example": 10
+          }
+        }
+      },
+      "Room": {
+        "type": "object",
+        "properties": {
+          "sid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "emptyTimeout": {
+            "type": "integer"
+          },
+          "maxParticipants": {
+            "type": "integer"
+          },
+          "creationTime": {
+            "type": "integer"
+          },
+          "numParticipants": {
+            "type": "integer"
+          }
+        }
+      },
+      "Participant": {
+        "type": "object",
+        "properties": {
+          "sid": {
+            "type": "string"
+          },
+          "identity": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "joinedAt": {
+            "type": "integer"
+          }
+        }
+      },
+      "MuteTrackRequest": {
+        "type": "object",
+        "required": ["trackSid", "muted"],
+        "properties": {
+          "trackSid": {
+            "type": "string",
+            "example": "TR_xxxxx"
+          },
+          "muted": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "invalid request"
+          }
+        }
+      }
+    }
+  }
+}

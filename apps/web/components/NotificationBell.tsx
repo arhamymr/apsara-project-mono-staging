@@ -1,19 +1,16 @@
-'use client';
+"use client";
 
-import { Button } from '@workspace/ui/components/button';
+import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu';
-import { ScrollArea } from '@workspace/ui/components/scroll-area';
-import { fetcher } from '@/lib/fetcher';
-import { cn } from '@/lib/utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Check, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+} from "@workspace/ui/components/dropdown-menu";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
+import { cn } from "@/lib/utils";
+import { Bell, Check, Trash2, X } from "lucide-react";
+import { useState } from "react";
 
 type Notification = {
   id: string;
@@ -30,119 +27,41 @@ type Notification = {
   created_at: string;
 };
 
-type NotificationsResponse = {
-  notifications: Notification[];
-  unread_count: number;
-};
+// Mock data for UI preview
+const mockNotifications: Notification[] = [
+  {
+    id: "1",
+    type: "info",
+    data: {
+      title: "Welcome!",
+      message: "Thanks for joining us.",
+      icon: "👋",
+    },
+    read_at: null,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    type: "update",
+    data: {
+      title: "New feature available",
+      message: "Check out the latest updates.",
+      icon: "🚀",
+      action_url: "#",
+      action_text: "Learn more",
+    },
+    read_at: new Date().toISOString(),
+    created_at: new Date(Date.now() - 3600000).toISOString(),
+  },
+];
 
-interface NotificationBellProps {
-  user?: { id: number } | null;
-}
-
-export default function NotificationBell({ user }: NotificationBellProps) {
+export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
 
-  const {
-    data,
-    isLoading: loading,
-    refetch,
-  } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: () => fetcher<NotificationsResponse>('/api/notifications'),
-    enabled: false, // Only fetch when dropdown is opened
-  });
-
-  const notifications = data?.notifications ?? [];
-  const unreadCount = data?.unread_count ?? 0;
-
-  const markAsReadMutation = useMutation({
-    mutationFn: (id: string) =>
-      fetcher<void>(`/api/notifications/${id}/read`, { method: 'POST' }),
-    onSuccess: (_, id) => {
-      queryClient.setQueryData<NotificationsResponse>(
-        ['notifications'],
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            notifications: old.notifications.map((n) =>
-              n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
-            ),
-            unread_count: Math.max(0, old.unread_count - 1),
-          };
-        },
-      );
-    },
-    onError: () => {
-      toast.error('Failed to mark notification as read');
-    },
-  });
-
-  const markAllAsReadMutation = useMutation({
-    mutationFn: () =>
-      fetcher<void>('/api/notifications/read-all', { method: 'POST' }),
-    onSuccess: () => {
-      queryClient.setQueryData<NotificationsResponse>(
-        ['notifications'],
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            notifications: old.notifications.map((n) => ({
-              ...n,
-              read_at: new Date().toISOString(),
-            })),
-            unread_count: 0,
-          };
-        },
-      );
-      toast.success('All notifications marked as read');
-    },
-    onError: () => {
-      toast.error('Failed to mark all as read');
-    },
-  });
-
-  const deleteNotificationMutation = useMutation({
-    mutationFn: (id: string) =>
-      fetcher<void>(`/api/notifications/${id}`, { method: 'DELETE' }),
-    onSuccess: (_, id) => {
-      queryClient.setQueryData<NotificationsResponse>(
-        ['notifications'],
-        (old) => {
-          if (!old) return old;
-          const notification = old.notifications.find((n) => n.id === id);
-          const wasUnread = notification && !notification.read_at;
-          return {
-            ...old,
-            notifications: old.notifications.filter((n) => n.id !== id),
-            unread_count: wasUnread
-              ? Math.max(0, old.unread_count - 1)
-              : old.unread_count,
-          };
-        },
-      );
-      toast.success('Notification deleted');
-    },
-    onError: () => {
-      toast.error('Failed to delete notification');
-    },
-  });
-
-  const clearAllMutation = useMutation({
-    mutationFn: () => fetcher<void>('/api/notifications', { method: 'DELETE' }),
-    onSuccess: () => {
-      queryClient.setQueryData<NotificationsResponse>(['notifications'], {
-        notifications: [],
-        unread_count: 0,
-      });
-      toast.success('All notifications cleared');
-    },
-    onError: () => {
-      toast.error('Failed to clear notifications');
-    },
-  });
+  // TODO: Replace with real data
+  const notifications = mockNotifications;
+  const unreadCount = notifications.filter((n) => !n.read_at).length;
+  const loading = false;
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -152,36 +71,28 @@ export default function NotificationBell({ user }: NotificationBellProps) {
     const diffInHours = Math.floor(diffInMs / 3600000);
     const diffInDays = Math.floor(diffInMs / 86400000);
 
-    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInDays < 7) return `${diffInDays}d ago`;
     return date.toLocaleDateString();
   };
 
-  // Fetch notifications only when dropdown is opened
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (open && user) {
-      refetch();
-    }
-  };
-
-  if (!user) return null;
-
   return (
-    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger className="relative inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-white/10">
-        <Bell className="h-4 w-4" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger className="relative inline-flex items-center justify-center rounded-md hover:bg-white/10">
+        <Button className="flex gap-1" variant={"ghost"}>
+          <Bell className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-400 text-[10px] font-normal font-mono text-white">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="z-[99999] w-80 p-0"
+        className="z-[99999] p-0"
         sideOffset={8}
       >
         <div className="flex items-center justify-between border-b px-4 py-3">
@@ -195,7 +106,9 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-xs"
-                  onClick={() => markAllAsReadMutation.mutate()}
+                  onClick={() => {
+                    /* TODO: mark all read */
+                  }}
                 >
                   <Check className="mr-1 h-3 w-3" />
                   Mark all read
@@ -205,7 +118,9 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs"
-                onClick={() => clearAllMutation.mutate()}
+                onClick={() => {
+                  /* TODO: clear all */
+                }}
               >
                 <Trash2 className="mr-1 h-3 w-3" />
                 Clear all
@@ -226,7 +141,7 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                 No notifications yet
               </p>
               <p className="text-muted-foreground text-xs">
-                We'll notify you when something arrives
+                We&apos;ll notify you when something arrives
               </p>
             </div>
           ) : (
@@ -235,9 +150,8 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                 <div
                   key={notification.id}
                   className={cn(
-                    'group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors',
-                    !notification.read_at &&
-                      'bg-blue-50/50 dark:bg-blue-950/20',
+                    "group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors",
+                    !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
                   )}
                 >
                   {notification.data.icon && (
@@ -254,9 +168,9 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() =>
-                          deleteNotificationMutation.mutate(notification.id)
-                        }
+                        onClick={() => {
+                          /* TODO: delete notification */
+                        }}
                       >
                         <X className="h-3 w-3" />
                       </Button>
@@ -268,13 +182,8 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                       <a
                         href={notification.data.action_url}
                         className="text-primary inline-block text-xs font-medium hover:underline"
-                        onClick={() => {
-                          if (!notification.read_at) {
-                            markAsReadMutation.mutate(notification.id);
-                          }
-                        }}
                       >
-                        {notification.data.action_text || 'View'}
+                        {notification.data.action_text || "View"}
                       </a>
                     )}
                     <div className="flex items-center justify-between">
@@ -286,9 +195,9 @@ export default function NotificationBell({ user }: NotificationBellProps) {
                           variant="ghost"
                           size="sm"
                           className="h-6 px-2 text-xs"
-                          onClick={() =>
-                            markAsReadMutation.mutate(notification.id)
-                          }
+                          onClick={() => {
+                            /* TODO: mark as read */
+                          }}
                         >
                           Mark as read
                         </Button>

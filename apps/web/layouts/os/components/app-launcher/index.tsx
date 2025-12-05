@@ -63,7 +63,7 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
             ref={panelRef}
             role="dialog"
             aria-label="App Launcher"
-            className="bg-background absolute bottom-[50px] left-0 z-[1002] mb-3 w-[480px] overflow-hidden rounded-lg border shadow-2xl"
+            className="bg-background absolute bottom-[50px] right-0 z-[1002] mb-3 w-[480px] overflow-hidden rounded-lg border shadow-2xl"
           >
             <div className="flex flex-col gap-4 p-4">
               <div className="relative">

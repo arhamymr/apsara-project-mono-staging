@@ -12,6 +12,7 @@ import { SiteBuilderWidget } from '@/layouts/os/components/widgets/bodies/SiteBu
 import { cn } from '@/lib/utils';
 import { GripVertical, Settings, Trash } from 'lucide-react';
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useWidgets, type WidgetModel } from '../../widgets/WidgetsContext';
 import ClockWidget from './bodies/ClockWidget';
 import NoteWidget from './bodies/NoteWidget';
@@ -89,7 +90,7 @@ function WidgetFrame({
       lastPos.current = { x: sx, y: sy };
       onMove(sx, sy);
     }
-  });
+  }, [onMove]);
 
   React.useEffect(() => () => onMouseUp(), [onMouseUp]);
 
