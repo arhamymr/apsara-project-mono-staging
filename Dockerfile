@@ -45,6 +45,10 @@ FROM base AS builder
 
 WORKDIR /app
 
+# Declare build arguments
+ARG NEXT_PUBLIC_CONVEX_URL
+ENV NEXT_PUBLIC_CONVEX_URL=${NEXT_PUBLIC_CONVEX_URL}
+
 # Install runtime dependencies for canvas (needed during build)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2 \
