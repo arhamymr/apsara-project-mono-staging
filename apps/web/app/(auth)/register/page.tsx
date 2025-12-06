@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
 import {
   AuthBrandingPanel,
   AuthSeparator,
   GoogleSignInButton,
   RegisterForm,
-} from '@/components/auth';
-import { Button } from '@workspace/ui/components/button';
-import { Toaster } from '@workspace/ui/components/sonner';
-import Link from 'next/link';
+} from "@/components/auth";
+import { Button } from "@workspace/ui/components/button";
+import { Toaster } from "@workspace/ui/components/sonner";
+import Link from "next/link";
 
 export default function SignUpPage() {
   return (
@@ -23,10 +23,9 @@ export default function SignUpPage() {
               Start building with Apsara.
             </p>
           </div>
-
-          <RegisterForm />
-          <AuthSeparator />
           <GoogleSignInButton />
+          <AuthSeparator />
+          <RegisterForm />
 
           <Button variant="ghost" className="mt-4 w-full" asChild>
             <Link href="/">Back to home</Link>

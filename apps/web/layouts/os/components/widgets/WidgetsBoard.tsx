@@ -34,6 +34,8 @@ function WidgetFrame({
   onContextMenu,
   children,
 }: WidgetFrameProps) {
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [isAltPressed, setIsAltPressed] = React.useState(false);
   const dragging = React.useRef(false);
   const start = React.useRef<{
     x: number;
@@ -44,55 +46,127 @@ function WidgetFrame({
   const lastPos = React.useRef<{ x: number; y: number }>({ x, y });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const handle = target.closest('[data-role="drag-handle"]');
-    if (!handle && !e.altKey) return;
-    dragging.current = true;
-    start.current = { x, y, mx: e.clientX, my: e.clientY };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    e.preventDefault();
-  };
+  // Update lastPos when x,y props change
+  React.useEffect(() => {
+    lastPos.current = { x, y };
+  }, [x, y]);
 
-  const onMouseMove = (e: MouseEvent) => {
-    if (!dragging.current || !start.current) return;
-    const dx = e.clientX - start.current.mx;
-    const dy = e.clientY - start.current.my;
-    const nx = start.current.x + dx;
-    const ny = start.current.y + dy;
-    lastPos.current = { x: nx, y: ny };
-    onMove(nx, ny);
-  };
+  // Track Alt key state for visual feedback
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && !isAltPressed) {
+        setIsAltPressed(true);
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.altKey && isAltPressed) {
+        setIsAltPressed(false);
+      }
+    };
 
-  const onMouseUp = useCallback(() => {
-    dragging.current = false;
-    start.current = null;
-    window.removeEventListener('mousemove', onMouseMove);
-    window.removeEventListener('mouseup', onMouseUp);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isAltPressed]);
 
-    const GRID = 8;
-    const NAVBAR = 56;
-    const MARGIN = 8;
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
-    const vh = typeof window !== 'undefined' ? window.innerHeight : 900;
-    const el = rootRef.current;
-    const w = el?.offsetWidth ?? 260;
-    const h = el?.offsetHeight ?? 180;
-    const rawX = lastPos.current.x;
-    const rawY = lastPos.current.y;
-    const clampX = Math.max(MARGIN, Math.min(rawX, vw - w - MARGIN));
-    const clampY = Math.max(NAVBAR + MARGIN, Math.min(rawY, vh - h - MARGIN));
-    const snap = (v: number) => Math.round(v / GRID) * GRID;
-    const sx = snap(clampX);
-    const sy = snap(clampY);
-    if (sx !== rawX || sy !== rawY) {
-      lastPos.current = { x: sx, y: sy };
-      onMove(sx, sy);
-    }
+  const handleMouseMove = React.useRef<((e: MouseEvent) => void) | null>(null);
+  const handleMouseUp = React.useRef<(() => void) | null>(null);
+
+  React.useEffect(() => {
+    handleMouseMove.current = (e: MouseEvent) => {
+      if (!dragging.current || !start.current) return;
+      const dx = e.clientX - start.current.mx;
+      const dy = e.clientY - start.current.my;
+      const nx = start.current.x + dx;
+      const ny = start.current.y + dy;
+      lastPos.current = { x: nx, y: ny };
+      onMove(nx, ny);
+    };
+
+    handleMouseUp.current = () => {
+      if (!dragging.current) return;
+      
+      dragging.current = false;
+      setIsDragging(false);
+      start.current = null;
+      
+      // Remove event listeners
+      if (handleMouseMove.current) {
+        document.removeEventListener('mousemove', handleMouseMove.current);
+      }
+      if (handleMouseUp.current) {
+        document.removeEventListener('mouseup', handleMouseUp.current);
+      }
+
+      const GRID = 8;
+      const NAVBAR = 56;
+      const MARGIN = 8;
+      const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 900;
+      const el = rootRef.current;
+      const w = el?.offsetWidth ?? 260;
+      const h = el?.offsetHeight ?? 180;
+      const rawX = lastPos.current.x;
+      const rawY = lastPos.current.y;
+      const clampX = Math.max(MARGIN, Math.min(rawX, vw - w - MARGIN));
+      const clampY = Math.max(NAVBAR + MARGIN, Math.min(rawY, vh - h - MARGIN));
+      const snap = (v: number) => Math.round(v / GRID) * GRID;
+      const sx = snap(clampX);
+      const sy = snap(clampY);
+      if (sx !== rawX || sy !== rawY) {
+        lastPos.current = { x: sx, y: sy };
+        onMove(sx, sy);
+      }
+    };
   }, [onMove]);
 
-  React.useEffect(() => () => onMouseUp(), [onMouseUp]);
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const handle = target.closest('[data-role="drag-handle"]');
+    
+    // Allow dragging from the drag handle or with Alt key anywhere
+    if (!handle && !e.altKey) return;
+    
+    // Prevent dragging if clicking on interactive elements
+    const isInteractive = target.closest('button, input, textarea, select, a, [role="button"]');
+    if (isInteractive && !e.altKey) return;
+    
+    dragging.current = true;
+    setIsDragging(true);
+    start.current = { x, y, mx: e.clientX, my: e.clientY };
+    
+    // Add event listeners
+    if (handleMouseMove.current) {
+      document.addEventListener('mousemove', handleMouseMove.current, { passive: false });
+    }
+    if (handleMouseUp.current) {
+      document.addEventListener('mouseup', handleMouseUp.current, { passive: false });
+    }
+    
+    e.preventDefault();
+    e.stopPropagation();
+  }, [x, y]);
+
+  // Cleanup event listeners on unmount
+  React.useEffect(() => {
+    return () => {
+      if (dragging.current) {
+        dragging.current = false;
+        setIsDragging(false);
+        if (handleMouseMove.current) {
+          document.removeEventListener('mousemove', handleMouseMove.current);
+        }
+        if (handleMouseUp.current) {
+          document.removeEventListener('mouseup', handleMouseUp.current);
+        }
+      }
+    };
+  }, []);
 
   return (
     <Card
@@ -101,20 +175,26 @@ function WidgetFrame({
       ref={rootRef}
       onMouseDown={onMouseDown}
       onContextMenu={onContextMenu}
-      className={
-        'pointer-events-auto absolute w-[260px] rounded-md border shadow-sm backdrop-blur-md transition-shadow select-none hover:shadow-md'
-      }
-      style={{ left: x, top: y, zIndex: 300 }}
+      className={`pointer-events-auto absolute w-[260px] rounded-md border shadow-sm backdrop-blur-md transition-all select-none hover:shadow-md ${
+        isAltPressed ? 'ring-2 ring-primary/50 cursor-grab' : ''
+      } ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}
+      style={{ 
+        left: x, 
+        top: y, 
+        zIndex: isDragging ? 400 : 300,
+        cursor: isDragging ? 'grabbing' : isAltPressed ? 'grab' : 'default'
+      }}
     >
       <div
         data-role="drag-handle"
-        className="text-muted-foreground flex cursor-grab items-center justify-between border-b px-2 py-1.5 text-[11px]"
+        className={`text-muted-foreground flex items-center justify-between border-b px-2 py-1.5 text-[11px] select-none transition-colors ${isDragging ? 'cursor-grabbing bg-muted/50' : 'cursor-grab hover:bg-muted/30'}`}
         title="Drag to move (Alt-drag anywhere)"
       >
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1 pointer-events-none">
           <GripVertical className="h-3.5 w-3.5" />
           Drag
         </span>
+        <span className="text-[10px] opacity-60">Alt+drag anywhere</span>
       </div>
       {children}
     </Card>

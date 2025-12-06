@@ -9,23 +9,26 @@ const EVENT_NAME = 'apsara:wallpaper-changed';
 
 export function getWallpaper(): Wallpaper {
   if (typeof window === 'undefined') {
-    return { kind: 'image', value: 'hero-bg.png' };
+    return { kind: 'gradient', value: 'aurora' };
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { kind: 'image', value: 'hero-bg.png' };
+    if (!raw) return { kind: 'gradient', value: 'aurora' };
     const parsed = JSON.parse(raw) as Wallpaper;
     if (!parsed || typeof parsed !== 'object')
-      return { kind: 'image', value: 'hero-bg.png' };
+      return { kind: 'gradient', value: 'aurora' };
     if (parsed.kind === 'solid' && typeof parsed.value === 'string') {
       return { kind: 'solid', value: parsed.value };
+    }
+    if (parsed.kind === 'gradient' && typeof parsed.value === 'string') {
+      return { kind: 'gradient', value: parsed.value };
     }
     if (parsed.kind === 'image' && typeof parsed.value === 'string') {
       return { kind: 'image', value: parsed.value };
     }
-    return { kind: 'image', value: 'hero-bg.png' };
+    return { kind: 'gradient', value: 'aurora' };
   } catch {
-    return { kind: 'image', value: 'hero-bg.png' };
+    return { kind: 'gradient', value: 'aurora' };
   }
 }
 

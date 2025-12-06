@@ -64,8 +64,24 @@ export default function ExpandedGroupPanel({
   const layout = useMemo(() => {
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-    const finalWidth = Math.min(560, vw - 32);
-    const rows = Math.max(1, Math.ceil(group.children.length / 4));
+    
+    // Calculate adaptive columns and width based on item count (max 4 per row)
+    const itemCount = group.children.length;
+    const maxItemsPerRow = 4;
+    const itemsPerRow = Math.min(itemCount, maxItemsPerRow);
+    const rows = Math.max(1, Math.ceil(itemCount / maxItemsPerRow));
+    
+    // Adaptive width based on number of items per row
+    // Base width per item: ~90px, plus padding and gaps
+    const baseItemWidth = 90;
+    const padding = 32; // 16px on each side
+    const gaps = (itemsPerRow - 1) * 12; // 12px gap between items
+    const adaptiveWidth = Math.min(
+      itemsPerRow * baseItemWidth + gaps + padding,
+      vw - 32
+    );
+    
+    const finalWidth = Math.max(280, adaptiveWidth); // Minimum width
     const contentHeight = Math.min(0.6 * vh, 16 + rows * 96);
     const finalHeight = 48 + 1 + contentHeight;
     const left = anchor ? anchor.left : 16;
@@ -74,7 +90,17 @@ export default function ExpandedGroupPanel({
     const sy = anchor
       ? Math.max(0.2, (anchor.height || 64) / finalHeight)
       : 0.85;
-    return { finalWidth, contentHeight, left, top, sx, sy };
+    
+    return { 
+      finalWidth, 
+      contentHeight, 
+      left, 
+      top, 
+      sx, 
+      sy, 
+      itemsPerRow,
+      rows 
+    };
   }, [anchor, group.children.length]);
 
   return (
@@ -152,7 +178,13 @@ export default function ExpandedGroupPanel({
         </div>
         <Separator />
         <ScrollArea style={{ maxHeight: layout.contentHeight }} className="p-2">
-          <div className="grid grid-cols-6 gap-3 p-1">
+          <div 
+            className="grid gap-3 p-1"
+            style={{ 
+              gridTemplateColumns: `repeat(${layout.itemsPerRow}, 1fr)`,
+              justifyItems: 'center'
+            }}
+          >
             {group.children.map((c) => (
               <div key={c.id} className="group relative">
                 <button

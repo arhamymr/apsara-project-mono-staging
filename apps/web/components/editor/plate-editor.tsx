@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { Plate, usePlateEditor } from 'platejs/react';
+import { Plate, PlateContent, usePlateEditor } from 'platejs/react';
 import { createContext, useContext } from 'react';
 
 import { EditorKit } from '@/components/editor/editor-kit';
@@ -26,7 +26,8 @@ export function PlateEditor({
 }) {
   const editor = usePlateEditor({
     plugins: EditorKit,
-    value: normalizeNodeId([]),
+    value: value || normalizeNodeId([]),
+    onChange,
   });
 
   const portalRef = useWindowPortalContainer();
@@ -41,7 +42,10 @@ export function PlateEditor({
             '[&_.slate-SelectionArea]:border [&_.slate-SelectionArea]:border-primary [&_.slate-SelectionArea]:bg-primary/10'
           )}
         >
-          <div className="min-h-[500px] w-full p-4" />
+          <PlateContent
+            className="min-h-[500px] w-full p-4 focus:outline-none"
+            placeholder="Start writing your article..."
+          />
         </div>
         <SettingsDialog />
       </Plate>

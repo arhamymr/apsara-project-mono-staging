@@ -131,7 +131,15 @@ export default function WidgetManagerApp() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div 
+            className={cn(
+              "grid gap-4",
+              filtered.length === 1 && "grid-cols-1",
+              filtered.length === 2 && "grid-cols-1 sm:grid-cols-2",
+              filtered.length === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+              filtered.length >= 4 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            )}
+          >
             {filtered.map((item) => (
               <CatalogCard key={item.type} item={item} onAdd={add(item.type)} />
             ))}

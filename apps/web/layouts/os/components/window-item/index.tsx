@@ -192,7 +192,7 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
             <div
               ref={portalContainerRef}
               className={cn(
-                'bg-muted @container flex h-full w-full flex-col overflow-hidden rounded-sm border transition-all select-none',
+                'bg-muted @container flex h-full w-full flex-col overflow-hidden rounded-sm border transition-all',
                 active &&
                   (win.sub
                     ? 'ring-1 ring-amber-500/30 ring-offset-1 ring-offset-transparent'
@@ -211,7 +211,7 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
                 onToggleMaximize={() => toggleMaximizeWindow(win.id)}
                 onClose={() => closeWindow(win.id)}
               />
-              <div className="bg-card flex-1 overflow-hidden">
+              <div className="bg-card flex-1 overflow-hidden select-text">
                 {win.content}
               </div>
             </div>

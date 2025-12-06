@@ -1,41 +1,26 @@
 'use client';
 
-import Image from 'next/image';
 import { useMemo } from 'react';
 
-import LanguageSelector from '@/components/LanguageSelector';
-import NotificationBell from '@/components/NotificationBell';
 import { Toaster } from '@workspace/ui/components/sonner';
-import { useOSStrings } from '@/i18n/os';
-import { ThemeToggle } from '@/layouts/dark-mode/theme-toggle';
 import { WindowProvider } from '@/layouts/os/WindowContext';
 import { createDefaultApps } from '@/layouts/os/app-definitions';
 import BootLoader from '@/layouts/os/components/BootLoader';
 import DesktopContextMenu from '@/layouts/os/components/DesktopContextMenu';
 import { DesktopShortcutsBoard } from '@/layouts/os/components/DesktopShortcutsBoard';
 import BackgroundPlaceholder from '@/layouts/os/components/background-placeholder';
-import ClockDisplay from '@/layouts/os/components/clock-display';
 import Dock from '@/layouts/os/components/dock';
 import { WidgetsBoard } from '@/layouts/os/components/widgets/WidgetsBoard';
 import WindowItem from '@/layouts/os/components/window-item';
 import { useDesktopState } from '@/layouts/os/useDesktopState';
 import { WidgetsProvider } from '@/layouts/os/widgets/WidgetsContext';
-import UserDropdown from "./UserDropdown";
+import Navbar from '@/layouts/os/components/navbar';
 
 type MacOSLayoutProps = {
   initialAppId?: string;
 };
 
-// LangToggle now reuses shared LanguageSelector for consistency
-function LangToggle() {
-  const s = useOSStrings();
-  return (
-    <LanguageSelector
-      ariaLabel={s.topbar.langLabel}
-      wrapperClassName="flex items-center gap-1 rounded-md border px-1.5 py-1 text-xs"
-    />
-  );
-}
+
 
 export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
   const apps = useMemo(createDefaultApps, []);
@@ -51,35 +36,9 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
           <BackgroundPlaceholder />
           <BootLoader />
 
-          <div className="fixed inset-x-0 top-0 z-[222] flex items-center justify-between border-b bg-black/20 p-2 text-xs text-white backdrop-blur-xl">
-            <div className="flex items-center gap-2">
-              <Image
-                src="https://assets.apsaradigital.com/logo.png"
-                alt="logo"
-                width={80}
-                height={24}
-                className="mr-1 ml-2 block dark:hidden"
-              />
-              <Image
-                src="https://assets.apsaradigital.com/logo-white.png"
-                alt="logo"
-                width={80}
-                height={24}
-                className="mr-1 ml-2 hidden dark:block"
-              />
-              ✦
-              <TitleLabel
-                title={windows.find((w) => w.id === activeId)?.title}
-              />
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <LangToggle />
-              <NotificationBell />
-              <ClockDisplay simple />
-              <ThemeToggle />
-              <UserDropdown />
-            </div>
-          </div>
+          <Navbar 
+            activeWindowTitle={windows.find((w) => w.id === activeId)?.title}
+          />
 
           <DesktopContextMenu>
             {/* ContextMenu wraps a full-screen relative container; render the desktop content and
@@ -110,11 +69,4 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
   return content;
 }
 
-function TitleLabel({ title }: { title: string | undefined }) {
-  const s = useOSStrings();
-  return (
-    <p className="text-muted-foreground text-sm font-medium">
-      {title || s.topbar.fallbackTitle}
-    </p>
-  );
-}
+

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
 import {
   AuthBrandingPanel,
   AuthSeparator,
   GoogleSignInButton,
   LoginForm,
-} from '@/components/auth';
-import { Button } from '@workspace/ui/components/button';
-import { Toaster } from '@workspace/ui/components/sonner';
-import Link from 'next/link';
+} from "@/components/auth";
+import { Button } from "@workspace/ui/components/button";
+import { Toaster } from "@workspace/ui/components/sonner";
+import Link from "next/link";
 
 export default function SignInPage() {
   return (
@@ -23,11 +23,9 @@ export default function SignInPage() {
               Sign in to manage your workspace.
             </p>
           </div>
-
-          <LoginForm />
-          <AuthSeparator />
           <GoogleSignInButton />
-
+          <AuthSeparator />
+          <LoginForm />
           <Button variant="ghost" className="mt-4 w-full" asChild>
             <Link href="/">Back to home</Link>
           </Button>

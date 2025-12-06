@@ -138,12 +138,21 @@ export default function DesktopSettingsApp() {
             Image URL
           </h3>
           <div className="flex gap-2">
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/wallpaper.jpg"
-              aria-label="Wallpaper image URL"
-            />
+            <div className="relative flex-1">
+              <Input
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com/wallpaper.jpg"
+                aria-label="Wallpaper image URL"
+                className={`${
+                  wallpaper.kind === 'image' && 
+                  wallpaper.value && 
+                  !IMAGE_PRESETS.includes(wallpaper.value)
+                    ? 'ring-primary ring-offset-background ring-2 ring-offset-2'
+                    : ''
+                }`}
+              />
+            </div>
             <button
               type="button"
               onClick={() => url && apply({ kind: 'image', value: url })}
