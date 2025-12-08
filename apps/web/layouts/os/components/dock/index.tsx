@@ -13,7 +13,6 @@ import { XCircle } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import AppLauncher from "../app-launcher";
-import Assistant from "../assistant";
 import { DockAppTile } from "./dock";
 // DockSettings popover replaced by right-click windowed manager
 
@@ -34,7 +33,7 @@ export default function Dock() {
     [windows]
   );
   const [isHovering, setIsHovering] = React.useState(false);
-  const [assistantOpen, setAssistantOpen] = React.useState(false);
+
   const [appLauncherOpen, setAppLauncherOpen] = React.useState(false);
   const hideTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const showTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -142,14 +141,11 @@ export default function Dock() {
             "rounded-xl border bg-transparent shadow-none backdrop-blur-xl transition-all duration-300",
             hasMaximizedWindow &&
               !isHovering &&
-              !assistantOpen &&
               !appLauncherOpen
               ? "translate-y-[85%] opacity-20"
               : "translate-y-0 opacity-100"
           )}
         >
-          <Assistant onOpenChange={setAssistantOpen} />
-
           <nav
             className="ml-2 flex items-end gap-3 @md:gap-4"
             aria-label="Applications"
