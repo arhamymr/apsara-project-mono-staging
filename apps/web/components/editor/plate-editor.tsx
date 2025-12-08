@@ -3,11 +3,6 @@
 
 import { Plate, PlateContent, usePlateEditor } from 'platejs/react';
 import { createContext, useContext } from 'react';
-
-import { EditorKit } from '@/components/editor/editor-kit';
-import { SettingsDialog } from '@/components/editor/settings-dialog';
-import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
-import { normalizeNodeId } from 'platejs';
 import { cn } from '@/lib/utils';
 
 // Create context for portal container
@@ -25,16 +20,16 @@ export function PlateEditor({
   onChange?: (val: any) => void;
 }) {
   const editor = usePlateEditor({
-    plugins: EditorKit,
-    value: value || normalizeNodeId([]),
-    onChange,
+    value: value || [{ type: 'p', children: [{ text: '' }] }],
   });
 
-  const portalRef = useWindowPortalContainer();
-  const portalContainer = portalRef?.current ?? undefined;
+  // Handle onChange manually
+  if (onChange && editor) {
+    editor.onChange = onChange;
+  }
 
   return (
-    <EditorPortalContext.Provider value={portalContainer}>
+    <EditorPortalContext.Provider value={undefined}>
       <Plate editor={editor}>
         <div
           className={cn(
@@ -47,7 +42,6 @@ export function PlateEditor({
             placeholder="Start writing your article..."
           />
         </div>
-        <SettingsDialog />
       </Plate>
     </EditorPortalContext.Provider>
   );

@@ -24,6 +24,33 @@ const schema = defineSchema({
     .index("by_author", ["authorId"])
     .index("by_status", ["status"])
     .index("by_created", ["createdAt"]),
+  
+  chatSessions: defineTable({
+    userId: v.id("users"),
+    title: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_created", ["createdAt"]),
+  
+  chatMessages: defineTable({
+    sessionId: v.id("chatSessions"),
+    userId: v.id("users"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    content: v.string(),
+    metadata: v.optional(v.object({
+      appIntent: v.optional(v.object({
+        type: v.string(),
+        appId: v.string(),
+        appName: v.string(),
+      })),
+    })),
+    createdAt: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_user", ["userId"])
+    .index("by_created", ["createdAt"]),
 });
 
 export default schema;

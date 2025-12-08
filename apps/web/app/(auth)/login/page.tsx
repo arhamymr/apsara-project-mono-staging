@@ -6,8 +6,10 @@ import {
   GoogleSignInButton,
   LoginForm,
 } from "@/components/auth";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
 import { Toaster } from "@workspace/ui/components/sonner";
+import { Construction } from "lucide-react";
 import Link from "next/link";
 
 export default function SignInPage() {
@@ -23,6 +25,14 @@ export default function SignInPage() {
               Sign in to manage your workspace.
             </p>
           </div>
+          
+          <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-800">
+            <Construction className="h-4 w-4" />
+            <AlertDescription>
+              This project is under heavy development. Features may be unstable or incomplete.
+            </AlertDescription>
+          </Alert>
+          
           <GoogleSignInButton />
           <AuthSeparator />
           <LoginForm />
