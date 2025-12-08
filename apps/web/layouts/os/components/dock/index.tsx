@@ -142,7 +142,7 @@ export default function Dock() {
             hasMaximizedWindow &&
               !isHovering &&
               !appLauncherOpen
-              ? "translate-y-[85%] opacity-20"
+              ? "translate-y-full opacity-0 pointer-events-none"
               : "translate-y-0 opacity-100"
           )}
         >

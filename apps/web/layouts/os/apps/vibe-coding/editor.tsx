@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { useVibeEditorConvex } from './hooks/use-vibe-editor-convex';
+import { useArtifactsConvex } from './hooks/use-artifacts-convex';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { ChatPanel } from './components/chat-panel';
-import { TabbedCodePanel } from './components/tabbed-code-panel';
-import { useArtifactFiles } from './hooks/use-artifact-files';
+import { CodePanel } from './components/code-panel';
 
 interface VibeCodeEditorProps {
   sessionId: string;
@@ -14,19 +16,30 @@ export default function VibeCodeEditor({
   sessionId,
   initialMessage,
 }: VibeCodeEditorProps) {
+  const [isExplorerOpen, setIsExplorerOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('editor');
   const { closeWindow, activeId } = useWindowContext();
 
-  // Use real artifact data instead of mock data
+  const {
+    messages,
+    inputMessage,
+    isStreaming,
+    scrollRef,
+    setInputMessage,
+    handleSendMessage,
+  } = useVibeEditorConvex(sessionId, initialMessage);
+
   const {
     fileTree,
     selectedFile,
     fileContent,
-    isLoadingArtifacts,
+    artifacts,
     hasArtifacts,
+    isLoadingArtifacts,
     onFileSelect,
     onFolderToggle,
-    onContentChange,
-  } = useArtifactFiles(sessionId);
+    createDummyArtifact,
+  } = useArtifactsConvex(sessionId);
 
   const handleNewChat = () => {
     if (activeId) {
@@ -36,26 +49,31 @@ export default function VibeCodeEditor({
 
   return (
     <div className="flex h-full w-full overflow-hidden">
-      <div className="w-[40%] max-w-[450px] min-w-[250px]">
-        <ChatPanel
-          sessionId={sessionId}
-          initialMessage={initialMessage}
-          onNewChat={handleNewChat}
-        />
-      </div>
-      <div className="flex-1">
-        <TabbedCodePanel
-          sessionId={sessionId}
-          fileTree={fileTree}
-          selectedFile={selectedFile}
-          fileContent={fileContent}
-          isLoadingArtifacts={isLoadingArtifacts}
-          hasArtifacts={hasArtifacts}
-          onFileSelect={onFileSelect}
-          onFolderToggle={onFolderToggle}
-          onContentChange={onContentChange}
-        />
-      </div>
+      <ChatPanel
+        messages={messages}
+        inputMessage={inputMessage}
+        isStreaming={isStreaming}
+        scrollRef={scrollRef}
+        onInputChange={setInputMessage}
+        onSendMessage={handleSendMessage}
+        onNewChat={handleNewChat}
+      />
+      <CodePanel
+        sessionId={sessionId}
+        activeTab={activeTab}
+        isExplorerOpen={isExplorerOpen}
+        fileTree={fileTree}
+        selectedFile={selectedFile}
+        fileContent={fileContent}
+        artifacts={artifacts}
+        hasArtifacts={hasArtifacts}
+        isLoadingArtifacts={isLoadingArtifacts}
+        onTabChange={setActiveTab}
+        onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
+        onFileSelect={onFileSelect}
+        onFolderToggle={onFolderToggle}
+        onCreateDummyArtifact={createDummyArtifact}
+      />
     </div>
   );
 }

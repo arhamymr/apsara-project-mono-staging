@@ -13,6 +13,7 @@ import type * as blogs from "../blogs.js";
 import type * as chat from "../chat.js";
 import type * as http from "../http.js";
 import type * as user from "../user.js";
+import type * as vibeCoding from "../vibeCoding.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   chat: typeof chat;
   http: typeof http;
   user: typeof user;
+  vibeCoding: typeof vibeCoding;
 }>;
 
 /**

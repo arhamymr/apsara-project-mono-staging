@@ -51,6 +51,25 @@ const schema = defineSchema({
     .index("by_session", ["sessionId"])
     .index("by_user", ["userId"])
     .index("by_created", ["createdAt"]),
+  
+  artifacts: defineTable({
+    sessionId: v.id("chatSessions"),
+    userId: v.id("users"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    // Store files as a JSON string since Convex doesn't support dynamic object keys
+    files: v.string(),
+    metadata: v.optional(v.object({
+      framework: v.optional(v.string()),
+      language: v.optional(v.string()),
+      dependencies: v.optional(v.array(v.string())),
+    })),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_user", ["userId"])
+    .index("by_created", ["createdAt"]),
 });
 
 export default schema;
