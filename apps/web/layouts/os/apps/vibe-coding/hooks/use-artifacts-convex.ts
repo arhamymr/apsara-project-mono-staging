@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
@@ -25,9 +25,6 @@ export function useArtifactsConvex(sessionId: string) {
     api.vibeCoding.getSessionArtifacts,
     sessionId ? { sessionId: sessionId as Id<"chatSessions"> } : 'skip'
   ) || [];
-
-  // Mutation to create dummy artifact
-  const createDummyArtifact = useMutation(api.vibeCoding.createDummyArtifact);
 
   // Build file tree from artifact files
   const fileTree = useMemo(() => {
@@ -130,21 +127,7 @@ export function useArtifactsConvex(sessionId: string) {
 
   const handleFolderToggle = (path: string[]) => {
     // This would update the isOpen state of folders
-    // For now, folders are always open in the dummy implementation
     console.log('Toggle folder:', path);
-  };
-
-  const handleCreateDummyArtifact = async (projectType: 'react' | 'html' = 'react') => {
-    if (!sessionId) return;
-    
-    try {
-      await createDummyArtifact({
-        sessionId: sessionId as Id<"chatSessions">,
-        projectType,
-      });
-    } catch (error) {
-      console.error('Error creating dummy artifact:', error);
-    }
   };
 
   return {
@@ -157,6 +140,5 @@ export function useArtifactsConvex(sessionId: string) {
     isLoadingArtifacts: latestArtifact === undefined,
     onFileSelect: handleFileSelect,
     onFolderToggle: handleFolderToggle,
-    createDummyArtifact: handleCreateDummyArtifact,
   };
 }

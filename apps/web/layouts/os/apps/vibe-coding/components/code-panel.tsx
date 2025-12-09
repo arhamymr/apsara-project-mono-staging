@@ -40,7 +40,6 @@ interface CodePanelProps {
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
-  onCreateDummyArtifact: (projectType?: 'react' | 'html') => Promise<void>;
 }
 
 export function CodePanel({
@@ -57,7 +56,6 @@ export function CodePanel({
   onToggleExplorer,
   onFileSelect,
   onFolderToggle,
-  onCreateDummyArtifact,
 }: CodePanelProps) {
   return (
     <div className="flex-1 flex flex-col">
@@ -106,14 +104,12 @@ export function CodePanel({
           onToggleExplorer={onToggleExplorer}
           onFileSelect={onFileSelect}
           onFolderToggle={onFolderToggle}
-          onCreateDummyArtifact={onCreateDummyArtifact}
         />
         <PreviewTab artifact={artifacts[0] || null} />
         <TerminalTab artifact={artifacts[0] || null} />
         <ArtifactsTab
           artifacts={artifacts}
           isLoading={isLoadingArtifacts}
-          onCreateDummyArtifact={onCreateDummyArtifact}
         />
       </Tabs>
     </div>

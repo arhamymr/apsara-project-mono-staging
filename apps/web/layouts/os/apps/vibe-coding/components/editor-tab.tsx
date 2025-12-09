@@ -5,7 +5,7 @@ import { TabsContent } from '@workspace/ui/components/tabs';
 import { useTheme } from '@/layouts/dark-mode/useTheme';
 import Editor from '@monaco-editor/react';
 import { getLanguageFromPath } from '@/lib/file-utils';
-import { ChevronLeft, ChevronRight, File, FileCode, Loader2, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, File, FileCode, Loader2 } from 'lucide-react';
 import { FileNode } from '../hooks/use-artifacts-convex';
 
 interface EditorTabProps {
@@ -18,7 +18,6 @@ interface EditorTabProps {
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
-  onCreateDummyArtifact: (projectType?: 'react' | 'html') => Promise<void>;
 }
 
 export function EditorTab({
@@ -29,7 +28,6 @@ export function EditorTab({
   hasArtifacts,
   isLoadingArtifacts,
   onFileSelect,
-  onCreateDummyArtifact,
 }: EditorTabProps) {
   const { theme } = useTheme();
 
@@ -57,29 +55,9 @@ export function EditorTab({
             ) : (
               <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
                 <FileCode className="text-muted-foreground h-8 w-8" />
-                <p className="text-muted-foreground mt-2 text-xs mb-3">
-                  No files yet. Create a dummy artifact to test.
+                <p className="text-muted-foreground mt-2 text-xs">
+                  No files yet. Start chatting to generate code.
                 </p>
-                <div className="flex flex-col gap-2 w-full px-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onCreateDummyArtifact('react')}
-                    className="w-full text-xs"
-                  >
-                    <Plus size={12} className="mr-1" />
-                    React App
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onCreateDummyArtifact('html')}
-                    className="w-full text-xs"
-                  >
-                    <Plus size={12} className="mr-1" />
-                    HTML App
-                  </Button>
-                </div>
               </div>
             )}
           </div>
@@ -104,25 +82,9 @@ export function EditorTab({
               <h3 className="mt-4 text-lg font-semibold">
                 No Code Generated Yet
               </h3>
-              <p className="text-muted-foreground mt-2 text-sm mb-4">
-                Start chatting with the agent to generate code, or create a dummy artifact to test the editor.
+              <p className="text-muted-foreground mt-2 text-sm">
+                Start chatting with the agent to generate code.
               </p>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => onCreateDummyArtifact('react')}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Create React App
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onCreateDummyArtifact('html')}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Create HTML App
-                </Button>
-              </div>
             </div>
           </div>
         ) : fileContent ? (

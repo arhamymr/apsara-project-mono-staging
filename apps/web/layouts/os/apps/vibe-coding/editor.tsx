@@ -24,6 +24,8 @@ export default function VibeCodeEditor({
     messages,
     inputMessage,
     isStreaming,
+    streamingContent,
+    currentToolCall,
     scrollRef,
     setInputMessage,
     handleSendMessage,
@@ -38,7 +40,6 @@ export default function VibeCodeEditor({
     isLoadingArtifacts,
     onFileSelect,
     onFolderToggle,
-    createDummyArtifact,
   } = useArtifactsConvex(sessionId);
 
   const handleNewChat = () => {
@@ -53,6 +54,8 @@ export default function VibeCodeEditor({
         messages={messages}
         inputMessage={inputMessage}
         isStreaming={isStreaming}
+        streamingContent={streamingContent}
+        currentToolCall={currentToolCall}
         scrollRef={scrollRef}
         onInputChange={setInputMessage}
         onSendMessage={handleSendMessage}
@@ -72,7 +75,6 @@ export default function VibeCodeEditor({
         onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
         onFileSelect={onFileSelect}
         onFolderToggle={onFolderToggle}
-        onCreateDummyArtifact={createDummyArtifact}
       />
     </div>
   );

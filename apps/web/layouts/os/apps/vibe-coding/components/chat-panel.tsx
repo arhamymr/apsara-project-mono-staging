@@ -10,6 +10,8 @@ interface ChatPanelProps {
   messages: AgentMessage[];
   inputMessage: string;
   isStreaming: boolean;
+  streamingContent?: string;
+  currentToolCall?: string | null;
   scrollRef: React.RefObject<HTMLDivElement | null>;
   onInputChange: (value: string) => void;
   onSendMessage: () => void;
@@ -20,6 +22,8 @@ export function ChatPanel({
   messages,
   inputMessage,
   isStreaming,
+  streamingContent,
+  currentToolCall,
   scrollRef,
   onInputChange,
   onSendMessage,
@@ -85,7 +89,24 @@ export function ChatPanel({
                 {isStreaming && (
                   <div className="flex gap-3 justify-start">
                     <div className="bg-muted max-w-[85%] rounded-lg px-3 py-2 text-xs">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {streamingContent ? (
+                        <div className="whitespace-pre-wrap break-words">
+                          {streamingContent}
+                          <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1" />
+                        </div>
+                      ) : currentToolCall ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-muted-foreground">
+                            Running: <span className="text-primary font-mono">{currentToolCall}</span>
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-muted-foreground">Thinking...</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

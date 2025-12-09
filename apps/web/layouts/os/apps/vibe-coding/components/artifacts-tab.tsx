@@ -1,19 +1,16 @@
 'use client';
 
-import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
-import { Archive, Loader2, Plus } from 'lucide-react';
+import { Archive, Loader2 } from 'lucide-react';
 
 interface ArtifactsTabProps {
   artifacts: any[];
   isLoading: boolean;
-  onCreateDummyArtifact: (projectType?: 'react' | 'html') => Promise<void>;
 }
 
 export function ArtifactsTab({
   artifacts,
   isLoading,
-  onCreateDummyArtifact,
 }: ArtifactsTabProps) {
   return (
     <TabsContent value="artifacts" className="m-0 flex flex-1 overflow-hidden">
@@ -67,25 +64,9 @@ export function ArtifactsTab({
             <div className="text-center max-w-md">
               <Archive className="text-muted-foreground mx-auto h-12 w-12" />
               <h3 className="mt-4 text-lg font-semibold">No Artifacts</h3>
-              <p className="text-muted-foreground mt-2 text-sm mb-4">
-                Artifacts will appear here as the agent generates code. Create a dummy artifact to test.
+              <p className="text-muted-foreground mt-2 text-sm">
+                Artifacts will appear here as the agent generates code.
               </p>
-              <div className="flex gap-2 justify-center">
-                <Button
-                  variant="outline"
-                  onClick={() => onCreateDummyArtifact('react')}
-                >
-                  <Plus size={16} className="mr-2" />
-                  React App
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => onCreateDummyArtifact('html')}
-                >
-                  <Plus size={16} className="mr-2" />
-                  HTML App
-                </Button>
-              </div>
             </div>
           </div>
         )}

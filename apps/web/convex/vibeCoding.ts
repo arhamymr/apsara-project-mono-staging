@@ -518,6 +518,46 @@ export const getSessionArtifacts = query({
   },
 });
 
+// Save generated artifact from coding agent
+export const saveGeneratedArtifact = mutation({
+  args: {
+    sessionId: v.id("chatSessions"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    files: v.string(), // JSON stringified files
+    metadata: v.optional(v.object({
+      framework: v.optional(v.string()),
+      language: v.optional(v.string()),
+      dependencies: v.optional(v.array(v.string())),
+    })),
+  },
+  handler: async (ctx, { sessionId, name, description, files, metadata }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Verify user owns this session
+    const session = await ctx.db.get(sessionId);
+    if (!session || session.userId !== userId) {
+      throw new Error("Session not found or access denied");
+    }
+
+    const now = Date.now();
+
+    const artifactId = await ctx.db.insert("artifacts", {
+      sessionId,
+      userId,
+      name,
+      description,
+      files,
+      metadata,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return artifactId;
+  },
+});
+
 // Get the latest artifact for a session
 export const getLatestArtifact = query({
   args: { sessionId: v.id("chatSessions") },
