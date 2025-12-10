@@ -43,6 +43,13 @@ export default function VibeCodeEditor({
     isLoadingArtifacts,
     onFileSelect,
     onFolderToggle,
+    // Version management
+    currentVersion,
+    totalVersions,
+    isViewingOldVersion,
+    versionHistory,
+    goToVersion,
+    goToLatest,
   } = useArtifactsConvex(sessionId, { streamingFiles, loadingFile });
 
   const handleNewChat = () => {
@@ -81,6 +88,13 @@ export default function VibeCodeEditor({
         onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
         onFileSelect={onFileSelect}
         onFolderToggle={onFolderToggle}
+        // Version props
+        currentVersion={currentVersion}
+        totalVersions={totalVersions}
+        isViewingOldVersion={isViewingOldVersion}
+        versionHistory={versionHistory}
+        onGoToVersion={goToVersion}
+        onGoToLatest={goToLatest}
       />
     </div>
   );

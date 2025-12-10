@@ -56,10 +56,12 @@ const schema = defineSchema({
   artifacts: defineTable({
     sessionId: v.id("chatSessions"),
     userId: v.id("users"),
+    messageId: v.optional(v.id("chatMessages")), // Link to the message that generated this version
     name: v.string(),
     description: v.optional(v.string()),
     // Store files as a JSON string since Convex doesn't support dynamic object keys
     files: v.string(),
+    version: v.optional(v.number()), // Version number for this artifact (auto-incremented per session)
     metadata: v.optional(v.object({
       framework: v.optional(v.string()),
       language: v.optional(v.string()),
@@ -69,6 +71,7 @@ const schema = defineSchema({
     updatedAt: v.number(),
   })
     .index("by_session", ["sessionId"])
+    .index("by_session_version", ["sessionId", "version"])
     .index("by_user", ["userId"])
     .index("by_created", ["createdAt"]),
 });

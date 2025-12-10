@@ -26,7 +26,7 @@ export default function SignInPage() {
             </p>
           </div>
           
-          <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-800">
+          <Alert className="mb-4 border bg-card text-muted-background">
             <Construction className="h-4 w-4" />
             <AlertDescription>
               This project is under heavy development. Features may be unstable or incomplete.

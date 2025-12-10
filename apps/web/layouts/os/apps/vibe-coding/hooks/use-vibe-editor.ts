@@ -473,7 +473,7 @@ export function useVibeEditorConvex(sessionId: string, initialMessage?: string) 
         }
       }
 
-      // Save merged files as artifact (includes both old and new files)
+      // Save merged files as new artifact version (includes both old and new files)
       if (mergedFiles.size > 0) {
         console.log('[saveResults] Saving artifact with merged files...');
         const filesObject = Object.fromEntries(mergedFiles);
@@ -482,14 +482,15 @@ export function useVibeEditorConvex(sessionId: string, initialMessage?: string) 
           sampleContent: Object.values(filesObject)[0]?.slice(0, 100),
           allContentLengths: Object.entries(filesObject).map(([k, v]) => ({ [k]: v.length })),
         });
-        await saveArtifact({
+        const result = await saveArtifact({
           sessionId: sessionId as Id<'chatSessions'>,
+          messageId: streamingMessageIdRef.current ?? undefined,
           name: 'Generated Code',
           description: description.slice(0, 100),
           files: JSON.stringify(filesObject),
           metadata: { framework: 'React', language: 'TypeScript' },
         });
-        console.log('[saveResults] Artifact saved with', mergedFiles.size, 'files!');
+        console.log('[saveResults] Artifact saved as version', result.version, 'with', mergedFiles.size, 'files!');
       }
     },
     [sessionId, addAssistantMessage, updateStreamingMessage, saveArtifact, latestArtifact],

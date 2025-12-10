@@ -115,10 +115,11 @@ export const sendVibeCodeMessage = mutation({
   },
 });
 
-// Save generated artifact from coding agent
+// Save generated artifact from coding agent (creates new version)
 export const saveGeneratedArtifact = mutation({
   args: {
     sessionId: v.id("chatSessions"),
+    messageId: v.optional(v.id("chatMessages")),
     name: v.string(),
     description: v.optional(v.string()),
     files: v.string(),
@@ -128,7 +129,7 @@ export const saveGeneratedArtifact = mutation({
       dependencies: v.optional(v.array(v.string())),
     })),
   },
-  handler: async (ctx, { sessionId, name, description, files, metadata }) => {
+  handler: async (ctx, { sessionId, messageId, name, description, files, metadata }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
@@ -137,24 +138,34 @@ export const saveGeneratedArtifact = mutation({
       throw new Error("Session not found or access denied");
     }
 
+    // Get the latest version number for this session
+    const latestArtifact = await ctx.db
+      .query("artifacts")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .order("desc")
+      .first();
+
+    const nextVersion = (latestArtifact?.version ?? 0) + 1;
     const now = Date.now();
 
     const artifactId = await ctx.db.insert("artifacts", {
       sessionId,
       userId,
+      messageId,
       name,
       description,
       files,
+      version: nextVersion,
       metadata,
       createdAt: now,
       updatedAt: now,
     });
 
-    return artifactId;
+    return { artifactId, version: nextVersion };
   },
 });
 
-// Get artifacts for a session
+// Get all artifact versions for a session (version history)
 export const getSessionArtifacts = query({
   args: { sessionId: v.id("chatSessions") },
   handler: async (ctx, { sessionId }) => {
@@ -201,5 +212,68 @@ export const getLatestArtifact = query({
     }
 
     return null;
+  },
+});
+
+// Get a specific artifact version
+export const getArtifactByVersion = query({
+  args: { 
+    sessionId: v.id("chatSessions"),
+    version: v.number(),
+  },
+  handler: async (ctx, { sessionId, version }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const session = await ctx.db.get(sessionId);
+    if (!session || session.userId !== userId) return null;
+
+    const artifact = await ctx.db
+      .query("artifacts")
+      .withIndex("by_session_version", (q) => 
+        q.eq("sessionId", sessionId).eq("version", version)
+      )
+      .first();
+
+    if (artifact) {
+      return {
+        ...artifact,
+        files: JSON.parse(artifact.files),
+      };
+    }
+
+    return null;
+  },
+});
+
+// Get version history summary (lightweight - without file contents)
+export const getVersionHistory = query({
+  args: { sessionId: v.id("chatSessions") },
+  handler: async (ctx, { sessionId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    const session = await ctx.db.get(sessionId);
+    if (!session || session.userId !== userId) return [];
+
+    const artifacts = await ctx.db
+      .query("artifacts")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .order("desc")
+      .collect();
+
+    // Return lightweight version info without file contents
+    return artifacts.map(artifact => {
+      const files = JSON.parse(artifact.files);
+      return {
+        _id: artifact._id,
+        version: artifact.version,
+        description: artifact.description,
+        messageId: artifact.messageId,
+        fileCount: Object.keys(files).length,
+        filePaths: Object.keys(files),
+        createdAt: artifact.createdAt,
+      };
+    });
   },
 });

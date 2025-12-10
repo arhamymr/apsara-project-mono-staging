@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
@@ -11,6 +11,16 @@ export interface FileNode {
   isOpen?: boolean;
 }
 
+export interface VersionInfo {
+  _id: string;
+  version: number;
+  description?: string;
+  messageId?: string;
+  fileCount: number;
+  filePaths: string[];
+  createdAt: number;
+}
+
 interface UseArtifactsOptions {
   streamingFiles?: Map<string, string>; // Files being streamed in real-time
   loadingFile?: string | null; // Currently loading file path (for auto-selection)
@@ -20,6 +30,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
   const { streamingFiles, loadingFile } = options;
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [prevArtifactId, setPrevArtifactId] = useState<string | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null); // null = latest
 
   // Query to get the latest artifact
   const latestArtifact = useQuery(
@@ -27,33 +38,52 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     sessionId ? { sessionId: sessionId as Id<"chatSessions"> } : 'skip'
   );
 
-  // Query to get all artifacts
+  // Query to get version history (lightweight)
+  const versionHistory = useQuery(
+    api.vibeCoding.getVersionHistory,
+    sessionId ? { sessionId: sessionId as Id<"chatSessions"> } : 'skip'
+  ) || [];
+
+  // Query to get specific version (only when not viewing latest)
+  const specificVersionArtifact = useQuery(
+    api.vibeCoding.getArtifactByVersion,
+    sessionId && selectedVersion !== null
+      ? { sessionId: sessionId as Id<"chatSessions">, version: selectedVersion }
+      : 'skip'
+  );
+
+  // Query to get all artifacts (for backwards compatibility)
   const artifacts = useQuery(
     api.vibeCoding.getSessionArtifacts,
     sessionId ? { sessionId: sessionId as Id<"chatSessions"> } : 'skip'
   ) || [];
 
+  // Determine which artifact to display
+  const activeArtifact = selectedVersion !== null ? specificVersionArtifact : latestArtifact;
+  const currentVersion = activeArtifact?.version ?? latestArtifact?.version ?? 0;
+  const totalVersions = versionHistory.length;
+
   // Merge persisted artifact files with streaming files
   const mergedFiles = useMemo(() => {
     console.log('[useArtifacts] Computing mergedFiles:', {
-      hasLatestArtifact: !!latestArtifact,
-      hasFiles: !!latestArtifact?.files,
-      filesType: typeof latestArtifact?.files,
-      filesPreview: typeof latestArtifact?.files === 'string' 
-        ? latestArtifact.files.slice(0, 100) 
-        : 'object',
+      hasActiveArtifact: !!activeArtifact,
+      selectedVersion,
+      currentVersion,
+      hasFiles: !!activeArtifact?.files,
+      filesType: typeof activeArtifact?.files,
       streamingFilesSize: streamingFiles?.size || 0,
     });
     
     const files: Record<string, string> = {};
     
-    // Add persisted files first
-    if (latestArtifact?.files) {
+    // Add persisted files first (from active artifact - either latest or selected version)
+    if (activeArtifact?.files) {
       try {
-        const artifactFiles = typeof latestArtifact.files === 'string' 
-          ? JSON.parse(latestArtifact.files) 
-          : latestArtifact.files;
+        const artifactFiles = typeof activeArtifact.files === 'string' 
+          ? JSON.parse(activeArtifact.files) 
+          : activeArtifact.files;
         console.log('[useArtifacts] Parsed artifact files:', {
+          version: activeArtifact.version,
           keys: Object.keys(artifactFiles),
           sampleContent: Object.values(artifactFiles)[0]?.toString().slice(0, 50),
         });
@@ -63,8 +93,8 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
       }
     }
     
-    // Overlay streaming files (these take precedence during streaming)
-    if (streamingFiles && streamingFiles.size > 0) {
+    // Overlay streaming files only when viewing latest version (these take precedence during streaming)
+    if (selectedVersion === null && streamingFiles && streamingFiles.size > 0) {
       streamingFiles.forEach((content, path) => {
         files[path] = content;
       });
@@ -76,7 +106,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
       keys: Object.keys(files),
     });
     return files;
-  }, [latestArtifact, streamingFiles]);
+  }, [activeArtifact, streamingFiles, selectedVersion, currentVersion]);
 
   // Build file tree from merged files (persisted + streaming)
   const fileTree = useMemo(() => {
@@ -170,7 +200,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
       return;
     }
     
-    const currentArtifactId = latestArtifact?._id ? String(latestArtifact._id) : null;
+    const currentArtifactId = activeArtifact?._id ? String(activeArtifact._id) : null;
     
     // Select first file if no file selected or if artifact changed
     if (filePaths[0]) {
@@ -179,7 +209,46 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
         setPrevArtifactId(currentArtifactId);
       }
     }
-  }, [mergedFiles, latestArtifact?._id, selectedFile, prevArtifactId, loadingFile]);
+  }, [mergedFiles, activeArtifact?._id, selectedFile, prevArtifactId, loadingFile]);
+
+  // Reset to latest version when new version is created during streaming
+  useEffect(() => {
+    if (latestArtifact?.version && selectedVersion !== null) {
+      // If we're viewing an old version and a new one is created, stay on old version
+      // User can manually switch to latest
+      console.log('[useArtifacts] New version available:', latestArtifact.version);
+    }
+  }, [latestArtifact?.version, selectedVersion]);
+
+  // Version navigation handlers
+  const goToVersion = useCallback((version: number) => {
+    console.log('[useArtifacts] Switching to version:', version);
+    setSelectedVersion(version);
+    setSelectedFile(''); // Reset file selection when changing versions
+  }, []);
+
+  const goToLatest = useCallback(() => {
+    console.log('[useArtifacts] Switching to latest version');
+    setSelectedVersion(null);
+    setSelectedFile(''); // Reset file selection
+  }, []);
+
+  const goToPreviousVersion = useCallback(() => {
+    if (currentVersion > 1) {
+      goToVersion(currentVersion - 1);
+    }
+  }, [currentVersion, goToVersion]);
+
+  const goToNextVersion = useCallback(() => {
+    const latestVersion = latestArtifact?.version ?? 0;
+    if (selectedVersion !== null && selectedVersion < latestVersion) {
+      if (selectedVersion + 1 === latestVersion) {
+        goToLatest();
+      } else {
+        goToVersion(selectedVersion + 1);
+      }
+    }
+  }, [selectedVersion, latestArtifact?.version, goToVersion, goToLatest]);
 
   // Get content of selected file (from merged files - streaming takes precedence)
   const fileContent = useMemo(() => {
@@ -208,6 +277,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
   };
 
   const hasStreamingFiles = !!(streamingFiles && streamingFiles.size > 0);
+  const isViewingOldVersion = selectedVersion !== null;
 
   return {
     fileTree,
@@ -220,5 +290,16 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     isStreaming: hasStreamingFiles,
     onFileSelect: handleFileSelect,
     onFolderToggle: handleFolderToggle,
+    
+    // Version management
+    currentVersion,
+    totalVersions,
+    selectedVersion,
+    isViewingOldVersion,
+    versionHistory: versionHistory as VersionInfo[],
+    goToVersion,
+    goToLatest,
+    goToPreviousVersion,
+    goToNextVersion,
   };
 }
