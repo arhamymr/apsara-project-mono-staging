@@ -67,6 +67,7 @@ export type WindowContextType = {
   ) => string; // returns new subwindow id
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
+  restoreWindow: (id: string) => void;
   toggleMaximizeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   updateWindowPosition: (id: string, x: number, y: number) => void;

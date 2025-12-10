@@ -6,7 +6,7 @@ import { useTheme } from '@/layouts/dark-mode/useTheme';
 import Editor from '@monaco-editor/react';
 import { getLanguageFromPath } from '@/lib/file-utils';
 import { ChevronLeft, ChevronRight, File, FileCode, Loader2 } from 'lucide-react';
-import { FileNode } from '../hooks/use-artifacts-convex';
+import { FileNode } from '../hooks/use-artifacts';
 
 interface EditorTabProps {
   isExplorerOpen: boolean;
@@ -15,6 +15,7 @@ interface EditorTabProps {
   fileContent: string;
   hasArtifacts: boolean;
   isLoadingArtifacts: boolean;
+  loadingFile?: string | null;
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
@@ -27,15 +28,25 @@ export function EditorTab({
   fileContent,
   hasArtifacts,
   isLoadingArtifacts,
+  loadingFile,
   onFileSelect,
 }: EditorTabProps) {
   const { theme } = useTheme();
+  // Debug logging
+  console.log('[EditorTab] State:', {
+    selectedFile,
+    hasFileContent: !!fileContent,
+    fileContentLength: fileContent?.length,
+    hasArtifacts,
+    isLoadingArtifacts,
+    fileTreeLength: fileTree.length,
+  });
 
   return (
-    <TabsContent value="editor" className="m-0 flex flex-1 overflow-hidden">
-      {/* File Explorer */}
+    <TabsContent value="editor" className="m-0 flex flex-1 overflow-hidden h-full">
+      {/* File Explorer - Left Side */}
       {isExplorerOpen && (
-        <div className="bg-muted/30 w-64 overflow-y-auto border-r">
+        <div className="bg-muted/30 w-64 flex-shrink-0 overflow-y-auto border-r">
           <div className="bg-muted/50 border-b px-3 py-2">
             <h3 className="text-muted-foreground text-xs font-semibold uppercase">
               Explorer
@@ -50,6 +61,7 @@ export function EditorTab({
               <FileTreeView
                 nodes={fileTree}
                 selectedFile={selectedFile}
+                loadingFile={loadingFile}
                 onFileSelect={onFileSelect}
               />
             ) : (
@@ -65,7 +77,7 @@ export function EditorTab({
       )}
 
       {/* Monaco Editor */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0 overflow-hidden h-full">
         {isLoadingArtifacts ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
@@ -88,20 +100,28 @@ export function EditorTab({
             </div>
           </div>
         ) : fileContent ? (
-          <Editor
-            height="100%"
-            language={getLanguageFromPath(selectedFile)}
-            value={fileContent}
-            theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
-            options={{
-              minimap: { enabled: false },
-              fontSize: 14,
-              lineNumbers: 'on',
-              scrollBeyondLastLine: false,
-              automaticLayout: true,
-              readOnly: true,
-            }}
-          />
+          <div className="h-full w-full">
+            <Editor
+              height="100%"
+              language={getLanguageFromPath(selectedFile)}
+              value={fileContent}
+              theme={theme === 'dark' ? 'vs-dark' : 'light'}
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                readOnly: true,
+                wordWrap: 'on',
+              }}
+              loading={
+                <div className="flex h-full items-center justify-center">
+                  <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+                </div>
+              }
+            />
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-center">
@@ -154,6 +174,7 @@ export function EditorHeader({
 interface FileTreeViewProps {
   nodes: FileNode[];
   selectedFile: string;
+  loadingFile?: string | null;
   onFileSelect: (path: string) => void;
   level?: number;
 }
@@ -161,37 +182,45 @@ interface FileTreeViewProps {
 function FileTreeView({
   nodes,
   selectedFile,
+  loadingFile,
   onFileSelect,
   level = 0,
 }: FileTreeViewProps) {
   return (
     <div>
-      {nodes.map((node) => (
-        <div key={node.path}>
-          <button
-            onClick={() => node.type === 'file' && onFileSelect(node.path)}
-            className={`flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-muted/50 transition-colors ${
-              selectedFile === node.path ? 'bg-muted' : ''
-            }`}
-            style={{ paddingLeft: `${level * 12 + 12}px` }}
-          >
-            {node.type === 'folder' ? (
-              <FileCode size={14} className="text-muted-foreground" />
-            ) : (
-              <File size={14} className="text-muted-foreground" />
+      {nodes.map((node) => {
+        const isLoading = node.type === 'file' && node.path === loadingFile;
+        
+        return (
+          <div key={node.path}>
+            <button
+              onClick={() => node.type === 'file' && onFileSelect(node.path)}
+              className={`flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-muted/50 transition-colors ${
+                selectedFile === node.path ? 'bg-muted' : ''
+              } ${isLoading ? 'bg-primary/10' : ''}`}
+              style={{ paddingLeft: `${level * 12 + 12}px` }}
+            >
+              {node.type === 'folder' ? (
+                <FileCode size={14} className="text-muted-foreground" />
+              ) : isLoading ? (
+                <Loader2 size={14} className="text-primary animate-spin" />
+              ) : (
+                <File size={14} className="text-muted-foreground" />
+              )}
+              <span className={`truncate ${isLoading ? 'text-primary' : ''}`}>{node.name}</span>
+            </button>
+            {node.children && node.children.length > 0 && (
+              <FileTreeView
+                nodes={node.children}
+                selectedFile={selectedFile}
+                loadingFile={loadingFile}
+                onFileSelect={onFileSelect}
+                level={level + 1}
+              />
             )}
-            <span className="truncate">{node.name}</span>
-          </button>
-          {node.children && node.children.length > 0 && (
-            <FileTreeView
-              nodes={node.children}
-              selectedFile={selectedFile}
-              onFileSelect={onFileSelect}
-              level={level + 1}
-            />
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

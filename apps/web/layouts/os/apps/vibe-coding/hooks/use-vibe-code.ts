@@ -1,31 +1,29 @@
 import { useState } from 'react';
-import { useMutation, useQuery, useAction } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
 export function useVibeCodeConvex() {
   const [welcomeInput, setWelcomeInput] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState<Id<"chatSessions"> | undefined>();
+  const [isStarting, setIsStarting] = useState(false);
 
   // Query to get recent vibe-coding conversations
   const recentConversations = useQuery(api.vibeCoding.getVibeCodeSessions) || [];
   
-  // Mutations and actions
+  // Mutations
   const createSession = useMutation(api.vibeCoding.createVibeCodeSession);
-  const processMessage = useAction(api.vibeCoding.processVibeCodeMessage);
-  
-  const [isStarting, setIsStarting] = useState(false);
 
   const handleStartChat = async (message: string): Promise<string | null> => {
     if (!message.trim() || isStarting) return null;
 
     try {
       setIsStarting(true);
-      
+
       // Create new session with initial message
-      const sessionId = await createSession({ 
+      const sessionId = await createSession({
         title: message.length > 50 ? message.substring(0, 47) + "..." : message,
-        initialMessage: message
+        initialMessage: message,
       });
 
       setCurrentSessionId(sessionId);

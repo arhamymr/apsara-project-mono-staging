@@ -4,7 +4,7 @@ import { Textarea } from '@workspace/ui/components/textarea';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { Code, Loader2, Send } from 'lucide-react';
 import VibeCodeEditor from './editor';
-import { useVibeCodeConvex } from './hooks/use-vibe-code-convex';
+import { useVibeCodeConvex } from './hooks/use-vibe-code';
 
 export default function VibeCodeRoot() {
   const { openSubWindow, activeId } = useWindowContext();
@@ -167,7 +167,6 @@ export default function VibeCodeRoot() {
                           openEditor(
                             conversation.id,
                             conversation.title || conversation.first_message,
-                            undefined, // Don't auto-send for existing sessions
                           );
                         }}
                         className="border-border hover:bg-muted flex items-start gap-3 rounded-lg border p-3 text-left transition-colors"

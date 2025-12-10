@@ -4,7 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
 // API URL for the coding agent
-const CODING_AGENT_API_URL = process.env.NEXT_PUBLIC_CODING_AGENT_URL || 'http://localhost:4111/coding-agent/stream';
+const CODING_AGENT_API_URL = process.env.NEXT_PUBLIC_CODING_AGENT_URL || 'http://localhost:4111/streaming-coding-agent/stream';
 
 export interface StreamingFile {
   filePath: string;

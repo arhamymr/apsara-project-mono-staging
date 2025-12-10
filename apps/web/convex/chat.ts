@@ -139,6 +139,63 @@ export const addAssistantMessage = mutation({
   },
 });
 
+// Mutation to create a streaming assistant message (returns messageId for updates)
+export const createStreamingMessage = mutation({
+  args: { 
+    sessionId: v.id("chatSessions"),
+  },
+  handler: async (ctx, { sessionId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Verify user owns this session
+    const session = await ctx.db.get(sessionId);
+    if (!session || session.userId !== userId) {
+      throw new Error("Session not found or access denied");
+    }
+
+    const messageId = await ctx.db.insert("chatMessages", {
+      sessionId,
+      userId,
+      role: "assistant",
+      content: "",
+      isStreaming: true,
+      createdAt: Date.now(),
+    });
+
+    return messageId;
+  },
+});
+
+// Mutation to update streaming message content
+export const updateStreamingMessage = mutation({
+  args: { 
+    messageId: v.id("chatMessages"),
+    content: v.string(),
+    isComplete: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { messageId, content, isComplete }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Verify user owns this message
+    const message = await ctx.db.get(messageId);
+    if (!message || message.userId !== userId) {
+      throw new Error("Message not found or access denied");
+    }
+
+    await ctx.db.patch(messageId, { 
+      content,
+      ...(isComplete ? { isStreaming: false } : {}),
+    });
+
+    // Update session timestamp
+    await ctx.db.patch(message.sessionId, { updatedAt: Date.now() });
+
+    return messageId;
+  },
+});
+
 // Action to process chat message (calls external API)
 export const processChatMessage = action({
   args: { 

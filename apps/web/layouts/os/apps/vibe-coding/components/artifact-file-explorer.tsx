@@ -11,6 +11,8 @@ import {
 import Editor from '@monaco-editor/react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  ChevronsDownUp,
+  ChevronsUpDown,
   Download,
   Eye,
   File,
@@ -18,7 +20,7 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { FileNode, FileTree } from './file-tree';
 
@@ -108,6 +110,31 @@ export function ArtifactFileExplorer({ sessionId }: ArtifactFileExplorerProps) {
       return next;
     });
   };
+
+  // Collect all folder paths from file manifest
+  const getAllFolderPaths = useCallback((): string[] => {
+    const folders = new Set<string>();
+    const manifest = artifactDetails?.artifact.file_manifest || [];
+    
+    manifest.forEach((item) => {
+      const parts = item.path.split('/');
+      // Build all parent folder paths
+      for (let i = 1; i < parts.length; i++) {
+        folders.add(parts.slice(0, i).join('/'));
+      }
+    });
+    
+    return Array.from(folders);
+  }, [artifactDetails?.artifact.file_manifest]);
+
+  const expandAll = useCallback(() => {
+    const allFolders = getAllFolderPaths();
+    setExpandedFolders(new Set(allFolders));
+  }, [getAllFolderPaths]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedFolders(new Set());
+  }, []);
 
   const handleDownload = async (artifactId: string, title: string) => {
     try {
@@ -219,16 +246,37 @@ export function ArtifactFileExplorer({ sessionId }: ArtifactFileExplorerProps) {
         <div className="w-64 border-r">
           <div className="bg-muted/50 flex items-center justify-between border-b px-3 py-2">
             <h3 className="text-xs font-semibold uppercase">Files</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6"
-              onClick={() =>
-                handleDownload(selectedArtifact.id, selectedArtifact.title)
-              }
-            >
-              <Download size={14} />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={expandAll}
+                title="Expand all folders"
+              >
+                <ChevronsUpDown size={14} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={collapseAll}
+                title="Collapse all folders"
+              >
+                <ChevronsDownUp size={14} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() =>
+                  handleDownload(selectedArtifact.id, selectedArtifact.title)
+                }
+                title="Download artifact"
+              >
+                <Download size={14} />
+              </Button>
+            </div>
           </div>
           <ScrollArea className="h-[calc(100%-41px)]">
             {isLoadingDetails ? (
@@ -269,7 +317,7 @@ export function ArtifactFileExplorer({ sessionId }: ArtifactFileExplorerProps) {
                   height="100%"
                   language={getLanguageFromPath(selectedFile)}
                   value={fileData?.content || ''}
-                  theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+                  theme="vs-dark"
                   options={{
                     readOnly: true,
                     minimap: { enabled: false },

@@ -175,6 +175,7 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
           left: 'resize-handle-left',
         }}
         style={{
+          position: 'fixed',
           zIndex: win.z + 333,
           transition:
             isAnimating && !isLowSpecDevice

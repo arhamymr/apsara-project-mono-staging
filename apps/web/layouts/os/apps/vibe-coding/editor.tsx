@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useVibeEditorConvex } from './hooks/use-vibe-editor-convex';
-import { useArtifactsConvex } from './hooks/use-artifacts-convex';
+import { useVibeEditorConvex } from './hooks/use-vibe-editor';
+import { useArtifactsConvex } from './hooks/use-artifacts';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { ChatPanel } from './components/chat-panel';
 import { CodePanel } from './components/code-panel';
@@ -24,8 +24,11 @@ export default function VibeCodeEditor({
     messages,
     inputMessage,
     isStreaming,
+    isLoadingMessages,
     streamingContent,
-    currentToolCall,
+    streamingFiles,
+    activityLog,
+    loadingFile,
     scrollRef,
     setInputMessage,
     handleSendMessage,
@@ -40,7 +43,7 @@ export default function VibeCodeEditor({
     isLoadingArtifacts,
     onFileSelect,
     onFolderToggle,
-  } = useArtifactsConvex(sessionId);
+  } = useArtifactsConvex(sessionId, { streamingFiles, loadingFile });
 
   const handleNewChat = () => {
     if (activeId) {
@@ -54,8 +57,10 @@ export default function VibeCodeEditor({
         messages={messages}
         inputMessage={inputMessage}
         isStreaming={isStreaming}
+        isLoadingMessages={isLoadingMessages}
         streamingContent={streamingContent}
-        currentToolCall={currentToolCall}
+        loadingFile={loadingFile}
+        activityLog={activityLog}
         scrollRef={scrollRef}
         onInputChange={setInputMessage}
         onSendMessage={handleSendMessage}
@@ -71,6 +76,7 @@ export default function VibeCodeEditor({
         artifacts={artifacts}
         hasArtifacts={hasArtifacts}
         isLoadingArtifacts={isLoadingArtifacts}
+        loadingFile={loadingFile}
         onTabChange={setActiveTab}
         onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
         onFileSelect={onFileSelect}

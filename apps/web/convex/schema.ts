@@ -39,6 +39,7 @@ const schema = defineSchema({
     userId: v.id("users"),
     role: v.union(v.literal("user"), v.literal("assistant")),
     content: v.string(),
+    isStreaming: v.optional(v.boolean()),
     metadata: v.optional(v.object({
       appIntent: v.optional(v.object({
         type: v.string(),

@@ -174,7 +174,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
         setActiveId(parsed.activeId);
       }
 
-      const anyParsed: any = parsed as any;
+      const anyParsed: any = parsed as unknown;
       if (Array.isArray(anyParsed.shortcuts)) {
         setShortcuts(hydrateFromV1(anyParsed.shortcuts as string[]));
       } else if (Array.isArray(anyParsed.desktopItems)) {
@@ -442,6 +442,16 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
     setResizingWindowId((current) => (current === id ? null : current));
   }, []);
 
+  const restoreWindow = useCallback((id: string) => {
+    const nextZ = ++zSeed.current;
+    setWindows((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, minimized: false, z: nextZ } : w,
+      ),
+    );
+    setActiveId(id);
+  }, []);
+
   const toggleMaximizeWindow = useCallback(
     (id: string) => {
       setWindows((prev) =>
@@ -645,6 +655,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
       },
       closeWindow,
       minimizeWindow,
+      restoreWindow,
       toggleMaximizeWindow,
       focusWindow,
       updateWindowPosition,
@@ -677,6 +688,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
       openAppById,
       closeWindow,
       minimizeWindow,
+      restoreWindow,
       toggleMaximizeWindow,
       focusWindow,
       updateWindowPosition,

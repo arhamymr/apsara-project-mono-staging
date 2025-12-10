@@ -199,7 +199,7 @@ export function TabbedCodePanel({
                 language={getLanguageFromPath(selectedFile)}
                 value={fileContent}
                 onChange={(value) => onContentChange(value || '')}
-                theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+                theme="vs-dark"
                 options={{
                   minimap: { enabled: false },
                   fontSize: 14,

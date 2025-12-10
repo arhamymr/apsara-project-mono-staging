@@ -6,7 +6,7 @@ import { EditorTab, EditorHeader } from './editor-tab';
 import { PreviewTab } from './preview-tab';
 import { TerminalTab } from './terminal-tab';
 import { ArtifactsTab } from './artifacts-tab';
-import { FileNode } from '../hooks/use-artifacts-convex';
+import { FileNode } from '../hooks/use-artifacts';
 import { Id } from '@/convex/_generated/dataModel';
 
 interface Artifact {
@@ -36,6 +36,7 @@ interface CodePanelProps {
   artifacts: Artifact[];
   hasArtifacts: boolean;
   isLoadingArtifacts: boolean;
+  loadingFile?: string | null;
   onTabChange: (tab: string) => void;
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
@@ -52,17 +53,18 @@ export function CodePanel({
   artifacts,
   hasArtifacts,
   isLoadingArtifacts,
+  loadingFile,
   onTabChange,
   onToggleExplorer,
   onFileSelect,
   onFolderToggle,
 }: CodePanelProps) {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full">
       <Tabs
         value={activeTab}
         onValueChange={onTabChange}
-        className="flex h-full flex-col"
+        className="flex h-full flex-col gap-0 flex-1"
       >
         {/* Tabs Header */}
         <div className="bg-muted/50 border-b">
@@ -101,6 +103,7 @@ export function CodePanel({
           fileContent={fileContent}
           hasArtifacts={hasArtifacts}
           isLoadingArtifacts={isLoadingArtifacts}
+          loadingFile={loadingFile}
           onToggleExplorer={onToggleExplorer}
           onFileSelect={onFileSelect}
           onFolderToggle={onFolderToggle}
