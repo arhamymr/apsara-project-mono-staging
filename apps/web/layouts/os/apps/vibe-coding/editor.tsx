@@ -17,7 +17,6 @@ export default function VibeCodeEditor({
   initialMessage,
 }: VibeCodeEditorProps) {
   const [isExplorerOpen, setIsExplorerOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('editor');
   const { closeWindow, activeId } = useWindowContext();
 
   const {
@@ -38,6 +37,7 @@ export default function VibeCodeEditor({
     fileTree,
     selectedFile,
     fileContent,
+    currentFiles,
     artifacts,
     hasArtifacts,
     isLoadingArtifacts,
@@ -75,16 +75,15 @@ export default function VibeCodeEditor({
       />
       <CodePanel
         sessionId={sessionId}
-        activeTab={activeTab}
         isExplorerOpen={isExplorerOpen}
         fileTree={fileTree}
         selectedFile={selectedFile}
         fileContent={fileContent}
         artifacts={artifacts}
+        currentFiles={currentFiles}
         hasArtifacts={hasArtifacts}
         isLoadingArtifacts={isLoadingArtifacts}
         loadingFile={loadingFile}
-        onTabChange={setActiveTab}
         onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
         onFileSelect={onFileSelect}
         onFolderToggle={onFolderToggle}

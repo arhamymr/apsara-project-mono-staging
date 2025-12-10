@@ -172,7 +172,6 @@ export function FileTree({
   showControls = false,
 }: FileTreeProps) {
 
-  console.log(nodes, "nodes")
   return (
     <div className="flex flex-col h-full">
       {showControls && (onExpandAll || onCollapseAll) && (

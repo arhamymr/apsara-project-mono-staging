@@ -1,11 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
-import { Archive, Code2, Globe, Terminal, ChevronDown, Check } from 'lucide-react';
+import { Code2, Globe, Terminal, ChevronDown, Check } from 'lucide-react';
 import { EditorTab, EditorHeader } from './editor-tab';
 import { PreviewTab } from './preview-tab';
 import { TerminalTab } from './terminal-tab';
-import { ArtifactsTab } from './artifacts-tab';
 import { FileNode, VersionInfo } from '../hooks/use-artifacts';
 import { Id } from '@/convex/_generated/dataModel';
 import {
@@ -34,16 +34,15 @@ interface Artifact {
 
 interface CodePanelProps {
   sessionId: string;
-  activeTab: string;
   isExplorerOpen: boolean;
   fileTree: FileNode[];
   selectedFile: string;
   fileContent: string;
   artifacts: Artifact[];
+  currentFiles: Record<string, string>; // All files for current version
   hasArtifacts: boolean;
   isLoadingArtifacts: boolean;
   loadingFile?: string | null;
-  onTabChange: (tab: string) => void;
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
@@ -57,17 +56,15 @@ interface CodePanelProps {
 }
 
 export function CodePanel({
-  sessionId,
-  activeTab,
   isExplorerOpen,
   fileTree,
   selectedFile,
   fileContent,
   artifacts,
+  currentFiles,
   hasArtifacts,
   isLoadingArtifacts,
   loadingFile,
-  onTabChange,
   onToggleExplorer,
   onFileSelect,
   onFolderToggle,
@@ -79,11 +76,18 @@ export function CodePanel({
   onGoToVersion,
   onGoToLatest,
 }: CodePanelProps) {
+  const [activeTab, setActiveTab] = useState('editor');
+  
+  // Build artifact object for preview with current version files
+  const currentArtifact = hasArtifacts ? {
+    files: currentFiles,
+    metadata: artifacts[0]?.metadata,
+  } : null;
   return (
     <div className="flex-1 flex flex-col h-full">
       <Tabs
         value={activeTab}
-        onValueChange={onTabChange}
+        onValueChange={setActiveTab}
         className="flex h-full flex-col gap-0 flex-1"
       >
         {/* Tabs Header */}
@@ -99,12 +103,8 @@ export function CodePanel({
               <TabsTrigger value="terminal" className="gap-2">
                 <Terminal size={16} />
               </TabsTrigger>
-              <TabsTrigger value="artifacts" className="gap-2">
-                <Archive size={16} />
-                Artifacts
-              </TabsTrigger>
 
-              {/* Version Dropdown - right of Artifacts tab */}
+              {/* Version Dropdown */}
               {totalVersions > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -170,12 +170,11 @@ export function CodePanel({
           onFileSelect={onFileSelect}
           onFolderToggle={onFolderToggle}
         />
-        <PreviewTab artifact={artifacts[0] || null} />
-        <TerminalTab artifact={artifacts[0] || null} />
-        <ArtifactsTab
-          artifacts={artifacts}
-          isLoading={isLoadingArtifacts}
+        <PreviewTab 
+          artifact={currentArtifact} 
+          isActive={activeTab === 'preview'} 
         />
+        <TerminalTab artifact={currentArtifact} />
       </Tabs>
     </div>
   );

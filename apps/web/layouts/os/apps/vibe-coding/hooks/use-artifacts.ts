@@ -283,6 +283,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     fileTree,
     selectedFile,
     fileContent,
+    currentFiles: mergedFiles, // All files for current version (for sandbox)
     artifacts,
     latestArtifact,
     hasArtifacts: artifacts.length > 0 || hasStreamingFiles,

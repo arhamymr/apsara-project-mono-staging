@@ -18,7 +18,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useState } from 'react';
-import { ArtifactFileExplorer } from './artifact-file-explorer';
+import { ArtifactExplorer } from './artifact-explorer';
 import { FileNode, FileTree } from './file-tree';
 
 interface TabbedCodePanelProps {
@@ -98,21 +98,6 @@ export function TabbedCodePanel({
         {/* Tabs Header */}
         <div className="bg-muted/50 border-b">
           <div className="flex items-center justify-between px-4">
-            <TabsList className="bg-transparent">
-              <TabsTrigger value="editor" className="gap-2">
-                <Code2 size={16} />
-              </TabsTrigger>
-              <TabsTrigger value="preview" className="gap-2">
-                <Globe size={16} />
-              </TabsTrigger>
-              <TabsTrigger value="terminal" className="gap-2">
-                <Terminal size={16} />
-              </TabsTrigger>
-              <TabsTrigger value="artifacts" className="gap-2">
-                <Archive size={16} />
-                Artifacts
-              </TabsTrigger>
-            </TabsList>
 
             <TabsContent value="editor" className="m-0 mt-0">
               <div className="flex items-center gap-2">
@@ -132,6 +117,25 @@ export function TabbedCodePanel({
                 <span className="text-sm font-medium">{selectedFile}</span>
               </div>
             </TabsContent>
+
+
+            <TabsList className="bg-transparent">
+              <TabsTrigger value="editor" className="gap-2">
+                <Code2 size={16} />
+              </TabsTrigger>
+              <TabsTrigger value="preview" className="gap-2">
+                <Globe size={16} />
+              </TabsTrigger>
+              <TabsTrigger value="terminal" className="gap-2">
+                <Terminal size={16} />
+              </TabsTrigger>
+              <TabsTrigger value="artifacts" className="gap-2">
+                <Archive size={16} />
+                Artifacts
+              </TabsTrigger>
+            </TabsList>
+
+            
           </div>
         </div>
 
@@ -280,7 +284,7 @@ export function TabbedCodePanel({
                     To preview your application, ask the agent:
                   </p>
                   <div className="bg-muted mt-4 rounded-lg p-4 font-mono text-sm">
-                    "Deploy this to a sandbox and start the dev server"
+                    "Deploy this to a sandbox and start the dev server&quot;
                   </div>
                   <p className="text-muted-foreground mt-4 text-xs">
                     The agent will create an E2B sandbox, install dependencies,
@@ -342,7 +346,7 @@ export function TabbedCodePanel({
           value="artifacts"
           className="m-0 flex flex-1 overflow-hidden"
         >
-          <ArtifactFileExplorer sessionId={sessionId} />
+          <ArtifactExplorer sessionId={sessionId} />
         </TabsContent>
       </Tabs>
     </div>
