@@ -119,7 +119,7 @@ export function CodePanel({
   } : null;
 
   // WebContainer instance shared between Preview and Terminal tabs
-  // Only boots when either tab is active AND we have files to run
+  // Boots immediately when we have files (for faster preview loading)
   const {
     status: sandboxStatus,
     previewUrl,
@@ -128,7 +128,7 @@ export function CodePanel({
     runCommand,
   } = useWebContainer({
     files: currentFiles,
-    enabled: (activeTab === 'preview' || activeTab === 'terminal') && hasArtifacts,
+    enabled: hasArtifacts, // Start immediately when artifacts are available
     // Keep last 200 log entries to prevent memory bloat
     onLog: (log: string) => setTerminalLogs((prev) => [...prev.slice(-200), log]),
   });
@@ -151,8 +151,20 @@ export function CodePanel({
               <TabsTrigger value="editor" className="gap-2">
                 <Code2 size={16} />
               </TabsTrigger>
-              <TabsTrigger value="preview" className="gap-2">
+              <TabsTrigger value="preview" className="gap-2 relative">
                 <Globe size={16} />
+                {/* Sandbox status indicator dot */}
+                {hasArtifacts && (
+                  <span 
+                    className={`h-2 w-2 rounded-full ${
+                      sandboxStatus === 'running' ? 'bg-green-500' :
+                      sandboxStatus === 'error' ? 'bg-red-500' :
+                      sandboxStatus === 'idle' ? 'bg-gray-400' :
+                      'bg-yellow-500 animate-pulse'
+                    }`}
+                    title={`Sandbox: ${sandboxStatus}`}
+                  />
+                )}
               </TabsTrigger>
               <TabsTrigger value="terminal" className="gap-2">
                 <Terminal size={16} />

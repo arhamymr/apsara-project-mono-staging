@@ -141,9 +141,23 @@ export function useVibeEditorConvex(
     [sessionId, state, persistence, streamFromAgent, createCallbacks],
   );
 
-  // Auto-send initial message
+  // Auto-send initial message (only for NEW sessions - first conversation only)
   useEffect(() => {
-    if (!initialMessage || !sessionId || hasInitialized.current) return;
+    // Skip if no initial message, no session, already initialized, or still loading messages
+    if (!initialMessage || !sessionId || hasInitialized.current || isLoadingMessages) return;
+    
+    // Check if this is a fresh session that needs initial streaming:
+    // - messages.length === 0: brand new session (no messages yet)
+    // - messages.length === 1 AND only user message: session just created with initial message, no AI response yet
+    // - messages.length > 1: existing conversation with responses, skip streaming
+    const hasAssistantResponse = messages.some(msg => msg.role === 'assistant');
+    const isFirstConversation = messages.length <= 1 && !hasAssistantResponse;
+    
+    if (!isFirstConversation) {
+      hasInitialized.current = true;
+      return;
+    }
+    
     hasInitialized.current = true;
 
     const triggerInitialStream = async () => {
@@ -191,7 +205,7 @@ export function useVibeEditorConvex(
     };
 
     triggerInitialStream();
-  }, [initialMessage, sessionId, state, persistence, streamFromAgent, createCallbacks]);
+  }, [initialMessage, sessionId, state, persistence, streamFromAgent, createCallbacks, isLoadingMessages, messages]);
 
   // Transform messages
   const transformedMessages: TransformedMessage[] = useMemo(

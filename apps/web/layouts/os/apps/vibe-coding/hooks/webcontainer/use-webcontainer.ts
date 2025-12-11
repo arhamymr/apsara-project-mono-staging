@@ -37,8 +37,10 @@ export function useWebContainer({
 
   const containerRef = useRef<WebContainer | null>(null);
   const serverProcessRef = useRef<{ kill: () => void } | null>(null);
-  const filesHashRef = useRef<string>('');
+  const mountedFilesRef = useRef<Record<string, string>>({});
   const isBootingRef = useRef(false);
+  const isServerRunningRef = useRef(false);
+  const installedPackageJsonRef = useRef<string | null>(null); // Cache package.json to skip reinstall
 
   const addLog = useCallback(
     (message: string) => {
@@ -49,6 +51,60 @@ export function useWebContainer({
     },
     [onLog]
   );
+
+  /**
+   * Write only changed files to the container (for HMR)
+   * Returns true if package.json changed (needs reinstall)
+   */
+  const updateChangedFiles = useCallback(async (
+    container: WebContainer,
+    newFiles: Record<string, string>
+  ): Promise<boolean> => {
+    const changedFiles: string[] = [];
+    let packageJsonChanged = false;
+    
+    for (const [path, content] of Object.entries(newFiles)) {
+      if (mountedFilesRef.current[path] !== content) {
+        changedFiles.push(path);
+        
+        // Track if package.json changed
+        if (path === 'package.json') {
+          packageJsonChanged = true;
+        }
+        
+        try {
+          // Ensure parent directories exist
+          const parts = path.split('/').filter(Boolean);
+          if (parts.length > 1) {
+            const dirPath = '/' + parts.slice(0, -1).join('/');
+            try {
+              await container.fs.mkdir(dirPath, { recursive: true });
+            } catch {
+              // Directory might already exist
+            }
+          }
+          await container.fs.writeFile('/' + path, content);
+          mountedFilesRef.current[path] = content;
+        } catch (err) {
+          console.error(`[Sandbox] Failed to write file ${path}:`, err);
+        }
+      }
+    }
+
+    if (changedFiles.length > 0) {
+      addLog(`HMR: Updated ${changedFiles.length} file(s)`);
+      console.log('[Sandbox Debug] HMR updated files:', changedFiles);
+      
+      // If package.json changed, reinstall dependencies
+      if (packageJsonChanged) {
+        addLog('package.json changed, reinstalling dependencies...');
+        await installDependencies(container, addLog);
+        installedPackageJsonRef.current = newFiles['package.json'] || '';
+      }
+    }
+    
+    return packageJsonChanged;
+  }, [addLog]);
 
   const startSandbox = useCallback(async () => {
     if (!enabled) {
@@ -64,9 +120,9 @@ export function useWebContainer({
       console.log('[Sandbox Debug] Using React+Vite boilerplate template');
     }
 
-    const currentHash = getFilesHash(mergedFiles);
-    if (currentHash === filesHashRef.current) {
-      console.log('[Sandbox Debug] Skipping - no file changes detected');
+    // If server is already running, just update changed files (HMR)
+    if (isServerRunningRef.current && containerRef.current) {
+      await updateChangedFiles(containerRef.current, mergedFiles);
       return;
     }
 
@@ -89,6 +145,7 @@ export function useWebContainer({
       if (serverProcessRef.current) {
         serverProcessRef.current.kill();
         serverProcessRef.current = null;
+        isServerRunningRef.current = false;
       }
 
       setStatus('installing');
@@ -104,12 +161,23 @@ export function useWebContainer({
       );
 
       await container.mount(webContainerFiles);
-      filesHashRef.current = currentHash;
+      // Track mounted files for HMR comparison
+      mountedFilesRef.current = { ...validatedFiles };
 
       addLog(`Mounted ${Object.keys(validatedFiles).length} files`);
 
       if (hasPackageJson(mergedFiles)) {
-        await installDependencies(container, addLog);
+        // Check if package.json changed - only reinstall if dependencies changed
+        const currentPackageJson = validatedFiles['package.json'] || '';
+        const needsInstall = installedPackageJsonRef.current !== currentPackageJson;
+        
+        if (needsInstall) {
+          await installDependencies(container, addLog);
+          installedPackageJsonRef.current = currentPackageJson;
+        } else {
+          addLog('Dependencies cached, skipping npm install');
+        }
+        
         addLog('Starting dev server...');
 
         const serverProcess = await startDevServer(container, addLog);
@@ -137,6 +205,7 @@ export function useWebContainer({
         addLog(`Server ready on port ${port}: ${url}`);
         setPreviewUrl(url);
         setStatus('running');
+        isServerRunningRef.current = true;
       });
 
       setStatus('ready');
@@ -148,7 +217,7 @@ export function useWebContainer({
     } finally {
       isBootingRef.current = false;
     }
-  }, [files, enabled, addLog]);
+  }, [files, enabled, addLog, updateChangedFiles]);
 
   useEffect(() => {
     if (enabled) {
@@ -162,11 +231,21 @@ export function useWebContainer({
       if (serverProcessRef.current) {
         serverProcessRef.current.kill();
       }
+      isServerRunningRef.current = false;
     };
   }, []);
 
-  const restart = useCallback(async () => {
-    filesHashRef.current = '';
+  const restart = useCallback(async (forceReinstall = false) => {
+    // Force full restart by resetting server state
+    isServerRunningRef.current = false;
+    mountedFilesRef.current = {};
+    if (forceReinstall) {
+      installedPackageJsonRef.current = null; // Clear cache to force reinstall
+    }
+    if (serverProcessRef.current) {
+      serverProcessRef.current.kill();
+      serverProcessRef.current = null;
+    }
     await startSandbox();
   }, [startSandbox]);
 

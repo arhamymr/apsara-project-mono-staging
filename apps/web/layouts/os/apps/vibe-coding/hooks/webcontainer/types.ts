@@ -13,7 +13,7 @@ export interface UseWebContainerReturn {
   previewUrl: string | null;
   logs: string[];
   error: string | null;
-  restart: () => Promise<void>;
+  restart: (forceReinstall?: boolean) => Promise<void>;
   // Terminal functionality
   runCommand: (command: string) => Promise<void>;
   spawnShell: () => Promise<{

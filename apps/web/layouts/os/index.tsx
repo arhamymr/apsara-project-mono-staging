@@ -54,7 +54,6 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
 
           {windows
             .sort((a, b) => a.z - b.z)
-            .filter((w) => !w.minimized)
             .map((w) => (
               <WindowItem key={w.id} win={w} />
             ))}
