@@ -1,23 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { useVibeEditorConvex } from './hooks/use-vibe-editor';
 import { useArtifactsConvex } from './hooks/use-artifacts';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { ChatPanel } from './components/chat-panel';
 import { CodePanel } from './components/code-panel';
+import { getReactViteBoilerplate } from './hooks/webcontainer/boilerplate';
 
 interface VibeCodeEditorProps {
   sessionId: string;
   initialMessage?: string;
+  initialBoilerplate?: 'react-vite' | 'none';
 }
 
 export default function VibeCodeEditor({
   sessionId,
   initialMessage,
+  initialBoilerplate,
 }: VibeCodeEditorProps) {
   const [isExplorerOpen, setIsExplorerOpen] = useState(true);
   const { closeWindow, activeId } = useWindowContext();
+  const boilerplateSavedRef = useRef(false);
+  const saveGeneratedArtifact = useMutation(api.vibeCoding.saveGeneratedArtifact);
 
   const {
     messages,
@@ -57,6 +65,44 @@ export default function VibeCodeEditor({
     goToVersion,
     goToLatest,
   } = useArtifactsConvex(sessionId, { streamingFiles, loadingFile });
+
+  // Save boilerplate as initial artifact when editor mounts (only once)
+  useEffect(() => {
+    if (
+      initialBoilerplate &&
+      initialBoilerplate !== 'none' &&
+      !boilerplateSavedRef.current &&
+      !isLoadingArtifacts &&
+      !hasArtifacts
+    ) {
+      boilerplateSavedRef.current = true;
+
+      const boilerplateFiles =
+        initialBoilerplate === 'react-vite' ? getReactViteBoilerplate() : {};
+
+      if (Object.keys(boilerplateFiles).length > 0) {
+        saveGeneratedArtifact({
+          sessionId: sessionId as Id<'chatSessions'>,
+          name: 'Initial Boilerplate',
+          description: `${initialBoilerplate} template`,
+          files: JSON.stringify(boilerplateFiles),
+          metadata: {
+            framework: 'react',
+            language: 'typescript',
+          },
+        }).catch((err) => {
+          console.error('Failed to save initial boilerplate:', err);
+          boilerplateSavedRef.current = false; // Allow retry on error
+        });
+      }
+    }
+  }, [
+    initialBoilerplate,
+    sessionId,
+    isLoadingArtifacts,
+    hasArtifacts,
+    saveGeneratedArtifact,
+  ]);
 
   const handleNewChat = () => {
     if (activeId) {

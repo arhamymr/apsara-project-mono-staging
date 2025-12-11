@@ -1,5 +1,16 @@
 'use client';
 
+/**
+ * CodePanel Component
+ *
+ * The right-side panel of the Vibe Code Editor containing three tabs:
+ * - Editor: Monaco code editor with file explorer
+ * - Preview: Live preview of the app running in WebContainer
+ * - Terminal: Interactive terminal for running commands in the sandbox
+ *
+ * Also includes version history dropdown for navigating between artifact versions.
+ */
+
 import { useState, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { Code2, Globe, Terminal, ChevronDown, Check } from 'lucide-react';
@@ -16,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
 
+/** Artifact data structure stored in Convex */
 interface Artifact {
   _id: Id<"artifacts">;
   _creationTime: number;
@@ -40,20 +52,22 @@ interface CodePanelProps {
   selectedFile: string;
   fileContent: string;
   artifacts: Artifact[];
-  currentFiles: Record<string, string>; // All files for current version
+  /** All files for the currently selected version (merged with streaming files) */
+  currentFiles: Record<string, string>;
   hasArtifacts: boolean;
   isLoadingArtifacts: boolean;
+  /** File path currently being streamed from AI agent */
   loadingFile?: string | null;
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
   onFileChange?: (filePath: string, content: string) => void;
   onSaveFile?: () => void;
-  // Save state
+  // Save state indicators
   isSaving?: boolean;
   hasUnsavedChanges?: boolean;
   justSaved?: boolean;
-  // Version props
+  // Version navigation props
   currentVersion: number;
   totalVersions: number;
   isViewingOldVersion: boolean;
@@ -62,6 +76,12 @@ interface CodePanelProps {
   onGoToLatest: () => void;
 }
 
+/**
+ * CodePanel - Main code editing and preview panel
+ *
+ * Manages three tabs (Editor, Preview, Terminal) and shares a single
+ * WebContainer instance between Preview and Terminal for efficiency.
+ */
 export function CodePanel({
   isExplorerOpen,
   fileTree,
@@ -92,26 +112,28 @@ export function CodePanel({
   const [activeTab, setActiveTab] = useState('editor');
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   
-  // Build artifact object for preview with current version files
+  // Build artifact object for preview - combines files with metadata
   const currentArtifact = hasArtifacts ? {
     files: currentFiles,
     metadata: artifacts[0]?.metadata,
   } : null;
 
-  // Use webcontainer for both preview and terminal
+  // WebContainer instance shared between Preview and Terminal tabs
+  // Only boots when either tab is active AND we have files to run
   const {
     status: sandboxStatus,
     previewUrl,
-    logs: sandboxLogs,
     error: sandboxError,
     restart: restartSandbox,
     runCommand,
   } = useWebContainer({
     files: currentFiles,
     enabled: (activeTab === 'preview' || activeTab === 'terminal') && hasArtifacts,
+    // Keep last 200 log entries to prevent memory bloat
     onLog: (log: string) => setTerminalLogs((prev) => [...prev.slice(-200), log]),
   });
 
+  /** Clear terminal output history */
   const handleClearTerminal = useCallback(() => {
     setTerminalLogs([]);
   }, []);
@@ -136,10 +158,11 @@ export function CodePanel({
                 <Terminal size={16} />
               </TabsTrigger>
 
-              {/* Version Dropdown */}
+              {/* Version History Dropdown - allows switching between artifact versions */}
               {totalVersions > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
+                    {/* Yellow highlight when viewing historical version (read-only mode) */}
                     <button
                       className={`inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded-md transition-colors
                         ${isViewingOldVersion 
@@ -151,6 +174,7 @@ export function CodePanel({
                       <ChevronDown size={12} />
                     </button>
                   </DropdownMenuTrigger>
+                  {/* High z-index ensures dropdown appears above all panel content */}
                   <DropdownMenuContent align="start" className="w-48 max-h-64 overflow-y-auto z-[9999]">
                     {versionHistory.map((v) => {
                       const isSelected = v.version === currentVersion;
@@ -158,6 +182,7 @@ export function CodePanel({
                       return (
                         <DropdownMenuItem
                           key={v._id}
+                          // Latest version uses goToLatest to enable editing mode
                           onClick={() => isLatest ? onGoToLatest() : onGoToVersion(v.version)}
                           className="flex items-center justify-between gap-2"
                         >
@@ -189,7 +214,9 @@ export function CodePanel({
           </div>
         </div>
 
-        {/* Tab Contents */}
+        {/* Tab Contents - Each tab renders its own TabsContent */}
+        
+        {/* Monaco Editor with file explorer sidebar */}
         <EditorTab
           isExplorerOpen={isExplorerOpen}
           fileTree={fileTree}
@@ -208,16 +235,18 @@ export function CodePanel({
           onFileChange={onFileChange}
           onSaveFile={onSaveFile}
         />
+        
+        {/* Live preview iframe - shares WebContainer with terminal */}
         <PreviewTab 
           artifact={currentArtifact} 
           isActive={activeTab === 'preview'}
-          // Pass shared webcontainer state
           sandboxStatus={sandboxStatus}
           previewUrl={previewUrl}
-          sandboxLogs={sandboxLogs}
           sandboxError={sandboxError}
           onRestart={restartSandbox}
         />
+        
+        {/* Interactive terminal for running commands in sandbox */}
         <SandboxTerminal
           logs={terminalLogs}
           status={sandboxStatus}

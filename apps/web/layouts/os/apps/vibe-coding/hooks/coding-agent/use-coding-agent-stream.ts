@@ -43,8 +43,9 @@ export function useCodingAgentStream({
   } = useStreamState();
 
   // Convex mutations for persisting messages and artifacts
+  // Pass sessionId to enable artifact version checking for boilerplate merge
   const { saveUserMessage, saveAssistantMessage, saveGeneratedFiles } =
-    useConvexActions();
+    useConvexActions(sessionId);
 
   /**
    * Initiates a streaming request to the coding agent API.

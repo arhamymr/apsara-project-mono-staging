@@ -1,40 +1,73 @@
 'use client';
 
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+import { getReactViteBoilerplate } from '../webcontainer/boilerplate';
 
-export function useConvexActions() {
+/**
+ * Hook providing Convex mutations for persisting chat messages and artifacts.
+ * Handles merging generated code with boilerplate for first-time artifact creation.
+ */
+export function useConvexActions(sessionId?: string) {
   const sendMessage = useMutation(api.vibeCoding.sendVibeCodeMessage);
   const addAssistantMessage = useMutation(api.chat.addAssistantMessage);
   const saveArtifact = useMutation(api.vibeCoding.saveGeneratedArtifact);
+  
+  // Query latest artifact to determine if this is the first save
+  const latestArtifact = useQuery(
+    api.vibeCoding.getLatestArtifact,
+    sessionId ? { sessionId: sessionId as Id<'chatSessions'> } : 'skip'
+  );
 
-  const saveUserMessage = async (sessionId: string, content: string) => {
+  const saveUserMessage = async (targetSessionId: string, content: string) => {
     await sendMessage({
-      sessionId: sessionId as Id<'chatSessions'>,
+      sessionId: targetSessionId as Id<'chatSessions'>,
       content,
     });
   };
 
-  const saveAssistantMessage = async (sessionId: string, content: string) => {
+  const saveAssistantMessage = async (targetSessionId: string, content: string) => {
     await addAssistantMessage({
-      sessionId: sessionId as Id<'chatSessions'>,
+      sessionId: targetSessionId as Id<'chatSessions'>,
       content,
     });
   };
 
+  /**
+   * Save generated files as an artifact.
+   * For the first artifact (v1), merges generated code with React+Vite boilerplate
+   * to ensure all necessary config files are present.
+   */
   const saveGeneratedFiles = async (
-    sessionId: string,
+    targetSessionId: string,
     files: Map<string, string>,
     prompt: string
   ) => {
     if (files.size === 0) return;
 
+    const isFirstArtifact = !latestArtifact;
+    const mergedFiles = new Map<string, string>();
+
+    // For first artifact, start with boilerplate as base
+    if (isFirstArtifact) {
+      const boilerplate = getReactViteBoilerplate();
+      Object.entries(boilerplate).forEach(([path, content]) => {
+        mergedFiles.set(path, content);
+      });
+      console.log('[saveGeneratedFiles] Applied boilerplate for v1:', Object.keys(boilerplate).length, 'files');
+    }
+
+    // Overlay generated files (takes precedence over boilerplate)
+    files.forEach((content, path) => {
+      mergedFiles.set(path, content);
+    });
+
     await saveArtifact({
-      sessionId: sessionId as Id<'chatSessions'>,
+      sessionId: targetSessionId as Id<'chatSessions'>,
       name: 'Generated Code',
       description: prompt.slice(0, 100),
-      files: JSON.stringify(Object.fromEntries(files)),
+      files: JSON.stringify(Object.fromEntries(mergedFiles)),
       metadata: {
         framework: 'React',
         language: 'TypeScript',

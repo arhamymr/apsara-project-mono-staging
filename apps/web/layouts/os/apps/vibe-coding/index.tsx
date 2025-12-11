@@ -1,13 +1,41 @@
+import { useState } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { Textarea } from '@workspace/ui/components/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { Code, Loader2, Send } from 'lucide-react';
 import VibeCodeEditor from './editor';
 import { useVibeCodeConvex } from './hooks/use-vibe-code';
 
+// Available boilerplate templates for initializing new projects
+// Each template provides a pre-configured starting point for the WebContainer sandbox
+const BOILERPLATE_OPTIONS = [
+  { value: 'react-vite', label: 'React + Vite + TypeScript' },
+  { value: 'none', label: 'Empty Project' },
+] as const;
+
+// Derive type from options array to ensure type safety when selecting templates
+type BoilerplateType = (typeof BOILERPLATE_OPTIONS)[number]['value'];
+/**
+ * VibeCodeRoot - Landing page for the Vibe Code Agent app.
+ * 
+ * Displays a welcome screen where users can:
+ * - Enter a prompt to start building a new project
+ * - Click suggestion buttons for quick-start templates
+ * - View and resume recent coding conversations
+ * 
+ * When a user starts building, opens a sub-window with the full editor.
+ */
 export default function VibeCodeRoot() {
   const { openSubWindow, activeId } = useWindowContext();
+  const [selectedBoilerplate, setSelectedBoilerplate] = useState<BoilerplateType>('react-vite');
   const {
     welcomeInput,
     setWelcomeInput,
@@ -19,39 +47,56 @@ export default function VibeCodeRoot() {
     handleSessionSelect,
   } = useVibeCodeConvex();
 
+  /**
+   * Opens the full code editor in a new sub-window.
+   * The editor includes chat panel, code panel with Monaco editor, and live preview.
+   */
   const openEditor = (
     sessionId: string,
     title?: string,
     initialMessage?: string,
+    boilerplate?: BoilerplateType,
   ) => {
     if (!activeId) return;
 
     openSubWindow(activeId, {
       title: title || `Session: ${sessionId.substring(0, 8)}...`,
       content: (
-        <VibeCodeEditor sessionId={sessionId} initialMessage={initialMessage} />
+        <VibeCodeEditor
+          sessionId={sessionId}
+          initialMessage={initialMessage}
+          initialBoilerplate={boilerplate}
+        />
       ),
       width: 1200,
       height: 800,
     });
   };
 
+  /**
+   * Initiates a new coding session from the welcome input.
+   * Creates a Convex session and opens the editor with the user's prompt.
+   */
   const handleStartBuilding = async () => {
     if (!welcomeInput.trim()) return;
 
     const message = welcomeInput.trim();
     const sessionId = await handleStartChat(message);
     if (sessionId) {
-      openEditor(sessionId, message, message);
+      openEditor(sessionId, message, message, selectedBoilerplate);
       setWelcomeInput('');
     }
   };
 
+  /**
+   * Quick-start handler for suggestion buttons.
+   * Pre-fills the input and immediately starts a new session.
+   */
   const handleSuggestionClick = async (suggestion: string) => {
     setWelcomeInput(suggestion);
     const sessionId = await handleStartChat(suggestion);
     if (sessionId) {
-      openEditor(sessionId, suggestion, suggestion);
+      openEditor(sessionId, suggestion, suggestion, selectedBoilerplate);
       setWelcomeInput('');
     }
   };
@@ -85,29 +130,50 @@ export default function VibeCodeRoot() {
                 disabled={isStarting}
               />
               <div className="flex items-center justify-between w-full">
-                <p className="text-muted-foreground text-sm">
-                  Press <kbd className="bg-muted rounded px-2 py-1">Enter</kbd> to
-                  send,{' '}
-                  <kbd className="bg-muted rounded px-2 py-1">Shift+Enter</kbd>{' '}
-                  for new line
-                </p>
-                <Button
-                  onClick={handleStartBuilding}
-                  disabled={!welcomeInput.trim() || isStarting}
-                  size="lg"
-                >
-                  {isStarting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Starting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-5 w-5" />
-                      Start Building
-                    </>
-                  )}
-                </Button>
+                <div className="flex items-center gap-4">
+                  <p className="text-muted-foreground text-sm">
+                    Press <kbd className="bg-muted rounded px-2 py-1">Enter</kbd> to
+                    send,{' '}
+                    <kbd className="bg-muted rounded px-2 py-1">Shift+Enter</kbd>{' '}
+                    for new line
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Select
+                    value={selectedBoilerplate}
+                    onValueChange={(value) => setSelectedBoilerplate(value as BoilerplateType)}
+                    disabled={isStarting}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select template" />
+                    </SelectTrigger>
+                    {/* High z-index ensures dropdown appears above OS window chrome */}
+                    <SelectContent className="z-[999]">
+                      {BOILERPLATE_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={handleStartBuilding}
+                    disabled={!welcomeInput.trim() || isStarting}
+                    size="lg"
+                  >
+                    {isStarting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Starting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 h-5 w-5" />
+                        Start Building
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 

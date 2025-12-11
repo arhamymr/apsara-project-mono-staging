@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "name": "Add Code Comments",
-  "description": "Automatically adds explanatory comments to code when files are edited, helping to document what the code does",
+  "description": "if file already have the comment ignore this immediatly \n\nAutomatically adds explanatory comments to code when files are edited, helping to document what the code does",
   "version": "1",
   "when": {
     "type": "fileEdited",
