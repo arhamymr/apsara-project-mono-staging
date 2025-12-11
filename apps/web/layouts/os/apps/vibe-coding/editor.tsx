@@ -43,6 +43,12 @@ export default function VibeCodeEditor({
     isLoadingArtifacts,
     onFileSelect,
     onFolderToggle,
+    onFileChange,
+    onSaveFile,
+    // Save state
+    isSaving,
+    hasUnsavedChanges,
+    justSaved,
     // Version management
     currentVersion,
     totalVersions,
@@ -87,6 +93,12 @@ export default function VibeCodeEditor({
         onToggleExplorer={() => setIsExplorerOpen(!isExplorerOpen)}
         onFileSelect={onFileSelect}
         onFolderToggle={onFolderToggle}
+        onFileChange={onFileChange}
+        onSaveFile={onSaveFile}
+        // Save state
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
+        justSaved={justSaved}
         // Version props
         currentVersion={currentVersion}
         totalVersions={totalVersions}

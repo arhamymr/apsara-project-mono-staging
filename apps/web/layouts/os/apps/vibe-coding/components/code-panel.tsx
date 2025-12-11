@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { Code2, Globe, Terminal, ChevronDown, Check } from 'lucide-react';
 import { EditorTab, EditorHeader } from './editor-tab';
 import { PreviewTab } from './preview-tab';
-import { TerminalTab } from './terminal-tab';
+import { SandboxTerminal } from './sandbox-terminal';
 import { FileNode, VersionInfo } from '../hooks/use-artifacts';
+import { useWebContainer } from '../hooks/use-webcontainer';
 import { Id } from '@/convex/_generated/dataModel';
 import {
   DropdownMenu,
@@ -46,6 +47,12 @@ interface CodePanelProps {
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
+  onFileChange?: (filePath: string, content: string) => void;
+  onSaveFile?: () => void;
+  // Save state
+  isSaving?: boolean;
+  hasUnsavedChanges?: boolean;
+  justSaved?: boolean;
   // Version props
   currentVersion: number;
   totalVersions: number;
@@ -68,6 +75,12 @@ export function CodePanel({
   onToggleExplorer,
   onFileSelect,
   onFolderToggle,
+  onFileChange,
+  onSaveFile,
+  // Save state
+  isSaving,
+  hasUnsavedChanges,
+  justSaved,
   // Version props
   currentVersion,
   totalVersions,
@@ -77,12 +90,31 @@ export function CodePanel({
   onGoToLatest,
 }: CodePanelProps) {
   const [activeTab, setActiveTab] = useState('editor');
+  const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   
   // Build artifact object for preview with current version files
   const currentArtifact = hasArtifacts ? {
     files: currentFiles,
     metadata: artifacts[0]?.metadata,
   } : null;
+
+  // Use webcontainer for both preview and terminal
+  const {
+    status: sandboxStatus,
+    previewUrl,
+    logs: sandboxLogs,
+    error: sandboxError,
+    restart: restartSandbox,
+    runCommand,
+  } = useWebContainer({
+    files: currentFiles,
+    enabled: (activeTab === 'preview' || activeTab === 'terminal') && hasArtifacts,
+    onLog: (log: string) => setTerminalLogs((prev) => [...prev.slice(-200), log]),
+  });
+
+  const handleClearTerminal = useCallback(() => {
+    setTerminalLogs([]);
+  }, []);
   return (
     <div className="flex-1 flex flex-col h-full">
       <Tabs
@@ -166,15 +198,32 @@ export function CodePanel({
           hasArtifacts={hasArtifacts}
           isLoadingArtifacts={isLoadingArtifacts}
           loadingFile={loadingFile}
+          isViewingOldVersion={isViewingOldVersion}
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+          justSaved={justSaved}
           onToggleExplorer={onToggleExplorer}
           onFileSelect={onFileSelect}
           onFolderToggle={onFolderToggle}
+          onFileChange={onFileChange}
+          onSaveFile={onSaveFile}
         />
         <PreviewTab 
           artifact={currentArtifact} 
-          isActive={activeTab === 'preview'} 
+          isActive={activeTab === 'preview'}
+          // Pass shared webcontainer state
+          sandboxStatus={sandboxStatus}
+          previewUrl={previewUrl}
+          sandboxLogs={sandboxLogs}
+          sandboxError={sandboxError}
+          onRestart={restartSandbox}
         />
-        <TerminalTab artifact={currentArtifact} />
+        <SandboxTerminal
+          logs={terminalLogs}
+          status={sandboxStatus}
+          onRunCommand={runCommand}
+          onClear={handleClearTerminal}
+        />
       </Tabs>
     </div>
   );

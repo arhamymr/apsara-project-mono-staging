@@ -277,3 +277,44 @@ export const getVersionHistory = query({
     });
   },
 });
+
+
+// Update a single file in the latest artifact (for manual edits)
+export const updateArtifactFile = mutation({
+  args: {
+    sessionId: v.id("chatSessions"),
+    filePath: v.string(),
+    content: v.string(),
+  },
+  handler: async (ctx, { sessionId, filePath, content }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const session = await ctx.db.get(sessionId);
+    if (!session || session.userId !== userId) {
+      throw new Error("Session not found or access denied");
+    }
+
+    // Get the latest artifact
+    const latestArtifact = await ctx.db
+      .query("artifacts")
+      .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
+      .order("desc")
+      .first();
+
+    if (!latestArtifact) {
+      throw new Error("No artifact found for this session");
+    }
+
+    // Parse existing files, update the specific file, and save
+    const files = JSON.parse(latestArtifact.files);
+    files[filePath] = content;
+
+    await ctx.db.patch(latestArtifact._id, {
+      files: JSON.stringify(files),
+      updatedAt: Date.now(),
+    });
+
+    return { success: true, artifactId: latestArtifact._id };
+  },
+});

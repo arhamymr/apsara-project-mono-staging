@@ -91,7 +91,14 @@ export function processStreamPart(
       
       if (typeof delta === 'string' && delta.length > 0) {
         state.assistantContent += delta;
-        callbacks.onTextDelta(state.assistantContent);
+        
+        // Clean up obvious duplicate words (e.g., "word word" -> "word")
+        // This handles AI model stuttering issues
+        const cleanedContent = state.assistantContent
+          .replace(/\b(\w+)\s+\1\b/g, '$1') // Remove duplicate words
+          .replace(/(\w)''\1/g, "$1'$1"); // Fix patterns like "I'm'm" -> "I'm"
+        
+        callbacks.onTextDelta(cleanedContent);
       } else {
         console.log('[StreamParser] text-delta: no valid delta found in:', Object.keys(textPart));
       }

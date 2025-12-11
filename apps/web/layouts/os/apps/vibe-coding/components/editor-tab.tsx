@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useCallback } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
 import { useTheme } from '@/layouts/dark-mode/useTheme';
@@ -16,9 +17,15 @@ interface EditorTabProps {
   hasArtifacts: boolean;
   isLoadingArtifacts: boolean;
   loadingFile?: string | null;
+  isViewingOldVersion?: boolean;
+  isSaving?: boolean;
+  hasUnsavedChanges?: boolean;
+  justSaved?: boolean;
   onToggleExplorer: () => void;
   onFileSelect: (path: string) => void;
   onFolderToggle: (path: string[]) => void;
+  onFileChange?: (filePath: string, content: string) => void;
+  onSaveFile?: () => void;
 }
 
 export function EditorTab({
@@ -29,9 +36,42 @@ export function EditorTab({
   hasArtifacts,
   isLoadingArtifacts,
   loadingFile,
+  isViewingOldVersion,
+  isSaving,
+  hasUnsavedChanges,
+  justSaved,
   onFileSelect,
+  onFileChange,
+  onSaveFile,
 }: EditorTabProps) {
   const { theme } = useTheme();
+  
+  // Handle editor content change
+  const handleEditorChange = useCallback((value: string | undefined) => {
+    if (value !== undefined && onFileChange && selectedFile) {
+      onFileChange(selectedFile, value);
+    }
+  }, [onFileChange, selectedFile]);
+  
+  // Handle Ctrl+S to save
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (onSaveFile && hasUnsavedChanges) {
+          console.log('[EditorTab] Ctrl+S pressed, saving...');
+          onSaveFile();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSaveFile, hasUnsavedChanges]);
+  
+  // Editor is read-only when viewing old versions
+  const isReadOnly = isViewingOldVersion || !onFileChange;
+  
   // Debug logging
   console.log('[EditorTab] State:', {
     selectedFile,
@@ -40,6 +80,8 @@ export function EditorTab({
     hasArtifacts,
     isLoadingArtifacts,
     fileTreeLength: fileTree.length,
+    isReadOnly,
+    isSaving,
   });
 
   return (
@@ -100,27 +142,64 @@ export function EditorTab({
             </div>
           </div>
         ) : fileContent ? (
-          <div className="h-full w-full">
-            <Editor
-              height="100%"
-              language={getLanguageFromPath(selectedFile)}
-              value={fileContent}
-              theme={theme === 'dark' ? 'vs-dark' : 'light'}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                readOnly: true,
-                wordWrap: 'on',
-              }}
-              loading={
-                <div className="flex h-full items-center justify-center">
-                  <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-                </div>
-              }
-            />
+          <div className="h-full w-full flex flex-col">
+            {/* Save status bar */}
+            {(isSaving || hasUnsavedChanges || isViewingOldVersion || justSaved) && (
+              <div className={`px-3 py-1 text-xs flex items-center gap-2 border-b ${
+                isViewingOldVersion 
+                  ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                  : isSaving 
+                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                    : hasUnsavedChanges
+                      ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                      : 'bg-green-500/10 text-green-600 dark:text-green-400'
+              }`}>
+                {isViewingOldVersion ? (
+                  <>
+                    <FileCode size={12} />
+                    <span>Viewing old version (read-only)</span>
+                  </>
+                ) : isSaving ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : hasUnsavedChanges ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-orange-500" />
+                    <span>Unsaved changes • Press Ctrl+S to save</span>
+                  </>
+                ) : justSaved ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-green-500" />
+                    <span>Saved</span>
+                  </>
+                ) : null}
+              </div>
+            )}
+            <div className="flex-1">
+              <Editor
+                height="100%"
+                language={getLanguageFromPath(selectedFile)}
+                value={fileContent}
+                onChange={handleEditorChange}
+                theme={theme === 'dark' ? 'vs-dark' : 'light'}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  readOnly: isReadOnly,
+                  wordWrap: 'on',
+                }}
+                loading={
+                  <div className="flex h-full items-center justify-center">
+                    <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+                  </div>
+                }
+              />
+            </div>
           </div>
         ) : (
           <div className="flex h-full items-center justify-center">
