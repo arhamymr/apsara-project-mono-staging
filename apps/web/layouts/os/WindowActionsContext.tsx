@@ -7,32 +7,22 @@ import {
   type ReactNode,
   type SetStateAction,
 } from 'react';
-import type { AppDef, DesktopItem, WinState } from './types';
+import type { AppDef, DesktopItem } from './types';
 
-// Re-export split contexts for gradual migration
-export { useWindowState, useIsWindowActive, useWindowById, useParentWindowTitle } from './WindowStateContext';
-export { useWindowActions } from './WindowActionsContext';
-
-export type WindowInteractionState = {
-  draggingWindowId: string | null;
-  resizingWindowId: string | null;
-};
-
-export type WindowContextType = {
-  windows: WinState[];
+/**
+ * Separate context for window actions (functions that don't change often)
+ * This prevents re-renders when only window state changes
+ */
+export type WindowActionsContextType = {
   apps: AppDef[];
-  activeId: string | null;
-  interaction: WindowInteractionState;
   shortcuts: DesktopItem[];
   setShortcuts: Dispatch<SetStateAction<DesktopItem[]>>;
   reorderShortcuts: (activeId: string, overId: string) => void;
-  // Desktop grouping helpers
   addToGroup: (itemId: string, groupId: string) => void;
   createGroupWithItems: (label: string, itemIds: string[]) => void;
   removeFromGroup: (itemId: string, groupId: string) => void;
   ungroup: (groupId: string) => void;
   renameGroup: (groupId: string, label: string) => void;
-  // Desktop shortcut helpers
   addShortcutForApp: (appId: string) => void;
   removeShortcutForApp: (appId: string) => void;
   dockAppIds: string[];
@@ -68,7 +58,7 @@ export type WindowContextType = {
       width?: number;
       height?: number;
     },
-  ) => string; // returns new subwindow id
+  ) => string;
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
   restoreWindow: (id: string) => void;
@@ -90,28 +80,26 @@ export type WindowContextType = {
   clearAllWindows: () => void;
 };
 
-const WindowContext = createContext<WindowContextType | null>(null);
+const WindowActionsContext = createContext<WindowActionsContextType | null>(null);
 
-/**
- * @deprecated Use useWindowActions() for actions and useWindowState() for state
- * This combined context causes unnecessary re-renders
- */
-export function useWindowContext() {
-  const context = useContext(WindowContext);
+export function useWindowActions() {
+  const context = useContext(WindowActionsContext);
   if (!context) {
-    throw new Error('useWindowContext must be used within WindowProvider');
+    throw new Error('useWindowActions must be used within WindowActionsProvider');
   }
   return context;
 }
 
-export function WindowProvider({
+export function WindowActionsProvider({
   children,
   value,
 }: {
   children: ReactNode;
-  value: WindowContextType;
+  value: WindowActionsContextType;
 }) {
   return (
-    <WindowContext.Provider value={value}>{children}</WindowContext.Provider>
+    <WindowActionsContext.Provider value={value}>
+      {children}
+    </WindowActionsContext.Provider>
   );
 }

@@ -74,6 +74,45 @@ const schema = defineSchema({
     .index("by_session_version", ["sessionId", "version"])
     .index("by_user", ["userId"])
     .index("by_created", ["createdAt"]),
+
+  notes: defineTable({
+    title: v.string(),
+    content: v.string(), // Lexical editor JSON state
+    userId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_updated", ["updatedAt"])
+    .index("by_user_updated", ["userId", "updatedAt"]),
+
+  kanbanBoards: defineTable({
+    name: v.string(),
+    userId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  kanbanColumns: defineTable({
+    boardId: v.id("kanbanBoards"),
+    name: v.string(),
+    position: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_board", ["boardId"]),
+
+  kanbanCards: defineTable({
+    columnId: v.id("kanbanColumns"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    position: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_column", ["columnId"]),
 });
 
 export default schema;

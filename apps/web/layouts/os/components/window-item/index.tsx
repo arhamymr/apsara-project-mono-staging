@@ -1,6 +1,7 @@
-import { useWindowContext } from '@/layouts/os/WindowContext';
+import { useIsWindowActive, useParentWindowTitle } from '@/layouts/os/WindowStateContext';
+import { useWindowActions } from '@/layouts/os/WindowActionsContext';
 import { WindowPortalProvider } from '@/layouts/os/WindowPortalContext';
-import { memo, useRef, type RefObject } from 'react';
+import { memo, useCallback, useMemo, useRef, type RefObject } from 'react';
 import { Rnd } from 'react-rnd';
 import type { WinState } from '../../types';
 import {
@@ -14,21 +15,26 @@ import { useWindowDrag } from './hooks/useWindowDrag';
 import { WindowContent } from './WindowContent';
 import { WindowContextMenu } from './WindowContextMenu';
 
-function getWindowTitle(win: WinState, windows: WinState[]): string {
-  if (win.sub && win.parentId) {
-    const parent = windows.find((w) => w.id === win.parentId);
-    return `${parent?.title ?? 'Window'} / ${win.title}`;
-  }
-  return win.title;
+interface WindowItemProps {
+  win: WinState;
 }
 
-const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
-  const { windows, activeId, closeWindow, minimizeWindow, toggleMaximizeWindow, focusWindow } =
-    useWindowContext();
+/**
+ * Optimized WindowItem component that:
+ * 1. Uses split contexts to minimize re-renders
+ * 2. Memoizes callbacks and computed values
+ * 3. Only subscribes to relevant state changes
+ */
+const WindowItem = memo(function WindowItem({ win }: WindowItemProps) {
+  // Use split contexts - actions are stable, state is selective
+  const { closeWindow, minimizeWindow, toggleMaximizeWindow, focusWindow } = useWindowActions();
+  
+  // Selective state subscriptions
+  const active = useIsWindowActive(win.id);
+  const parentTitle = useParentWindowTitle(win.parentId);
 
   const portalContainerRef = useRef<HTMLDivElement>(null);
   const isLowSpecDevice = useDeviceDetection();
-  const active = activeId === win.id;
 
   const {
     isAnimating,
@@ -40,31 +46,61 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
     handleFocus,
   } = useWindowDrag({ windowId: win.id, width: win.w, height: win.h });
 
-  const rndStyle = {
+  const isMaximized = win.maximized ?? false;
+
+  // Memoize window title computation
+  const windowTitle = useMemo(() => {
+    if (win.sub && win.parentId) {
+      return `${parentTitle ?? 'Window'} / ${win.title}`;
+    }
+    return win.title;
+  }, [win.sub, win.parentId, win.title, parentTitle]);
+
+  // Memoize style object to prevent re-creation
+  const rndStyle = useMemo(() => ({
     position: 'fixed' as const,
-    zIndex: win.minimized ? -1 : win.z + 333,
+    zIndex: win.z + 333,
     transition: isAnimating && !isLowSpecDevice ? 'transform 0.3s ease-out' : 'none',
-    transform: `translate(${win.x}px, ${win.y}px)`,
-    left: 0,
-    top: 0,
-    willChange: isLowSpecDevice ? 'auto' : 'transform',
-    visibility: win.minimized ? ('hidden' as const) : ('visible' as const),
-    pointerEvents: win.minimized ? ('none' as const) : ('auto' as const),
-  };
+    transform: isMaximized ? 'none' : `translate(${win.x}px, ${win.y}px)`,
+    left: isMaximized ? 0 : 0,
+    top: isMaximized ? 0 : 0,
+    right: isMaximized ? 0 : 'auto',
+    bottom: isMaximized ? 0 : 'auto',
+    width: isMaximized ? '100vw' : undefined,
+    height: isMaximized ? '100vh' : undefined,
+    willChange: isAnimating ? 'transform' : 'auto', // Only use willChange during animation
+  }), [win.z, win.x, win.y, isMaximized, isAnimating, isLowSpecDevice]);
+
+  // Memoize position and size objects
+  const position = useMemo(
+    () => (isMaximized ? { x: 0, y: 0 } : { x: win.x, y: win.y }),
+    [isMaximized, win.x, win.y]
+  );
+
+  const size = useMemo(
+    () => (isMaximized ? { width: '100vw', height: '100vh' } : { width: win.w, height: win.h }),
+    [isMaximized, win.w, win.h]
+  );
+
+  // Memoize callbacks to prevent re-creation
+  const handleBringToFront = useCallback(() => focusWindow(win.id), [focusWindow, win.id]);
+  const handleMinimize = useCallback(() => minimizeWindow(win.id), [minimizeWindow, win.id]);
+  const handleToggleMaximize = useCallback(() => toggleMaximizeWindow(win.id), [toggleMaximizeWindow, win.id]);
+  const handleClose = useCallback(() => closeWindow(win.id), [closeWindow, win.id]);
 
   return (
     <WindowPortalProvider value={portalContainerRef as RefObject<HTMLElement>}>
       <Rnd
-        position={{ x: win.x, y: win.y }}
-        size={{ width: win.w, height: win.h }}
+        position={position}
+        size={size}
         onDragStart={handleDragStart}
         onDrag={handleDrag}
         onDragStop={handleDragStop}
         onResizeStart={handleResizeStart}
         onResizeStop={handleResizeStop}
         dragHandleClassName="window-drag-handle"
-        disableDragging={win.maximized || win.minimized}
-        enableResizing={!win.maximized && !win.minimized}
+        disableDragging={isMaximized}
+        enableResizing={!isMaximized}
         minWidth={MIN_WINDOW_WIDTH}
         minHeight={MIN_WINDOW_HEIGHT}
         resizeHandleStyles={RESIZE_HANDLE_STYLES}
@@ -73,22 +109,22 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
         onMouseDown={handleFocus}
       >
         <WindowContextMenu
-          maximized={win.maximized ?? false}
-          onBringToFront={() => focusWindow(win.id)}
-          onMinimize={() => minimizeWindow(win.id)}
-          onToggleMaximize={() => toggleMaximizeWindow(win.id)}
-          onClose={() => closeWindow(win.id)}
+          maximized={isMaximized}
+          onBringToFront={handleBringToFront}
+          onMinimize={handleMinimize}
+          onToggleMaximize={handleToggleMaximize}
+          onClose={handleClose}
         >
           <WindowContent
             ref={portalContainerRef}
-            title={getWindowTitle(win, windows)}
+            title={windowTitle}
             active={active}
             isSub={!!win.sub}
-            maximized={win.maximized ?? false}
+            maximized={isMaximized}
             content={win.content}
-            onMinimize={() => minimizeWindow(win.id)}
-            onToggleMaximize={() => toggleMaximizeWindow(win.id)}
-            onClose={() => closeWindow(win.id)}
+            onMinimize={handleMinimize}
+            onToggleMaximize={handleToggleMaximize}
+            onClose={handleClose}
           />
         </WindowContextMenu>
       </Rnd>
@@ -97,3 +133,6 @@ const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
 });
 
 export default WindowItem;
+
+// Re-export WindowList for convenience
+export { WindowList } from './WindowList';

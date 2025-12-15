@@ -78,4 +78,12 @@ func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *conf
 		us.GET("/search", unsplashHandler.Search)
 		us.GET("/download", unsplashHandler.TrackDownload)
 	}
+
+	// Knowledge Base routes
+	kbHandler := handler.NewKnowledgeBaseHandler()
+	kb := e.Group("/knowledge-bases")
+	kb.GET("", kbHandler.ListKnowledgeBases)
+	kb.POST("", kbHandler.CreateKnowledgeBase)
+	kb.DELETE("/:id", kbHandler.DeleteKnowledgeBase)
+	kb.POST("/collections", kbHandler.CreateCollection)
 }

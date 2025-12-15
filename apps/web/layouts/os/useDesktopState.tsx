@@ -11,6 +11,8 @@ import {
 } from 'react';
 
 import type { WindowContextType } from '@/layouts/os/WindowContext';
+import type { WindowStateContextType } from '@/layouts/os/WindowStateContext';
+import type { WindowActionsContextType } from '@/layouts/os/WindowActionsContext';
 import { getViewportBounds } from '@/layouts/os/helpers';
 import * as ShortcutActions from '@/layouts/os/state/actions';
 import {
@@ -55,6 +57,8 @@ function buildDefaultDockIds(apps: AppDef[]): string[] {
 
 export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
   contextValue: WindowContextType;
+  stateContextValue: WindowStateContextType;
+  actionsContextValue: WindowActionsContextType;
   windows: WinState[];
   activeId: string | null;
 } {
@@ -174,7 +178,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
         setActiveId(parsed.activeId);
       }
 
-      const anyParsed: any = parsed as unknown;
+      const anyParsed: unknown = parsed as unknown;
       if (Array.isArray(anyParsed.shortcuts)) {
         setShortcuts(hydrateFromV1(anyParsed.shortcuts as string[]));
       } else if (Array.isArray(anyParsed.desktopItems)) {
@@ -297,7 +301,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
         const id = `${app.name}-${Date.now()}`;
         const defaultSize = app.defaultSize ?? { width: 640, height: 380 };
         const width = options?.width ?? defaultSize.width;
-        const height = options?.height ?? defaultSize.height;
+        const height = options?.height ?? defaultSize.height ?? 380;
 
         const win: WinState = {
           id,
@@ -583,13 +587,155 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
   }, []);
 
   const addShortcutForApp = useCallback((appId: string) => {
-    setShortcuts((prev) => ShortcutActions.addShortcutForApp(prev, appId));
-  }, []);
+    const app = apps.find((a) => a.id === appId);
+    const iconElement = app?.icon ? (
+      typeof app.icon === 'string' ? (
+        <span className="text-4xl">{app.icon}</span>
+      ) : (
+        app.icon
+      )
+    ) : undefined;
+    setShortcuts((prev) =>
+      ShortcutActions.addShortcutForApp(prev, appId, app?.name, iconElement),
+    );
+  }, [apps]);
 
   const removeShortcutForApp = useCallback((appId: string) => {
     setShortcuts((prev) => ShortcutActions.removeShortcutForApp(prev, appId));
   }, []);
 
+  // Memoized openSubWindow callback
+  const openSubWindow = useCallback(
+    (
+      parentWindowId: string,
+      options: {
+        title: string;
+        content: React.ReactNode;
+        width?: number;
+        height?: number;
+      }
+    ) => {
+      let newId = '';
+      setWindows((prev) => {
+        const parent = prev.find((w) => w.id === parentWindowId);
+        if (!parent) return prev;
+        const nextZ = ++zSeed.current;
+        const id = `${parent.title}-sub-${Date.now()}`;
+        newId = id;
+        const width =
+          options.width ??
+          Math.max(360, Math.min(720, Math.floor(parent.w * 0.6)));
+        const height =
+          options.height ??
+          Math.max(220, Math.min(600, Math.floor(parent.h * 0.6)));
+        const x = parent.x + Math.max(12, Math.floor((parent.w - width) / 2));
+        const y =
+          parent.y + Math.max(12, Math.floor((parent.h - height) / 2));
+        return [
+          ...prev,
+          {
+            id,
+            appId: parent.appId,
+            title: options.title,
+            x,
+            y,
+            w: width,
+            h: height,
+            z: nextZ,
+            content: options.content,
+            minimized: false,
+            maximized: false,
+            prev: null,
+            parentId: parent.id,
+            sub: true,
+          },
+        ];
+      });
+      return newId;
+    },
+    []
+  );
+
+  // Split state context - changes frequently, minimal dependencies
+  const stateContextValue = useMemo<WindowStateContextType>(
+    () => ({
+      windows,
+      activeId,
+      draggingWindowId,
+      resizingWindowId,
+    }),
+    [windows, activeId, draggingWindowId, resizingWindowId]
+  );
+
+  // Split actions context - stable references, rarely changes
+  const actionsContextValue = useMemo<WindowActionsContextType>(
+    () => ({
+      apps,
+      shortcuts,
+      setShortcuts,
+      reorderShortcuts,
+      addToGroup,
+      createGroupWithItems,
+      removeFromGroup,
+      ungroup,
+      renameGroup,
+      addShortcutForApp,
+      removeShortcutForApp,
+      dockAppIds,
+      openApp,
+      openAppById,
+      openAppWithOptions,
+      openAppByIdWithOptions,
+      openSubWindow,
+      closeWindow,
+      minimizeWindow,
+      restoreWindow,
+      toggleMaximizeWindow,
+      focusWindow,
+      updateWindowPosition,
+      updateWindowSize,
+      setDraggingWindow,
+      setResizingWindow,
+      setDockAppIds,
+      resetState,
+      clearWindow,
+      clearAllWindows,
+    }),
+    [
+      apps,
+      shortcuts,
+      setShortcuts,
+      reorderShortcuts,
+      addToGroup,
+      createGroupWithItems,
+      removeFromGroup,
+      ungroup,
+      renameGroup,
+      addShortcutForApp,
+      removeShortcutForApp,
+      dockAppIds,
+      openApp,
+      openAppById,
+      openAppWithOptions,
+      openAppByIdWithOptions,
+      openSubWindow,
+      closeWindow,
+      minimizeWindow,
+      restoreWindow,
+      toggleMaximizeWindow,
+      focusWindow,
+      updateWindowPosition,
+      updateWindowSize,
+      setDraggingWindow,
+      setResizingWindow,
+      setDockAppIds,
+      resetState,
+      clearWindow,
+      clearAllWindows,
+    ]
+  );
+
+  // Legacy combined context for backward compatibility
   const contextValue = useMemo<WindowContextType>(
     () => ({
       windows,
@@ -614,45 +760,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
       openAppById,
       openAppWithOptions,
       openAppByIdWithOptions,
-      openSubWindow: (parentWindowId, options) => {
-        let newId = '';
-        setWindows((prev) => {
-          const parent = prev.find((w) => w.id === parentWindowId);
-          if (!parent) return prev;
-          const nextZ = ++zSeed.current;
-          const id = `${parent.title}-sub-${Date.now()}`;
-          newId = id;
-          const width =
-            options.width ??
-            Math.max(360, Math.min(720, Math.floor(parent.w * 0.6)));
-          const height =
-            options.height ??
-            Math.max(220, Math.min(600, Math.floor(parent.h * 0.6)));
-          const x = parent.x + Math.max(12, Math.floor((parent.w - width) / 2));
-          const y =
-            parent.y + Math.max(12, Math.floor((parent.h - height) / 2));
-          return [
-            ...prev,
-            {
-              id,
-              appId: parent.appId,
-              title: options.title,
-              x,
-              y,
-              w: width,
-              h: height,
-              z: nextZ,
-              content: options.content,
-              minimized: false,
-              maximized: false,
-              prev: null,
-              parentId: parent.id,
-              sub: true,
-            },
-          ];
-        });
-        return newId;
-      },
+      openSubWindow,
       closeWindow,
       minimizeWindow,
       restoreWindow,
@@ -686,6 +794,9 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
       dockAppIds,
       openApp,
       openAppById,
+      openAppWithOptions,
+      openAppByIdWithOptions,
+      openSubWindow,
       closeWindow,
       minimizeWindow,
       restoreWindow,
@@ -702,5 +813,5 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
     ],
   );
 
-  return { contextValue, windows, activeId };
+  return { contextValue, stateContextValue, actionsContextValue, windows, activeId };
 }

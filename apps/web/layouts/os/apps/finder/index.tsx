@@ -1,4 +1,4 @@
-import FinderRoot from './finder/FinderRoot';
+import FinderRoot from './FinderRoot';
 
 export default function FinderApp() {
   return <FinderRoot />;

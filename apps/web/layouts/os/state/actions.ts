@@ -5,6 +5,7 @@ import type {
 } from '@/layouts/os/types';
 import { arrayMove } from '@dnd-kit/sortable';
 import { cloneShortcut, findShortcut } from './persistence';
+import type React from 'react';
 
 export function reorderShortcuts(
   items: DesktopItem[],
@@ -123,6 +124,8 @@ export function renameGroup(
 export function addShortcutForApp(
   items: DesktopItem[],
   appId: string,
+  appName?: string,
+  appIcon?: React.ReactNode,
 ): DesktopItem[] {
   const exists = items.some((it) =>
     it.type === 'app'
@@ -130,9 +133,26 @@ export function addShortcutForApp(
       : it.children.some((c) => c.appId === appId),
   );
   if (exists) return items;
+
+  // Try to find from default shortcuts first
   const base = findShortcut(appId);
-  if (!base) return items;
-  return [cloneShortcut(base), ...items];
+  if (base) {
+    return [cloneShortcut(base), ...items];
+  }
+
+  // If not in defaults, create a new shortcut from app info
+  if (appName && appIcon) {
+    const newShortcut: DesktopAppShortcut = {
+      type: 'app',
+      id: appId,
+      appId: appId,
+      label: appName,
+      icon: appIcon,
+    };
+    return [newShortcut, ...items];
+  }
+
+  return items;
 }
 
 export function removeShortcutForApp(

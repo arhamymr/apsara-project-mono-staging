@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { useWindowContext } from '@/layouts/os/WindowContext';
+import { useCallback, useRef, useState } from 'react';
+import { useWindowActions } from '@/layouts/os/WindowActionsContext';
 import { useEdgeSnapping } from './useEdgeSnapping';
 
 interface UseWindowDragProps {
@@ -9,18 +9,27 @@ interface UseWindowDragProps {
 }
 
 export function useWindowDrag({ windowId, width, height }: UseWindowDragProps) {
+  // Use split actions context - stable references
   const {
     focusWindow,
     updateWindowPosition,
     setDraggingWindow,
     setResizingWindow,
     updateWindowSize,
-  } = useWindowContext();
+  } = useWindowActions();
 
   const { calculateEdgePosition } = useEdgeSnapping();
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Use ref to track animation timeout for cleanup
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleDragStart = useCallback(() => {
+    // Clear any pending animation timeout
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+      animationTimeoutRef.current = null;
+    }
     focusWindow(windowId);
     setDraggingWindow(windowId);
   }, [focusWindow, windowId, setDraggingWindow]);
@@ -37,9 +46,10 @@ export function useWindowDrag({ windowId, width, height }: UseWindowDragProps) {
         setIsAnimating(true);
         updateWindowPosition(windowId, edgePosition.x, edgePosition.y);
 
-        setTimeout(() => {
+        animationTimeoutRef.current = setTimeout(() => {
           setIsAnimating(false);
           setDraggingWindow(null);
+          animationTimeoutRef.current = null;
         }, 300);
       } else {
         updateWindowPosition(windowId, data.x, data.y);
