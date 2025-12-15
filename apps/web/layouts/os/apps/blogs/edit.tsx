@@ -1,219 +1,191 @@
 'use client';
 
-import { AssetPicker } from '@/components/asset-picker';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
-import React from 'react';
+import { Kbd } from '@workspace/ui/components/kbd';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useBlog, useUpdateBlog, useDeleteBlog } from './hooks';
+import { CoverImagePicker } from './components/upload-cover';
 import type { Id } from '@/convex/_generated/dataModel';
 
-export default function EditArticleWindow({
-  id,
-  onUpdated,
-}: {
-  id: Id<"blogs">;
+type BlogStatus = 'draft' | 'published';
+
+interface EditArticleWindowProps {
+  id: Id<'blogs'>;
   onUpdated?: () => void;
-}) {
+}
+
+export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowProps) {
   const blog = useBlog(id);
   const updateBlog = useUpdateBlog();
   const deleteBlog = useDeleteBlog();
 
-  const [title, setTitle] = React.useState('');
-  const [content, setContent] = React.useState('');
-  const [coverImage, setCoverImage] = React.useState<string | undefined>();
-  const [status, setStatus] = React.useState<'draft' | 'published'>('draft');
-  const [busy, setBusy] = React.useState(false);
-  const [isPickerOpen, setPickerOpen] = React.useState(false);
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [status, setStatus] = useState<BlogStatus>('draft');
+  const [coverImage, setCoverImage] = useState<string | undefined>();
+  const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync state when blog loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (blog) {
       setTitle(blog.title);
-      setContent(blog.content);
-      setCoverImage(blog.coverImage);
+      setSlug(blog.slug ?? '');
       setStatus(blog.status);
+      setCoverImage(blog.coverImage);
+      setTags(blog.tags?.join(', ') ?? '');
+      setContent(blog.content ?? '');
     }
   }, [blog]);
 
-  const handleUpdate = async () => {
-    if (!blog) return;
-    setBusy(true);
+  const handleUpdate = useCallback(async () => {
+    if (isSubmitting || !blog) return;
+
+    if (!title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
+      const contentString = content;
+      const tagsArray = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+
       await updateBlog({
         id: blog._id,
-        title,
-        content,
+        title: title.trim(),
+        content: contentString,
         coverImage,
         status,
+        tags: tagsArray.length > 0 ? tagsArray : undefined,
       });
-      onUpdated?.();
+
       toast.success('Article updated');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to update';
+      onUpdated?.();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update';
       toast.error(message);
     } finally {
-      setBusy(false);
+      setIsSubmitting(false);
     }
-  };
+  }, [title, content, tags, coverImage, status, isSubmitting, blog, updateBlog, onUpdated]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!blog) return;
     const ok = window.confirm('Delete this article? This cannot be undone.');
     if (!ok) return;
-    
-    setBusy(true);
+
+    setIsSubmitting(true);
     try {
       await deleteBlog({ id: blog._id });
-      onUpdated?.();
       toast.success('Article deleted');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to delete';
+      onUpdated?.();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete';
       toast.error(message);
     } finally {
-      setBusy(false);
+      setIsSubmitting(false);
     }
-  };
+  }, [blog, deleteBlog, onUpdated]);
 
   if (blog === undefined) return <div className="p-4 text-sm">Loading…</div>;
   if (blog === null) return <div className="p-4 text-sm">Not found</div>;
 
   return (
-    <div className="space-y-4 p-4 text-sm">
+    <div className="text-foreground flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="bg-card sticky top-0 flex w-full items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex items-center gap-3">
           <h2 className="text-base font-semibold">Edit Article</h2>
-          <p className="text-muted-foreground text-xs">
-            Make changes and save when ready.
-          </p>
+          <Select value={status} onValueChange={(v) => setStatus(v as BlogStatus)}>
+            <SelectTrigger className="h-8 w-[120px]">
+              <SelectValue placeholder="Draft" />
+            </SelectTrigger>
+            <SelectContent className="z-[99999]">
+              <SelectGroup>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
+
         <div className="flex items-center gap-2">
-          <select
-            className="bg-background border-border rounded-md border px-2 py-1 text-xs"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
-          <Button size="sm" onClick={handleUpdate} disabled={busy}>
-            {busy ? 'Saving…' : 'Save'}
+          <Button size="sm" variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
+            Delete
+          </Button>
+          <Button size="sm" onClick={handleUpdate} disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+            <Kbd className="text-primary-900 bg-black/20">S</Kbd>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="space-y-3 md:col-span-2">
-          <label className="text-xs">Title</label>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+      {/* Body */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* Sidebar */}
+          <aside className="space-y-3">
+            <p className="text-muted-foreground text-xs">
+              Make changes and save when ready.
+            </p>
 
-          <label className="text-xs">Content</label>
-          <textarea
-            className="border-border bg-background h-60 w-full rounded-md border p-2 text-sm"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+            <div>
+              <label className="text-xs">Title</label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Article title"
+              />
+            </div>
 
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={busy}
-            >
-              Delete
-            </Button>
-            <div className="text-muted-foreground flex-1 text-xs">
+            <div>
+              <label className="text-xs">Slug</label>
+              <Input value={slug} disabled placeholder="article-slug" />
+            </div>
+
+            <div>
+              <label className="text-xs">Tags (comma separated)</label>
+              <Input
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="tech, news, tutorial"
+              />
+            </div>
+
+            <CoverImagePicker setImageUrl={setCoverImage} imageUrl={coverImage} />
+
+            <div className="text-muted-foreground pt-2 text-xs">
               Last updated: {new Date(blog.updatedAt).toLocaleString()}
             </div>
+          </aside>
+
+          {/* Editor */}
+          <div className="relative max-h-[calc(100vh-150px)] overflow-hidden rounded-md border md:col-span-2">
+            <textarea
+              className="bg-background h-full min-h-[500px] w-full resize-none p-4 focus:outline-none"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Start writing your article..."
+            />
           </div>
         </div>
-
-        <aside className="space-y-3">
-          <div>
-            <label className="text-xs">Cover Image</label>
-            <div className="mt-2">
-              {coverImage ? (
-                <div className="flex items-start gap-3">
-                  <img
-                    src={coverImage}
-                    alt="Cover preview"
-                    className="h-24 w-24 rounded-md object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="mt-2 flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setPickerOpen(true)}
-                      >
-                        Change
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setCoverImage(undefined)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setPickerOpen(true)}
-                >
-                  Select cover image
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-muted-foreground text-xs">Preview</div>
-            <div className="border-border mt-2 h-28 overflow-hidden rounded-md border p-2 text-xs">
-              <div className="line-clamp-2 font-semibold">
-                {title || 'Title preview'}
-              </div>
-              <div className="text-muted-foreground mt-1 line-clamp-3 text-xs">
-                {content.replace(/<[^>]+>/g, '').slice(0, 200) || 'Content preview...'}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-muted-foreground text-xs">Tags</div>
-            <div className="mt-1 flex flex-wrap gap-1">
-              {blog.tags?.map((tag) => (
-                <span key={tag} className="bg-muted rounded px-2 py-0.5 text-xs">
-                  {tag}
-                </span>
-              )) ?? <span className="text-muted-foreground text-xs">No tags</span>}
-            </div>
-          </div>
-        </aside>
       </div>
-
-      <AssetPicker
-        open={isPickerOpen}
-        onOpenChange={setPickerOpen}
-        kindFilter="image"
-        onSelect={(path) => {
-          setCoverImage(path);
-          setPickerOpen(false);
-        }}
-        onSelectUnsplash={(photo) => {
-          const url = photo.urls.regular ?? photo.urls.full;
-          setCoverImage(url);
-          setPickerOpen(false);
-        }}
-      />
     </div>
   );
 }

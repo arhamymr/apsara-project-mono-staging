@@ -1,6 +1,5 @@
 'use client';
 
-import { PlateEditor } from '@/components/editor/plate-editor';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Kbd } from '@workspace/ui/components/kbd';
@@ -12,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useMutation } from 'convex/react';
@@ -37,7 +35,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
   const [slug, setSlug] = useState('');
   const [status, setStatus] = useState<BlogStatus>('draft');
   const [coverImage, setCoverImage] = useState<string | undefined>();
-  const [content, setContent] = useState<unknown[]>([]);
+  const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,7 +64,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
     setIsSubmitting(true);
 
     try {
-      const contentString = JSON.stringify(content);
+      const contentString = content;
       const tagsArray = tags
         .split(',')
         .map((t) => t.trim())
@@ -87,7 +85,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
 
       setTitle('');
       setSlug('');
-      setContent([]);
+      setContent('');
       setTags('');
       setCoverImage(undefined);
       setStatus('draft');
@@ -164,10 +162,13 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
           </aside>
 
           {/* Editor */}
-          <div className="relative max-h-[calc(100vh-150px)] space-y-3 overflow-hidden rounded-md border md:col-span-2">
-            <ScrollArea className="h-full w-full">
-              <PlateEditor value={content} onChange={setContent} />
-            </ScrollArea>
+          <div className="relative max-h-[calc(100vh-150px)] overflow-hidden rounded-md border md:col-span-2">
+            <textarea
+              className="bg-background h-full min-h-[500px] w-full resize-none p-4 focus:outline-none"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Start writing your article..."
+            />
           </div>
         </div>
       </div>
