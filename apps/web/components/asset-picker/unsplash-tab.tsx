@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Button } from '@workspace/ui/components/button';
 import { Card } from '@workspace/ui/components/card';
 import { Input } from '@workspace/ui/components/input';
@@ -29,23 +27,37 @@ export function UnsplashTab({
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
+  const [error, setError] = React.useState<string | null>(null);
+
   const searchUnsplash = React.useCallback(async (q: string, page = 1) => {
     if (!q) {
       setUnsplashItems([]);
       setUnsplashTotal(0);
       return;
     }
+    if (!API_BASE) {
+      setError('API not configured');
+      return;
+    }
     setUnsplashLoading(true);
+    setError(null);
     try {
       const res = await fetch(
         `${API_BASE}/unsplash/search?q=${encodeURIComponent(q)}&page=${page}&per_page=${UNSPLASH_PER_PAGE}`,
       );
-      if (!res.ok) throw new Error('Unsplash API error');
+      if (!res.ok) {
+        const errText = await res.text().catch(() => 'Unknown error');
+        throw new Error(`Unsplash API error: ${res.status} - ${errText}`);
+      }
 
       const json = await res.json();
       setUnsplashItems(json.data ?? []);
       setUnsplashTotal(json.total ?? 0);
       setUnsplashPage(page);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to search');
+      setUnsplashItems([]);
+      setUnsplashTotal(0);
     } finally {
       setUnsplashLoading(false);
     }
@@ -94,7 +106,11 @@ export function UnsplashTab({
             ))}
             {unsplashItems.length === 0 && !unsplashLoading && (
               <div className="text-muted-foreground col-span-full grid place-items-center rounded-lg border border-dashed py-12 text-sm">
-                No results. Try another keyword.
+                {error ? (
+                  <span className="text-destructive">{error}</span>
+                ) : (
+                  'No results. Try another keyword.'
+                )}
               </div>
             )}
           </div>

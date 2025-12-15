@@ -17,8 +17,10 @@ func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *conf
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000", "*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "X-Requested-With"},
+		AllowCredentials: true,
 	}))
 
 	// Health check
@@ -64,6 +66,9 @@ func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *conf
 		st.POST("/folder", storageHandler.CreateFolder)
 		st.GET("/download-url", storageHandler.GetDownloadURL)
 		st.GET("/proxy/*", storageHandler.ProxyObject)
+		st.POST("/rename", storageHandler.RenameObject)
+		st.POST("/move", storageHandler.MoveObject)
+		st.POST("/visibility", storageHandler.SetVisibility)
 	}
 
 	// Unsplash routes

@@ -260,3 +260,169 @@ func (r *R2Client) GetPresignedURL(ctx context.Context, key string, ttl time.Dur
 
 	return presignedReq.URL, nil
 }
+
+func (r *R2Client) Rename(ctx context.Context, key string, newName string) (*StorageEntry, error) {
+	// Extract directory from key
+	isFolder := strings.HasSuffix(key, "/")
+	trimmedKey := strings.TrimSuffix(key, "/")
+	lastSlash := strings.LastIndex(trimmedKey, "/")
+	
+	var newKey string
+	if lastSlash == -1 {
+		newKey = newName
+	} else {
+		newKey = trimmedKey[:lastSlash+1] + newName
+	}
+	
+	if isFolder {
+		newKey += "/"
+	}
+
+	// Copy to new location
+	copyInput := &s3.CopyObjectInput{
+		Bucket:     aws.String(r.bucket),
+		CopySource: aws.String(r.bucket + "/" + key),
+		Key:        aws.String(newKey),
+	}
+
+	_, err := r.client.CopyObject(ctx, copyInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to copy object: %w", err)
+	}
+
+	// Delete original
+	deleteInput := &s3.DeleteObjectInput{
+		Bucket: aws.String(r.bucket),
+		Key:    aws.String(key),
+	}
+
+	_, err = r.client.DeleteObject(ctx, deleteInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete original object: %w", err)
+	}
+
+	var publicURL *string
+	if r.publicURL != "" {
+		url := fmt.Sprintf("%s/%s", strings.TrimSuffix(r.publicURL, "/"), newKey)
+		publicURL = &url
+	}
+
+	return &StorageEntry{
+		Key:       newKey,
+		Name:      newName,
+		IsFolder:  isFolder,
+		PublicURL: publicURL,
+	}, nil
+}
+
+func (r *R2Client) Move(ctx context.Context, key string, destPrefix string) (*StorageEntry, error) {
+	isFolder := strings.HasSuffix(key, "/")
+	trimmedKey := strings.TrimSuffix(key, "/")
+	
+	// Extract filename
+	lastSlash := strings.LastIndex(trimmedKey, "/")
+	var name string
+	if lastSlash == -1 {
+		name = trimmedKey
+	} else {
+		name = trimmedKey[lastSlash+1:]
+	}
+
+	// Build new key
+	newKey := destPrefix + name
+	if isFolder {
+		newKey += "/"
+	}
+
+	// Copy to new location
+	copyInput := &s3.CopyObjectInput{
+		Bucket:     aws.String(r.bucket),
+		CopySource: aws.String(r.bucket + "/" + key),
+		Key:        aws.String(newKey),
+	}
+
+	_, err := r.client.CopyObject(ctx, copyInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to copy object: %w", err)
+	}
+
+	// Delete original
+	deleteInput := &s3.DeleteObjectInput{
+		Bucket: aws.String(r.bucket),
+		Key:    aws.String(key),
+	}
+
+	_, err = r.client.DeleteObject(ctx, deleteInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete original object: %w", err)
+	}
+
+	var publicURL *string
+	if r.publicURL != "" {
+		url := fmt.Sprintf("%s/%s", strings.TrimSuffix(r.publicURL, "/"), newKey)
+		publicURL = &url
+	}
+
+	return &StorageEntry{
+		Key:       newKey,
+		Name:      name,
+		IsFolder:  isFolder,
+		PublicURL: publicURL,
+	}, nil
+}
+
+func (r *R2Client) SetVisibility(ctx context.Context, key string, visibility string) (*StorageEntry, error) {
+	// R2 doesn't support ACLs directly like S3
+	// Visibility is typically managed through bucket policies or custom metadata
+	// For now, we'll store visibility as custom metadata
+	
+	// Get current object to preserve content type
+	headInput := &s3.HeadObjectInput{
+		Bucket: aws.String(r.bucket),
+		Key:    aws.String(key),
+	}
+
+	headResult, err := r.client.HeadObject(ctx, headInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object metadata: %w", err)
+	}
+
+	// Copy object with updated metadata
+	metadata := headResult.Metadata
+	if metadata == nil {
+		metadata = make(map[string]string)
+	}
+	metadata["visibility"] = visibility
+
+	copyInput := &s3.CopyObjectInput{
+		Bucket:            aws.String(r.bucket),
+		CopySource:        aws.String(r.bucket + "/" + key),
+		Key:               aws.String(key),
+		Metadata:          metadata,
+		MetadataDirective: types.MetadataDirectiveReplace,
+		ContentType:       headResult.ContentType,
+	}
+
+	_, err = r.client.CopyObject(ctx, copyInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update object metadata: %w", err)
+	}
+
+	name := key
+	if lastSlash := strings.LastIndex(key, "/"); lastSlash != -1 {
+		name = key[lastSlash+1:]
+	}
+
+	var publicURL *string
+	if r.publicURL != "" && visibility == "public" {
+		url := fmt.Sprintf("%s/%s", strings.TrimSuffix(r.publicURL, "/"), key)
+		publicURL = &url
+	}
+
+	return &StorageEntry{
+		Key:       key,
+		Name:      name,
+		IsFolder:  false,
+		PublicURL: publicURL,
+	}, nil
+}

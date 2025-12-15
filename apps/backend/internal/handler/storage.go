@@ -176,3 +176,90 @@ func (h *StorageHandler) ProxyObject(c echo.Context) error {
 	_, err = io.Copy(c.Response().Writer, resp.Body)
 	return err
 }
+
+// RenameObject handles POST /storage/rename
+func (h *StorageHandler) RenameObject(c echo.Context) error {
+	var req struct {
+		Key     string `json:"key"`
+		NewName string `json:"new_name"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "invalid request body",
+		})
+	}
+
+	if req.Key == "" || req.NewName == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "key and new_name are required",
+		})
+	}
+
+	entry, err := h.r2.Rename(c.Request().Context(), req.Key, req.NewName)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, entry)
+}
+
+// MoveObject handles POST /storage/move
+func (h *StorageHandler) MoveObject(c echo.Context) error {
+	var req struct {
+		Key        string `json:"key"`
+		DestPrefix string `json:"dest_prefix"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "invalid request body",
+		})
+	}
+
+	if req.Key == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "key is required",
+		})
+	}
+
+	entry, err := h.r2.Move(c.Request().Context(), req.Key, req.DestPrefix)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, entry)
+}
+
+// SetVisibility handles POST /storage/visibility
+func (h *StorageHandler) SetVisibility(c echo.Context) error {
+	var req struct {
+		Key        string `json:"key"`
+		Visibility string `json:"visibility"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "invalid request body",
+		})
+	}
+
+	if req.Key == "" || (req.Visibility != "public" && req.Visibility != "private") {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "key and visibility (public/private) are required",
+		})
+	}
+
+	entry, err := h.r2.SetVisibility(c.Request().Context(), req.Key, req.Visibility)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, entry)
+}
