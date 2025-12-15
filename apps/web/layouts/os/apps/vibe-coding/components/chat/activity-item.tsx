@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { Brain, CheckCircle2, ChevronDown, ChevronRight, Code2, FileCode, Loader2 } from 'lucide-react';
 import type { ActivityLogItem } from './types';
 
@@ -8,30 +8,28 @@ interface ActivityItemProps {
   item: ActivityLogItem;
 }
 
-export function ActivityItem({ item }: ActivityItemProps) {
+const ICONS = {
+  'file-created': <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />,
+  'tool-start': <Loader2 className="h-3 w-3 animate-spin text-blue-500 flex-shrink-0" />,
+  'tool-end': <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />,
+  'thinking': <Brain className="h-3 w-3 text-purple-500 flex-shrink-0" />,
+  'text': <Code2 className="h-3 w-3 text-muted-foreground flex-shrink-0" />,
+} as const;
+
+export const ActivityItem = memo(function ActivityItem({ item }: ActivityItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const getIcon = () => {
-    switch (item.type) {
-      case 'file-created':
-        return <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />;
-      case 'tool-start':
-        return <Loader2 className="h-3 w-3 animate-spin text-blue-500 flex-shrink-0" />;
-      case 'tool-end':
-        return <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />;
-      case 'thinking':
-        return <Brain className="h-3 w-3 text-purple-500 flex-shrink-0" />;
-      default:
-        return <Code2 className="h-3 w-3 text-muted-foreground flex-shrink-0" />;
-    }
-  };
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
 
-  // Thinking items are collapsible
+  const icon = useMemo(() => ICONS[item.type] || ICONS.text, [item.type]);
+
   if (item.type === 'thinking') {
     return (
       <div className="text-xs py-0.5">
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={toggleExpanded}
           className="flex items-center gap-1.5 w-full text-left hover:bg-muted/50 rounded px-1 -mx-1"
         >
           {isExpanded ? (
@@ -39,7 +37,7 @@ export function ActivityItem({ item }: ActivityItemProps) {
           ) : (
             <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
           )}
-          {getIcon()}
+          {icon}
           <span className="text-purple-500 text-[11px]">Thinking</span>
         </button>
         {isExpanded && (
@@ -53,7 +51,7 @@ export function ActivityItem({ item }: ActivityItemProps) {
 
   return (
     <div className="flex items-center gap-1.5 text-xs py-0.5">
-      {getIcon()}
+      {icon}
       {item.filePath ? (
         <div className="flex items-center gap-1">
           <FileCode className="h-3 w-3 text-muted-foreground" />
@@ -64,4 +62,4 @@ export function ActivityItem({ item }: ActivityItemProps) {
       )}
     </div>
   );
-}
+});

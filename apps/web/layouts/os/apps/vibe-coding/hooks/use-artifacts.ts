@@ -34,6 +34,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
   const [localEdits, setLocalEdits] = useState<Record<string, string>>({}); // Local edits before save
   const [isSaving, setIsSaving] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null); // Timestamp of last save
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set()); // Track expanded folders
   const savedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prevSelectedFileRef = useRef<string>('');
   
@@ -73,16 +74,6 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
 
   // Merge persisted artifact files with streaming files and local edits
   const mergedFiles = useMemo(() => {
-    console.log('[useArtifacts] Computing mergedFiles:', {
-      hasActiveArtifact: !!activeArtifact,
-      selectedVersion,
-      currentVersion,
-      hasFiles: !!activeArtifact?.files,
-      filesType: typeof activeArtifact?.files,
-      streamingFilesSize: streamingFiles?.size || 0,
-      localEditsCount: Object.keys(localEdits).length,
-    });
-    
     const files: Record<string, string> = {};
     
     // Add persisted files first (from active artifact - either latest or selected version)
@@ -91,14 +82,9 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
         const artifactFiles = typeof activeArtifact.files === 'string' 
           ? JSON.parse(activeArtifact.files) 
           : activeArtifact.files;
-        console.log('[useArtifacts] Parsed artifact files:', {
-          version: activeArtifact.version,
-          keys: Object.keys(artifactFiles),
-          sampleContent: Object.values(artifactFiles)[0]?.toString().slice(0, 50),
-        });
         Object.assign(files, artifactFiles);
-      } catch (error) {
-        console.error('[useArtifacts] Failed to parse artifact files:', error);
+      } catch {
+        // Failed to parse artifact files
       }
     }
     
@@ -107,21 +93,15 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
       streamingFiles.forEach((content, path) => {
         files[path] = content;
       });
-      console.log('[useArtifacts] Added streaming files:', Array.from(streamingFiles.keys()));
     }
     
     // Overlay local edits (highest priority - user's unsaved changes)
     if (selectedVersion === null && Object.keys(localEdits).length > 0) {
       Object.assign(files, localEdits);
-      console.log('[useArtifacts] Added local edits:', Object.keys(localEdits));
     }
     
-    console.log('[useArtifacts] Final merged files:', {
-      count: Object.keys(files).length,
-      keys: Object.keys(files),
-    });
     return files;
-  }, [activeArtifact, streamingFiles, selectedVersion, currentVersion, localEdits]);
+  }, [activeArtifact, streamingFiles, selectedVersion, localEdits]);
 
   // Build file tree from merged files (persisted + streaming)
   const fileTree = useMemo(() => {
@@ -164,7 +144,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
               path: currentPath,
               type: 'folder',
               children: [],
-              isOpen: true,
+              isOpen: expandedFolders.size === 0 || expandedFolders.has(currentPath),
             };
 
             folders.set(currentPath, folder);
@@ -202,7 +182,7 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     sortNodes(tree);
 
     return tree;
-  }, [mergedFiles]);
+  }, [mergedFiles, expandedFolders]);
 
   // Auto-select loading file when streaming, or first file when files change
   useEffect(() => {
@@ -226,30 +206,19 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     }
   }, [mergedFiles, activeArtifact?._id, selectedFile, prevArtifactId, loadingFile]);
 
-  // Reset to latest version when new version is created during streaming
-  useEffect(() => {
-    if (latestArtifact?.version && selectedVersion !== null) {
-      // If we're viewing an old version and a new one is created, stay on old version
-      // User can manually switch to latest
-      console.log('[useArtifacts] New version available:', latestArtifact.version);
-    }
-  }, [latestArtifact?.version, selectedVersion]);
-
   // Version navigation handlers
   const goToVersion = useCallback((version: number) => {
-    console.log('[useArtifacts] Switching to version:', version);
     setSelectedVersion(version);
     setSelectedFile(''); // Reset file selection when changing versions
   }, []);
 
   const goToLatest = useCallback(() => {
-    console.log('[useArtifacts] Switching to latest version');
     setSelectedVersion(null);
     setSelectedFile(''); // Reset file selection
   }, []);
 
   const goToPreviousVersion = useCallback(() => {
-    if (currentVersion > 1) {
+    if (currentVersion > 0) {
       goToVersion(currentVersion - 1);
     }
   }, [currentVersion, goToVersion]);
@@ -268,28 +237,27 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
   // Get content of selected file (from merged files - streaming takes precedence)
   const fileContent = useMemo(() => {
     if (!selectedFile) {
-      console.log('[useArtifacts] No file selected');
       return '';
     }
-    const content = mergedFiles[selectedFile] || '';
-    console.log('[useArtifacts] File content:', {
-      selectedFile,
-      hasContent: !!content,
-      contentLength: content.length,
-      availableFiles: Object.keys(mergedFiles),
-    });
-    return content;
+    return mergedFiles[selectedFile] || '';
   }, [selectedFile, mergedFiles]);
 
   const handleFileSelect = (path: string) => {
-    console.log('[useArtifacts] File selected:', path);
     setSelectedFile(path);
   };
 
-  const handleFolderToggle = (path: string[]) => {
-    // This would update the isOpen state of folders
-    console.log('Toggle folder:', path);
-  };
+  const handleFolderToggle = useCallback((pathArray: string[]) => {
+    const path = pathArray.join('/');
+    setExpandedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  }, []);
 
   // Save a specific file to Convex
   const saveFile = useCallback(async (filePath: string, content: string) => {
@@ -297,13 +265,11 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     
     try {
       setIsSaving(true);
-      console.log('[useArtifacts] Saving file:', filePath);
       await updateArtifactFile({
         sessionId: sessionId as Id<"chatSessions">,
         filePath,
         content,
       });
-      console.log('[useArtifacts] File saved successfully');
       
       // Clear local edit for this file after successful save
       setLocalEdits(prev => {
@@ -321,8 +287,8 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
         setLastSavedAt(null);
       }, 2000);
       
-    } catch (error) {
-      console.error('[useArtifacts] Failed to save file:', error);
+    } catch {
+      // Failed to save file
     } finally {
       setIsSaving(false);
     }
@@ -330,8 +296,6 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
 
   // Handle file content change (from editor) - just update local state, no auto-save
   const handleFileChange = useCallback((filePath: string, content: string) => {
-    console.log('[useArtifacts] File changed:', filePath, 'length:', content.length);
-    
     // Clear "saved" indicator when user starts editing again
     setLastSavedAt(null);
     if (savedTimeoutRef.current) {
@@ -348,7 +312,6 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
   // Manual save (Ctrl+S)
   const handleSaveFile = useCallback(async () => {
     if (!selectedFile || !localEdits[selectedFile]) {
-      console.log('[useArtifacts] Nothing to save');
       return;
     }
     await saveFile(selectedFile, localEdits[selectedFile]);
@@ -360,7 +323,6 @@ export function useArtifactsConvex(sessionId: string, options: UseArtifactsOptio
     
     // If we had a previous file selected and it has unsaved changes, save it
     if (prevFile && prevFile !== selectedFile && localEdits[prevFile]) {
-      console.log('[useArtifacts] File deselected, saving:', prevFile);
       saveFile(prevFile, localEdits[prevFile]);
     }
     

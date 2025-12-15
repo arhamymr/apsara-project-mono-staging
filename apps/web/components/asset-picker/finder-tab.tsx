@@ -5,12 +5,13 @@ import {
 } from '@workspace/ui/components/breadcrumb';
 import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
-import type { StorageEntry } from '@/layouts/os/apps/finder/queries';
-import { useStorageList } from '@/layouts/os/apps/finder/queries';
 import { cn } from '@/lib/utils';
 import { FileIcon, FolderIcon, ImageIcon, Loader2 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
+
+import type { StorageEntry } from './queries';
+import { useStorageList } from './queries';
 
 type FinderTabProps = {
   open: boolean;

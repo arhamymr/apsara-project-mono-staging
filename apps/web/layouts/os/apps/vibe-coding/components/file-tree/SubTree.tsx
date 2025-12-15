@@ -29,6 +29,16 @@ export function SubTree({
               onFolderToggle={onFolderToggle}
               path={path}
               depth={depth}
+              renderChildren={() => (
+                <SubTree
+                  nodes={node.children!}
+                  selectedFile={selectedFile}
+                  onFileSelect={onFileSelect}
+                  onFolderToggle={onFolderToggle}
+                  path={currentPath}
+                  depth={depth + 1}
+                />
+              )}
             />
           );
         }

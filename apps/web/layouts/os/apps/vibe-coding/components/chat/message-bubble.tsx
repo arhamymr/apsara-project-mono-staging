@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { Bot, Loader2, User } from 'lucide-react';
 import type { AgentMessage } from '@/types/agent';
 import { MessageContent } from './message-content';
@@ -8,9 +9,14 @@ interface MessageBubbleProps {
   message: AgentMessage;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user';
   const isStreamingFromConvex = message.isStreaming && !isUser;
+
+  const formattedTime = useMemo(
+    () => message.timestamp.toLocaleTimeString(),
+    [message.timestamp]
+  );
 
   return (
     <div className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -47,7 +53,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             isUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
           }`}
         >
-          {message.timestamp.toLocaleTimeString()}
+          {formattedTime}
         </div>
       </div>
 
@@ -58,4 +64,4 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       )}
     </div>
   );
-}
+});

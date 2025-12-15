@@ -1,12 +1,13 @@
 'use client';
 
-import { LogoSwitch } from '@/components/LogoSwitch';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Twitter } from 'lucide-react';
+import { GithubIcon, LinkedinIcon, TwitterIcon } from 'lucide-react';
+
+import { Logo } from './top-nav/Logo';
 
 export function Footer() {
   const fadeUp = useFadeUp();
@@ -22,9 +23,9 @@ export function Footer() {
         <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-4">
-            <Link href="/" className="mb-6 inline-block">
-              <LogoSwitch width="140px" />
-            </Link>
+            <div className="mb-6">
+              <Logo />
+            </div>
             <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
               AI-powered development platform. Build faster with intelligent
               code generation and sandbox environments.
@@ -35,21 +36,21 @@ export function Footer() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Twitter"
               >
-                <Twitter className="h-5 w-5" />
+                <TwitterIcon className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="GitHub"
               >
-                <Github className="h-5 w-5" />
+                <GithubIcon className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="LinkedIn"
               >
-                <Linkedin className="h-5 w-5" />
+                <LinkedinIcon className="h-5 w-5" />
               </a>
             </div>
           </div>

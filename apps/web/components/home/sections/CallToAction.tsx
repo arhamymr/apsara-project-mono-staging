@@ -35,7 +35,7 @@ export function CallToAction({
 
   return (
     <Section className="py-24 lg:py-32">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         <motion.div
           {...fadeUp}
           className="bg-foreground relative w-full overflow-hidden rounded-xl px-8 py-20 text-center md:px-16 md:py-28 lg:py-32"

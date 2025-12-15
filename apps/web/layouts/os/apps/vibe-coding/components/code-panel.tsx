@@ -182,15 +182,16 @@ export function CodePanel({
                           : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                         }`}
                     >
-                      v{currentVersion}
+                      {currentVersion === 0 ? 'v0 (Boilerplate)' : `v${currentVersion}`}
                       <ChevronDown size={12} />
                     </button>
                   </DropdownMenuTrigger>
                   {/* High z-index ensures dropdown appears above all panel content */}
                   <DropdownMenuContent align="start" className="w-48 max-h-64 overflow-y-auto z-[9999]">
-                    {versionHistory.map((v) => {
+                    {versionHistory.map((v, index) => {
                       const isSelected = v.version === currentVersion;
-                      const isLatest = v.version === totalVersions;
+                      const isLatest = index === 0; // First item in desc order is latest
+                      const displayLabel = v.version === 0 ? 'Boilerplate' : `Version ${v.version}`;
                       return (
                         <DropdownMenuItem
                           key={v._id}
@@ -200,7 +201,7 @@ export function CodePanel({
                         >
                           <div className="flex flex-col">
                             <span className="font-medium">
-                              Version {v.version}
+                              {displayLabel}
                               {isLatest && <span className="ml-1 text-green-500">(latest)</span>}
                             </span>
                             <span className="text-xs text-muted-foreground">

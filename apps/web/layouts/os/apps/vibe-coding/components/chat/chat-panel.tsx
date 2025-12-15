@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import type { ChatPanelProps } from './types';
@@ -9,7 +10,10 @@ import { EmptyState } from './empty-state';
 import { MessageBubble } from './message-bubble';
 import { StreamingMessage } from './streaming-message';
 
-export function ChatPanel({
+const MemoizedMessageBubble = memo(MessageBubble);
+const MemoizedStreamingMessage = memo(StreamingMessage);
+
+export const ChatPanel = memo(function ChatPanel({
   messages,
   inputMessage,
   isStreaming,
@@ -23,6 +27,11 @@ export function ChatPanel({
   onNewChat,
 }: ChatPanelProps) {
   const hasContent = messages.length > 0 || isStreaming;
+  const hasStreamingMessage = useMemo(
+    () => messages.some((m) => m.isStreaming),
+    [messages]
+  );
+  const showStreamingMessage = isStreaming && !hasStreamingMessage;
 
   return (
     <div className="bg-background w-[40%] max-w-[450px] min-w-[250px] flex flex-col border-r text-xs">
@@ -40,11 +49,11 @@ export function ChatPanel({
             ) : (
               <>
                 {messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
+                  <MemoizedMessageBubble key={message.id} message={message} />
                 ))}
 
-                {isStreaming && !messages.some((m) => m.isStreaming) && (
-                  <StreamingMessage
+                {showStreamingMessage && (
+                  <MemoizedStreamingMessage
                     streamingContent={streamingContent}
                     loadingFile={loadingFile}
                     activityLog={activityLog}
@@ -65,4 +74,4 @@ export function ChatPanel({
       />
     </div>
   );
-}
+});

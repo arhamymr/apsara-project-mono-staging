@@ -79,7 +79,7 @@ export function useConvexPersistence({ sessionId, latestArtifact }: UsePersisten
    * Saves final streaming results to Convex after stream completes.
    *
    * File merging strategy (layered, later layers override earlier):
-   * 1. Boilerplate files (only for first artifact v1) - provides base config
+   * 1. Boilerplate files (only for first artifact v0) - provides base config
    * 2. Existing artifact files (for subsequent versions) - preserves prior work
    * 3. Newly generated files - AI-generated code takes highest priority
    *
@@ -115,7 +115,7 @@ export function useConvexPersistence({ sessionId, latestArtifact }: UsePersisten
         Object.entries(boilerplate).forEach(([path, fileContent]) => {
           mergedFiles.set(path, fileContent);
         });
-        console.log('[saveResults] Applied boilerplate as base for v1:', Object.keys(boilerplate).length, 'files');
+        console.log('[saveResults] Applied boilerplate as base for v0:', Object.keys(boilerplate).length, 'files');
       }
 
       // Layer 2: Overlay existing artifact files (preserves user's prior work)

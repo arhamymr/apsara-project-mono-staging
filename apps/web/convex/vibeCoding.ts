@@ -145,7 +145,8 @@ export const saveGeneratedArtifact = mutation({
       .order("desc")
       .first();
 
-    const nextVersion = (latestArtifact?.version ?? 0) + 1;
+    // Version starts from 0 (first artifact is v0)
+    const nextVersion = latestArtifact?.version !== undefined ? latestArtifact.version + 1 : 0;
     const now = Date.now();
 
     const artifactId = await ctx.db.insert("artifacts", {

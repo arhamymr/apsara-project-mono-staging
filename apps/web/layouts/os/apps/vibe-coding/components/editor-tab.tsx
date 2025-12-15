@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
 import { useTheme } from '@/layouts/dark-mode/useTheme';
-import Editor from '@monaco-editor/react';
+import Editor, { Monaco } from '@monaco-editor/react';
 import { getLanguageFromPath } from '@/lib/file-utils';
 import { ChevronLeft, ChevronRight, File, FileCode, Loader2 } from 'lucide-react';
 import { FileNode } from '../hooks/use-artifacts';
+import { FileTree, FileNode as TreeFileNode } from './file-tree';
 
 interface EditorTabProps {
   isExplorerOpen: boolean;
@@ -35,16 +36,83 @@ export function EditorTab({
   fileContent,
   hasArtifacts,
   isLoadingArtifacts,
-  loadingFile,
   isViewingOldVersion,
   isSaving,
   hasUnsavedChanges,
   justSaved,
   onFileSelect,
+  onFolderToggle,
   onFileChange,
   onSaveFile,
 }: EditorTabProps) {
   const { theme } = useTheme();
+  const monacoRef = useRef<Monaco | null>(null);
+  
+  // Configure Monaco for JSX/TSX support
+  const handleEditorBeforeMount = useCallback((monaco: Monaco) => {
+    monacoRef.current = monaco;
+    
+    // Configure TypeScript compiler options for JSX support
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.Latest,
+      allowNonTsExtensions: true,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      module: monaco.languages.typescript.ModuleKind.CommonJS,
+      noEmit: true,
+      esModuleInterop: true,
+      jsx: monaco.languages.typescript.JsxEmit.React,
+      reactNamespace: 'React',
+      allowJs: true,
+      typeRoots: ['node_modules/@types'],
+    });
+    
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.Latest,
+      allowNonTsExtensions: true,
+      moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      module: monaco.languages.typescript.ModuleKind.CommonJS,
+      noEmit: true,
+      esModuleInterop: true,
+      jsx: monaco.languages.typescript.JsxEmit.React,
+      reactNamespace: 'React',
+      allowJs: true,
+      typeRoots: ['node_modules/@types'],
+    });
+    
+    // Disable all diagnostics to avoid false errors in sandbox environment
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    });
+    
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: true,
+    });
+    
+    // Add React type definitions for better JSX support
+    const reactTypes = `
+      declare namespace React {
+        interface ReactElement<P = any, T extends string | JSXElementConstructor<any> = string | JSXElementConstructor<any>> {}
+        type JSXElementConstructor<P> = ((props: P) => ReactElement<any, any> | null) | (new (props: P) => Component<P, any>);
+        class Component<P = {}, S = {}> {}
+        function useState<T>(initialState: T | (() => T)): [T, (value: T | ((prev: T) => T)) => void];
+        function useEffect(effect: () => void | (() => void), deps?: any[]): void;
+        function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]): T;
+        function useMemo<T>(factory: () => T, deps: any[]): T;
+        function useRef<T>(initialValue: T): { current: T };
+        function useContext<T>(context: Context<T>): T;
+        interface Context<T> {}
+        function createContext<T>(defaultValue: T): Context<T>;
+        type FC<P = {}> = (props: P) => ReactElement | null;
+        type ReactNode = ReactElement | string | number | boolean | null | undefined;
+      }
+      declare const React: typeof React;
+    `;
+    
+    monaco.languages.typescript.typescriptDefaults.addExtraLib(reactTypes, 'react.d.ts');
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(reactTypes, 'react.d.ts');
+  }, []);
   
   // Handle editor content change
   const handleEditorChange = useCallback((value: string | undefined) => {
@@ -59,7 +127,6 @@ export function EditorTab({
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         if (onSaveFile && hasUnsavedChanges) {
-          console.log('[EditorTab] Ctrl+S pressed, saving...');
           onSaveFile();
         }
       }
@@ -71,18 +138,6 @@ export function EditorTab({
   
   // Editor is read-only when viewing old versions
   const isReadOnly = isViewingOldVersion || !onFileChange;
-  
-  // Debug logging
-  console.log('[EditorTab] State:', {
-    selectedFile,
-    hasFileContent: !!fileContent,
-    fileContentLength: fileContent?.length,
-    hasArtifacts,
-    isLoadingArtifacts,
-    fileTreeLength: fileTree.length,
-    isReadOnly,
-    isSaving,
-  });
 
   return (
     <TabsContent value="editor" className="m-0 flex flex-1 overflow-hidden h-full">
@@ -100,11 +155,11 @@ export function EditorTab({
                 <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
               </div>
             ) : fileTree.length > 0 ? (
-              <FileTreeView
-                nodes={fileTree}
+              <FileTree
+                nodes={convertToTreeNodes(fileTree)}
                 selectedFile={selectedFile}
-                loadingFile={loadingFile}
                 onFileSelect={onFileSelect}
+                onFolderToggle={onFolderToggle}
               />
             ) : (
               <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
@@ -183,15 +238,54 @@ export function EditorTab({
                 language={getLanguageFromPath(selectedFile)}
                 value={fileContent}
                 onChange={handleEditorChange}
+                beforeMount={handleEditorBeforeMount}
                 theme={theme === 'dark' ? 'vs-dark' : 'light'}
                 options={{
-                  minimap: { enabled: false },
+                  minimap: { enabled: true },
                   fontSize: 14,
                   lineNumbers: 'on',
                   scrollBeyondLastLine: false,
                   automaticLayout: true,
                   readOnly: isReadOnly,
                   wordWrap: 'on',
+                  // Performance optimizations
+                  renderWhitespace: 'none',
+                  renderControlCharacters: false,
+                  renderLineHighlight: 'none',
+                  renderValidationDecorations: 'editable',
+                  // folding: false,
+                  // glyphMargin: false,
+                  lineDecorationsWidth: 0,
+                  lineNumbersMinChars: 3,
+                  overviewRulerBorder: false,
+                  overviewRulerLanes: 0,
+                  hideCursorInOverviewRuler: true,
+                  scrollbar: {
+                    vertical: 'auto',
+                    horizontal: 'auto',
+                    useShadows: false,
+                    verticalScrollbarSize: 10,
+                    horizontalScrollbarSize: 10,
+                  },
+                  quickSuggestions: false,
+                  suggestOnTriggerCharacters: false,
+                  acceptSuggestionOnEnter: 'off',
+                  tabCompletion: 'off',
+                  parameterHints: { enabled: false },
+                  hover: { enabled: false, delay: 500 },
+                  links: false,
+                  contextmenu: false,
+                  matchBrackets: 'never',
+                  occurrencesHighlight: 'off',
+                  selectionHighlight: false,
+                  codeLens: false,
+
+                  inlayHints: { enabled: 'off' },
+                  bracketPairColorization: { enabled: false },
+                  guides: { indentation: false, bracketPairs: false },
+                  smoothScrolling: false,
+                  cursorBlinking: 'solid',
+                  cursorSmoothCaretAnimation: 'off',
                 }}
                 loading={
                   <div className="flex h-full items-center justify-center">
@@ -249,59 +343,14 @@ export function EditorHeader({
   );
 }
 
-// Simple file tree component
-interface FileTreeViewProps {
-  nodes: FileNode[];
-  selectedFile: string;
-  loadingFile?: string | null;
-  onFileSelect: (path: string) => void;
-  level?: number;
-}
-
-function FileTreeView({
-  nodes,
-  selectedFile,
-  loadingFile,
-  onFileSelect,
-  level = 0,
-}: FileTreeViewProps) {
-  return (
-    <div>
-      {nodes.map((node) => {
-        const isLoading = node.type === 'file' && node.path === loadingFile;
-        
-        return (
-          <div key={node.path}>
-            <button
-              onClick={() => node.type === 'file' && onFileSelect(node.path)}
-              className={`flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-muted/50 transition-colors ${
-                selectedFile === node.path ? 'bg-muted' : ''
-              } ${isLoading ? 'bg-primary/10' : ''}`}
-              style={{ paddingLeft: `${level * 12 + 12}px` }}
-            >
-              {node.type === 'folder' ? (
-                <FileCode size={14} className="text-muted-foreground" />
-              ) : isLoading ? (
-                <Loader2 size={14} className="text-primary animate-spin" />
-              ) : (
-                <File size={14} className="text-muted-foreground" />
-              )}
-              <span className={`truncate ${isLoading ? 'text-primary' : ''}`}>{node.name}</span>
-            </button>
-            {node.children && node.children.length > 0 && (
-              <FileTreeView
-                nodes={node.children}
-                selectedFile={selectedFile}
-                loadingFile={loadingFile}
-                onFileSelect={onFileSelect}
-                level={level + 1}
-              />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+// Convert FileNode from use-artifacts to TreeFileNode for file-tree component
+function convertToTreeNodes(nodes: FileNode[]): TreeFileNode[] {
+  return nodes.map((node) => ({
+    name: node.name,
+    type: node.type,
+    expanded: node.isOpen ?? true,
+    children: node.children ? convertToTreeNodes(node.children) : undefined,
+  }));
 }
 
 

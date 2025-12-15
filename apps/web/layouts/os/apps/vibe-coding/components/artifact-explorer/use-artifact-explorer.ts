@@ -105,8 +105,7 @@ export function useArtifactExplorer(sessionId: string) {
       window.URL.revokeObjectURL(url);
 
       toast.success('Artifact downloaded successfully');
-    } catch (error) {
-      console.error('Download error:', error);
+    } catch {
       toast.error('Failed to download artifact');
     }
   }, []);

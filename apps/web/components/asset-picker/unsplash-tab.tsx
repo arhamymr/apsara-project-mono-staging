@@ -27,6 +27,8 @@ export function UnsplashTab({
   const [unsplashTotal, setUnsplashTotal] = React.useState(0);
   const UNSPLASH_PER_PAGE = 12;
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
   const searchUnsplash = React.useCallback(async (q: string, page = 1) => {
     if (!q) {
       setUnsplashItems([]);
@@ -36,7 +38,7 @@ export function UnsplashTab({
     setUnsplashLoading(true);
     try {
       const res = await fetch(
-        `/api/unsplash/search?q=${encodeURIComponent(q)}&page=${page}`,
+        `${API_BASE}/unsplash/search?q=${encodeURIComponent(q)}&page=${page}&per_page=${UNSPLASH_PER_PAGE}`,
       );
       if (!res.ok) throw new Error('Unsplash API error');
 
@@ -47,7 +49,7 @@ export function UnsplashTab({
     } finally {
       setUnsplashLoading(false);
     }
-  }, []);
+  }, [API_BASE]);
 
   // initial fetch when switching into Unsplash tab
   React.useEffect(() => {

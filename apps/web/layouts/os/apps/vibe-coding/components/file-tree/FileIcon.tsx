@@ -71,5 +71,5 @@ export function FileIcon({ filename, size = 16 }: FileIconProps) {
     return <FileType size={size} className="text-pink-500 shrink-0" />;
   }
 
-  return <File size={size} className="text-muted-foreground shrink-0" />;
+  return <File size={size} className="text-yellow-500 shrink-0" />;
 }

@@ -3,14 +3,16 @@ package router
 import (
 	"net/http"
 
+	"myapp/internal/config"
 	"myapp/internal/handler"
 	"myapp/internal/livekit"
+	"myapp/internal/storage"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Setup(e *echo.Echo, client *livekit.Client) {
+func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *config.Config) {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -51,4 +53,24 @@ func Setup(e *echo.Echo, client *livekit.Client) {
 	
 	// Webhook
 	lk.POST("/webhook", webhookHandler.HandleWebhook)
+
+	// Storage routes (R2)
+	if r2 != nil {
+		storageHandler := handler.NewStorageHandler(r2)
+		st := e.Group("/storage")
+		st.GET("/list", storageHandler.ListObjects)
+		st.POST("/upload", storageHandler.UploadObject)
+		st.DELETE("/object", storageHandler.DeleteObject)
+		st.POST("/folder", storageHandler.CreateFolder)
+		st.GET("/download-url", storageHandler.GetDownloadURL)
+		st.GET("/proxy/*", storageHandler.ProxyObject)
+	}
+
+	// Unsplash routes
+	if cfg.UnsplashAccessKey != "" {
+		unsplashHandler := handler.NewUnsplashHandler(cfg)
+		us := e.Group("/unsplash")
+		us.GET("/search", unsplashHandler.Search)
+		us.GET("/download", unsplashHandler.TrackDownload)
+	}
 }

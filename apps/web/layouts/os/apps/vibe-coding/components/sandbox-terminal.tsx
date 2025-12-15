@@ -4,7 +4,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { TabsContent } from '@workspace/ui/components/tabs';
 import { Terminal, Trash2, Play } from 'lucide-react';
-import { useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, memo, KeyboardEvent } from 'react';
 
 interface SandboxTerminalProps {
   logs: string[];
@@ -12,6 +12,38 @@ interface SandboxTerminalProps {
   onRunCommand?: (command: string) => Promise<void>;
   onClear?: () => void;
 }
+
+const STATUS_COLORS: Record<string, string> = {
+  running: 'text-green-400',
+  error: 'text-red-400',
+  installing: 'text-yellow-400',
+  booting: 'text-yellow-400',
+};
+
+const STATUS_MESSAGES: Record<string, string> = {
+  idle: 'Generate some code first to start the sandbox',
+  booting: 'Booting WebContainer...',
+  installing: 'Installing dependencies...',
+  ready: 'Starting server...',
+  running: 'Ready. Enter commands below.',
+  error: 'Error occurred. Check logs above.',
+};
+
+// Memoized log line component to prevent re-renders
+const LogLine = memo(({ content }: { content: string }) => (
+  <div className="leading-relaxed">{content}</div>
+));
+LogLine.displayName = 'LogLine';
+
+// Memoized logs container to prevent re-renders when other state changes
+const LogsContainer = memo(({ logs }: { logs: string[] }) => (
+  <div className="space-y-0.5 whitespace-pre-wrap">
+    {logs.map((log, index) => (
+      <LogLine key={index} content={log} />
+    ))}
+  </div>
+));
+LogsContainer.displayName = 'LogsContainer';
 
 export function SandboxTerminal({
   logs,
@@ -21,19 +53,21 @@ export function SandboxTerminal({
 }: SandboxTerminalProps) {
   const [command, setCommand] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [, setHistoryIndex] = useState(-1);
   const [isRunning, setIsRunning] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom when logs change
+  // Auto-scroll to bottom when logs change (using RAF for smooth scrolling)
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollRef.current && logs.length > 0) {
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+      });
     }
-  }, [logs]);
+  }, [logs.length]);
 
-  const handleRunCommand = async () => {
+  const handleRunCommand = useCallback(async () => {
     if (!command.trim() || !onRunCommand || isRunning) return;
 
     const cmd = command.trim();
@@ -48,67 +82,45 @@ export function SandboxTerminal({
       setIsRunning(false);
       inputRef.current?.focus();
     }
-  };
+  }, [command, onRunCommand, isRunning]);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleRunCommand();
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      if (commandHistory.length > 0) {
-        const newIndex = historyIndex < commandHistory.length - 1 ? historyIndex + 1 : historyIndex;
-        setHistoryIndex(newIndex);
+      setHistoryIndex((prev) => {
+        const newIndex = prev < commandHistory.length - 1 ? prev + 1 : prev;
         setCommand(commandHistory[commandHistory.length - 1 - newIndex] || '');
-      }
+        return newIndex;
+      });
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
-      if (historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        setHistoryIndex(newIndex);
-        setCommand(commandHistory[commandHistory.length - 1 - newIndex] || '');
-      } else if (historyIndex === 0) {
-        setHistoryIndex(-1);
-        setCommand('');
-      }
+      setHistoryIndex((prev) => {
+        if (prev > 0) {
+          const newIndex = prev - 1;
+          setCommand(commandHistory[commandHistory.length - 1 - newIndex] || '');
+          return newIndex;
+        } else if (prev === 0) {
+          setCommand('');
+          return -1;
+        }
+        return prev;
+      });
     }
-  };
+  }, [handleRunCommand, commandHistory]);
 
-  const getStatusColor = () => {
-    switch (status) {
-      case 'running':
-        return 'text-green-400';
-      case 'error':
-        return 'text-red-400';
-      case 'installing':
-      case 'booting':
-        return 'text-yellow-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
-
+  const statusColor = useMemo(() => STATUS_COLORS[status] || 'text-gray-400', [status]);
+  
   const isReady = status === 'running' || status === 'ready';
-  const canRun = isReady && !!onRunCommand; // Can only run when ready
+  const canRun = isReady && !!onRunCommand;
+  
+  const statusMessage = useMemo(() => STATUS_MESSAGES[status] || `Status: ${status}`, [status]);
 
-  const getStatusMessage = () => {
-    switch (status) {
-      case 'idle':
-        return 'Generate some code first to start the sandbox';
-      case 'booting':
-        return 'Booting WebContainer...';
-      case 'installing':
-        return 'Installing dependencies...';
-      case 'ready':
-        return 'Starting server...';
-      case 'running':
-        return 'Ready. Enter commands below.';
-      case 'error':
-        return 'Error occurred. Check logs above.';
-      default:
-        return `Status: ${status}`;
-    }
-  };
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setCommand(e.target.value);
+  }, []);
 
   return (
     <TabsContent
@@ -120,7 +132,7 @@ export function SandboxTerminal({
         <div className="flex items-center gap-2">
           <Terminal size={14} className="text-muted-foreground" />
           <span className="text-sm font-medium">Terminal</span>
-          <span className={`text-xs ${getStatusColor()}`}>
+          <span className={`text-xs ${statusColor}`}>
             ({status})
           </span>
         </div>
@@ -143,16 +155,10 @@ export function SandboxTerminal({
         {logs.length === 0 ? (
           <div className="text-gray-500">
             <p>WebContainer Terminal</p>
-            <p className="mt-2">{getStatusMessage()}</p>
+            <p className="mt-2">{statusMessage}</p>
           </div>
         ) : (
-          <div className="space-y-0.5 whitespace-pre-wrap">
-            {logs.map((log, index) => (
-              <div key={index} className="leading-relaxed">
-                {log}
-              </div>
-            ))}
-          </div>
+          <LogsContainer logs={logs} />
         )}
       </div>
 
@@ -163,9 +169,9 @@ export function SandboxTerminal({
           <Input
             ref={inputRef}
             value={command}
-            onChange={(e) => setCommand(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={canRun ? 'Enter command... (e.g., ls, npm run build)' : getStatusMessage()}
+            placeholder={canRun ? 'Enter command... (e.g., ls, npm run build)' : statusMessage}
             disabled={isRunning}
             className="flex-1 bg-transparent border-none text-green-400 font-mono text-sm placeholder:text-gray-600 focus-visible:ring-0 focus-visible:ring-offset-0"
           />

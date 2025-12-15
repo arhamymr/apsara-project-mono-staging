@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Bot, Loader2 } from 'lucide-react';
 import type { ActivityLogItem } from './types';
 import { ActivityItem } from './activity-item';
@@ -10,7 +11,9 @@ interface StreamingMessageProps {
   activityLog: ActivityLogItem[];
 }
 
-export function StreamingMessage({
+const MemoizedActivityItem = memo(ActivityItem);
+
+export const StreamingMessage = memo(function StreamingMessage({
   streamingContent,
   loadingFile,
   activityLog,
@@ -25,7 +28,7 @@ export function StreamingMessage({
         {activityLog.length > 0 && (
           <div className="border-b border-border/50 pb-2 mb-2 space-y-0.5 max-h-[200px] overflow-y-auto">
             {activityLog.map((item) => (
-              <ActivityItem key={item.id} item={item} />
+              <MemoizedActivityItem key={item.id} item={item} />
             ))}
           </div>
         )}
@@ -54,4 +57,4 @@ export function StreamingMessage({
       </div>
     </div>
   );
-}
+});
