@@ -24,7 +24,7 @@ export default function ApsaraLandingPage() {
         <Features />
         <OSShowcase />
         {/* <Integrations /> */}
-        <Pricing />
+        {/* <Pricing /> */}
         <Blog />
         <CallToAction />
         <FAQ />

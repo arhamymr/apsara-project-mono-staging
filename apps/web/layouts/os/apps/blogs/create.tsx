@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { CoverImagePicker } from './components/upload-cover';
+import { Editor } from '@/components/blocks/editor-x/editor';
+import type { SerializedEditorState } from 'lexical';
 
 type BlogStatus = 'draft' | 'published';
 
@@ -30,12 +32,60 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
+// Extract plain text from Lexical editor state for excerpt
+function extractTextFromLexical(state: SerializedEditorState, maxLength = 200): string {
+  const texts: string[] = [];
+
+  function traverse(node: unknown) {
+    if (!node || typeof node !== 'object') return;
+    const n = node as Record<string, unknown>;
+
+    // If it's a text node, extract the text
+    if (n.type === 'text' && typeof n.text === 'string') {
+      texts.push(n.text);
+    }
+
+    // Recursively traverse children
+    if (Array.isArray(n.children)) {
+      for (const child of n.children) {
+        traverse(child);
+      }
+    }
+  }
+
+  traverse(state.root);
+  const fullText = texts.join(' ').replace(/\s+/g, ' ').trim();
+
+  if (fullText.length <= maxLength) return fullText;
+  return fullText.slice(0, maxLength).trim() + '...';
+}
+
+const initialEditorState = {
+  root: {
+    children: [
+      {
+        children: [],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'paragraph',
+        version: 1,
+      },
+    ],
+    direction: null,
+    format: '',
+    indent: 0,
+    type: 'root',
+    version: 1,
+  },
+} as unknown as SerializedEditorState;
+
 export default function CreateArticleWindow({ onCreated }: CreateArticleWindowProps) {
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [status, setStatus] = useState<BlogStatus>('draft');
   const [coverImage, setCoverImage] = useState<string | undefined>();
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState<SerializedEditorState>(initialEditorState);
   const [tags, setTags] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,7 +114,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
     setIsSubmitting(true);
 
     try {
-      const contentString = content;
+      const contentString = JSON.stringify(content);
       const tagsArray = tags
         .split(',')
         .map((t) => t.trim())
@@ -74,7 +124,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
         title: title.trim(),
         slug: slug.trim(),
         content: contentString,
-        excerpt: contentString.slice(0, 200),
+        excerpt: extractTextFromLexical(content),
         coverImage,
         status,
         tags: tagsArray.length > 0 ? tagsArray : undefined,
@@ -85,7 +135,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
 
       setTitle('');
       setSlug('');
-      setContent('');
+      setContent(initialEditorState);
       setTags('');
       setCoverImage(undefined);
       setStatus('draft');
@@ -162,12 +212,10 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
           </aside>
 
           {/* Editor */}
-          <div className="relative max-h-[calc(100vh-150px)] overflow-hidden rounded-md border md:col-span-2">
-            <textarea
-              className="bg-background h-full min-h-[500px] w-full resize-none p-4 focus:outline-none"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Start writing your article..."
+          <div className="relative max-h-[calc(100vh-150px)] overflow-hidden md:col-span-2">
+            <Editor
+              editorSerializedState={content}
+              onSerializedChange={setContent}
             />
           </div>
         </div>
