@@ -26,7 +26,7 @@ type WidgetFrameProps = {
   children: React.ReactNode;
 };
 
-function WidgetFrame({
+const WidgetFrame = React.memo(function WidgetFrame({
   id,
   x,
   y,
@@ -46,9 +46,11 @@ function WidgetFrame({
   const lastPos = React.useRef<{ x: number; y: number }>({ x, y });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Update lastPos when x,y props change
+  // Update lastPos when x,y props change (only when not dragging)
   React.useEffect(() => {
-    lastPos.current = { x, y };
+    if (!dragging.current) {
+      lastPos.current = { x, y };
+    }
   }, [x, y]);
 
   // Track Alt key state for visual feedback
@@ -78,14 +80,16 @@ function WidgetFrame({
   const handleMouseUp = React.useRef<(() => void) | null>(null);
 
   React.useEffect(() => {
+    // Use CSS transform during drag for GPU acceleration - no state updates per frame
     handleMouseMove.current = (e: MouseEvent) => {
-      if (!dragging.current || !start.current) return;
+      if (!dragging.current || !start.current || !rootRef.current) return;
       const dx = e.clientX - start.current.mx;
       const dy = e.clientY - start.current.my;
       const nx = start.current.x + dx;
       const ny = start.current.y + dy;
       lastPos.current = { x: nx, y: ny };
-      onMove(nx, ny);
+      // GPU-accelerated transform instead of state update
+      rootRef.current.style.transform = `translate3d(${nx}px, ${ny}px, 0)`;
     };
 
     handleMouseUp.current = () => {
@@ -103,6 +107,11 @@ function WidgetFrame({
         document.removeEventListener('mouseup', handleMouseUp.current);
       }
 
+      // Reset transform style (position will be set via props)
+      if (rootRef.current) {
+        rootRef.current.style.transform = '';
+      }
+
       const GRID = 8;
       const NAVBAR = 56;
       const MARGIN = 8;
@@ -118,10 +127,9 @@ function WidgetFrame({
       const snap = (v: number) => Math.round(v / GRID) * GRID;
       const sx = snap(clampX);
       const sy = snap(clampY);
-      if (sx !== rawX || sy !== rawY) {
-        lastPos.current = { x: sx, y: sy };
-        onMove(sx, sy);
-      }
+      lastPos.current = { x: sx, y: sy };
+      // Single state update on drag end
+      onMove(sx, sy);
     };
   }, [onMove]);
 
@@ -139,6 +147,11 @@ function WidgetFrame({
     dragging.current = true;
     setIsDragging(true);
     start.current = { x, y, mx: e.clientX, my: e.clientY };
+    
+    // Set initial transform position for smooth drag start
+    if (rootRef.current) {
+      rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    }
     
     // Add event listeners
     if (handleMouseMove.current) {
@@ -168,6 +181,11 @@ function WidgetFrame({
     };
   }, []);
 
+  // Use transform for positioning when dragging, left/top when static
+  const positionStyle = isDragging
+    ? { left: 0, top: 0 } // Position handled by transform during drag
+    : { left: x, top: y, transform: 'none' };
+
   return (
     <Card
       role="group"
@@ -175,14 +193,14 @@ function WidgetFrame({
       ref={rootRef}
       onMouseDown={onMouseDown}
       onContextMenu={onContextMenu}
-      className={`pointer-events-auto absolute w-[260px] rounded-md border shadow-sm backdrop-blur-md transition-all select-none hover:shadow-md ${
+      className={`pointer-events-auto absolute w-[260px] rounded-md border shadow-sm backdrop-blur-md select-none hover:shadow-md ${
         isAltPressed ? 'ring-2 ring-primary/50 cursor-grab' : ''
       } ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}
       style={{ 
-        left: x, 
-        top: y, 
+        ...positionStyle,
         zIndex: isDragging ? 400 : 300,
-        cursor: isDragging ? 'grabbing' : isAltPressed ? 'grab' : 'default'
+        cursor: isDragging ? 'grabbing' : isAltPressed ? 'grab' : 'default',
+        willChange: isDragging ? 'transform' : 'auto',
       }}
     >
       <div
@@ -199,7 +217,7 @@ function WidgetFrame({
       {children}
     </Card>
   );
-}
+});
 
 function WidgetSettingsDialog({
   open,

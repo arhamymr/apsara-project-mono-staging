@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ArrowUp, Minus } from 'lucide-react';
+import { memo } from 'react';
 import type { KanbanCard, Priority } from '../types';
 
 interface KanbanCardViewProps {
@@ -34,7 +35,7 @@ const priorityConfig: Record<Priority, { label: string; icon: typeof Minus; clas
   },
 };
 
-export function KanbanCardView({ card, onClick, isDragging = false }: KanbanCardViewProps) {
+export const KanbanCardView = memo(function KanbanCardView({ card, onClick, isDragging = false }: KanbanCardViewProps) {
   const {
     attributes,
     listeners,
@@ -97,4 +98,4 @@ export function KanbanCardView({ card, onClick, isDragging = false }: KanbanCard
       </div>
     </div>
   );
-}
+});

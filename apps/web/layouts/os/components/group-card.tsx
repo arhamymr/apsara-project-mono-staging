@@ -2,7 +2,7 @@ import type { DesktopAppShortcut } from '@/layouts/os/types';
 import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { cloneElement, isValidElement, type CSSProperties } from 'react';
+import { cloneElement, isValidElement, memo, type CSSProperties } from 'react';
 
 type GroupCardProps = {
   id: string;
@@ -12,7 +12,7 @@ type GroupCardProps = {
   dropHint?: boolean;
 };
 
-export default function GroupCard({
+const GroupCard = memo(function GroupCard({
   id,
   label,
   childrenApps,
@@ -124,4 +124,6 @@ export default function GroupCard({
       )}
     </div>
   );
-}
+});
+
+export default GroupCard;

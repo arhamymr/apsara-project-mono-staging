@@ -2,6 +2,7 @@ import { ContextMenu, ContextMenuTrigger } from '@workspace/ui/components/contex
 import GroupContextMenu from '@/layouts/os/components/desktop-shortcuts/GroupContextMenu';
 import GroupCard from '@/layouts/os/components/group-card';
 import type { DesktopGroup } from '@/layouts/os/types';
+import { memo } from 'react';
 
 type Props = {
   item: DesktopGroup;
@@ -10,7 +11,7 @@ type Props = {
   dropHint?: boolean;
 };
 
-export default function DesktopGroupShortcutItem({
+const DesktopGroupShortcutItem = memo(function DesktopGroupShortcutItem({
   item,
   onOpenGroup,
   onUngroup,
@@ -37,4 +38,6 @@ export default function DesktopGroupShortcutItem({
       />
     </ContextMenu>
   );
-}
+});
+
+export default DesktopGroupShortcutItem;

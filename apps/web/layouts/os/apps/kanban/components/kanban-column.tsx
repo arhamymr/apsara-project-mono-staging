@@ -12,6 +12,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { memo } from 'react';
 import { KanbanCardView } from './kanban-card';
 import type { KanbanCard, KanbanColumn } from '../types';
 
@@ -24,7 +25,7 @@ interface KanbanColumnViewProps {
   isDragging?: boolean;
 }
 
-export function KanbanColumnView({
+export const KanbanColumnView = memo(function KanbanColumnView({
   column,
   onAddCard,
   onEditColumn,
@@ -137,4 +138,4 @@ export function KanbanColumnView({
       </div>
     </div>
   );
-}
+});

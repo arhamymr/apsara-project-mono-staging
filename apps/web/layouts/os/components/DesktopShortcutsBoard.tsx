@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DndContext,
   PointerSensor,
-  closestCenter,
+  rectIntersection,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -159,7 +159,7 @@ export function DesktopShortcutsBoard() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={rectIntersection}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
     >

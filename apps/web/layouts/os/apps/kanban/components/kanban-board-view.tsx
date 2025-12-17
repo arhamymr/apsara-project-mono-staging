@@ -13,9 +13,8 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { KanbanColumnView } from './kanban-column';
-import { KanbanCardView } from './kanban-card';
 import type { BoardId, ColumnId, KanbanBoard, KanbanCard, KanbanColumn } from '../types';
 
 interface KanbanBoardViewProps {
@@ -186,19 +185,28 @@ export function KanbanBoardView({
       <DragOverlay>
         {activeCard && (
           <div className="rotate-3 opacity-90 shadow-2xl">
-            <KanbanCardView card={activeCard} onClick={() => {}} isDragging />
+            {/* Simplified ghost for better performance */}
+            <div className="bg-card border-border w-72 rounded-lg border p-3">
+              <div className="bg-primary/60 absolute top-0 left-0 h-full w-1 rounded-l-lg opacity-60" />
+              <h4 className="line-clamp-2 pl-1 text-sm font-medium leading-snug">{activeCard.title}</h4>
+              {activeCard.description && (
+                <p className="text-muted-foreground mt-1 line-clamp-1 pl-1 text-xs">{activeCard.description}</p>
+              )}
+            </div>
           </div>
         )}
         {activeColumn && (
           <div className="rotate-2 opacity-90 shadow-2xl">
-            <KanbanColumnView
-              column={activeColumn}
-              onAddCard={() => {}}
-              onEditColumn={() => {}}
-              onDeleteColumn={() => {}}
-              onCardClick={() => {}}
-              isDragging
-            />
+            {/* Simplified column ghost */}
+            <div className="bg-muted/40 border-border w-72 rounded-xl border p-3">
+              <div className="flex items-center gap-2">
+                <div className="bg-primary/60 h-2 w-2 rounded-full" />
+                <h3 className="text-sm font-semibold">{activeColumn.name}</h3>
+                <span className="text-muted-foreground text-xs">
+                  {activeColumn.cards?.length || 0}
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </DragOverlay>
