@@ -97,6 +97,18 @@ const schema = defineSchema({
   kanbanColumns: defineTable({
     boardId: v.id("kanbanBoards"),
     name: v.string(),
+    color: v.optional(
+      v.union(
+        v.literal("default"),
+        v.literal("red"),
+        v.literal("orange"),
+        v.literal("yellow"),
+        v.literal("green"),
+        v.literal("blue"),
+        v.literal("purple"),
+        v.literal("pink")
+      )
+    ),
     position: v.number(),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -128,6 +140,70 @@ const schema = defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_created", ["userId", "createdAt"])
     .index("by_user_read", ["userId", "readAt"]),
+
+  // Organization tables
+  organizations: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    createdBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_creator", ["createdBy"]),
+
+  organizationMembers: defineTable({
+    organizationId: v.id("organizations"),
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("admin"),
+      v.literal("editor"),
+      v.literal("viewer")
+    ),
+    joinedAt: v.number(),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_user", ["userId"])
+    .index("by_org_user", ["organizationId", "userId"]),
+
+  invitations: defineTable({
+    organizationId: v.id("organizations"),
+    email: v.string(),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("editor"),
+      v.literal("viewer")
+    ),
+    invitedBy: v.id("users"),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("accepted"),
+      v.literal("declined"),
+      v.literal("cancelled")
+    ),
+    createdAt: v.number(),
+    respondedAt: v.optional(v.number()),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_email", ["email"])
+    .index("by_org_email", ["organizationId", "email"])
+    .index("by_status", ["status"]),
+
+  sharedResources: defineTable({
+    organizationId: v.id("organizations"),
+    resourceType: v.union(
+      v.literal("kanbanBoard"),
+      v.literal("note"),
+      v.literal("chatSession"),
+      v.literal("artifact")
+    ),
+    resourceId: v.string(),
+    sharedBy: v.id("users"),
+    sharedAt: v.number(),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_resource", ["resourceType", "resourceId"])
+    .index("by_org_resource", ["organizationId", "resourceType", "resourceId"]),
 });
 
 export default schema;

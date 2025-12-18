@@ -4,7 +4,6 @@ import ArticleManagerApp from '@/layouts/os/apps/blogs';
 import BroadcastEmailApp from '@/layouts/os/apps/BroadcastEmailApp';
 import CalculatorApp from '@/layouts/os/apps/CalculatorApp';
 import ChatbotApp from '@/layouts/os/apps/ChatbotApp';
-import DesktopIconsManagerApp from '@/layouts/os/apps/DesktopIconsManagerApp';
 import DesktopSettingsApp from '@/layouts/os/apps/DesktopSettingsApp';
 import DockManagerApp from '@/layouts/os/apps/DockManagerApp';
 import FinderApp from '@/layouts/os/apps/finder';
@@ -18,7 +17,6 @@ import MailApp from '@/layouts/os/apps/MailApp';
 import MapsApp from '@/layouts/os/apps/MapsApp';
 import NotesApp from '@/layouts/os/apps/notes';
 import PhotosApp from '@/layouts/os/apps/PhotosApp';
-import ProductsApp from '@/layouts/os/apps/ProductsApp';
 import SketchApp from '@/layouts/os/apps/SketchApp';
 import TasksApp from '@/layouts/os/apps/TasksApp';
 import UnifiedAnalyticsApp from '@/layouts/os/apps/UnifiedAnalyticsApp';
@@ -64,13 +62,7 @@ export function createDefaultApps(): AppDef[] {
       content: <DockManagerApp />,
       defaultSize: { width: 920 },
     },
-    {
-      id: 'desktop-icons',
-      name: 'Desktop Icons',
-      icon: '🗂️',
-      content: <DesktopIconsManagerApp />,
-      defaultSize: { width: 480 },
-    },
+
 
     {
       id: 'graphicdesignerai',
@@ -93,13 +85,7 @@ export function createDefaultApps(): AppDef[] {
       content: <CalculatorApp />,
       defaultSize: { width: 400 },
     },
-    {
-      id: 'products',
-      name: 'Products',
-      icon: '🛍️',
-      content: <ProductsApp />,
-      defaultSize: { width: 900 },
-    },
+
     {
       id: 'notes',
       name: 'Notes',

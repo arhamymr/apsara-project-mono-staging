@@ -113,6 +113,8 @@ export default function VibeCodeEditor({
   return (
     <div className="flex h-full w-full overflow-hidden">
       <ChatPanel
+        sessionId={sessionId}
+        sessionTitle={initialMessage}
         messages={messages}
         inputMessage={inputMessage}
         isStreaming={isStreaming}

@@ -55,7 +55,7 @@ export function TopNav() {
 
           <div className="ml-4 flex gap-3">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="hidden md:inline-flex">
+              <Button variant="outline" size="sm" className="hidden md:inline-flex">
                 {s.topNav.cta} <Kbd>T</Kbd>
               </Button>
             </a>

@@ -2,8 +2,8 @@
 
 import { useKanban } from './use-kanban';
 import { KanbanHeader } from './components/kanban-header';
-import { KanbanSidebar } from './components/kanban-sidebar';
 import { KanbanBoardView } from './components/kanban-board-view';
+import { BoardModal } from './components/board-modal';
 import { CardModal } from './components/card-modal';
 import { ColumnModal } from './components/column-modal';
 
@@ -14,36 +14,32 @@ export default function KanbanApp() {
     <div className="text-foreground flex h-full flex-col">
       <KanbanHeader
         board={kanban.board}
+        boards={kanban.boards}
+        selectedBoardId={kanban.selectedBoardId}
         isCreatingColumn={kanban.isCreatingColumn}
+        isCreatingBoard={kanban.isCreatingBoard}
         onCreateColumn={kanban.openCreateColumn}
+        onSelectBoard={kanban.setSelectedBoardId}
+        onOpenBoardModal={() => kanban.setBoardModalOpen(true)}
+        onDeleteBoard={kanban.handleDeleteBoard}
+        onUpdateBoard={kanban.handleUpdateBoard}
       />
 
       <div className="flex-1 overflow-hidden p-4">
-        <div className="grid h-full grid-cols-1 gap-4 md:grid-cols-4">
-          <KanbanSidebar
-            boards={kanban.boards}
-            selectedBoardId={kanban.selectedBoardId}
-            isCreatingBoard={kanban.isCreatingBoard}
-            onSelectBoard={kanban.setSelectedBoardId}
-            onCreateBoard={kanban.handleCreateBoard}
-            onDeleteBoard={kanban.handleDeleteBoard}
-          />
-
-          <div className="relative md:col-span-3 overflow-hidden">
-            <KanbanBoardView
-              board={kanban.board}
-              selectedBoardId={kanban.selectedBoardId}
-              isCreatingBoard={kanban.isCreatingBoard}
-              onCreateBoard={kanban.handleCreateBoard}
-              onCreateCard={kanban.openCreateCard}
-              onEditCard={kanban.openEditCard}
-              onEditColumn={kanban.openEditColumn}
-              onDeleteColumn={kanban.handleDeleteColumn}
-              onMoveCard={kanban.handleMoveCard}
-              onReorderColumns={kanban.handleReorderColumns}
-            />
-          </div>
-        </div>
+        <KanbanBoardView
+          board={kanban.board}
+          selectedBoardId={kanban.selectedBoardId}
+          isCreatingBoard={kanban.isCreatingBoard}
+          onCreateBoard={kanban.handleCreateBoard}
+          onCreateCard={kanban.openCreateCard}
+          onEditCard={kanban.openEditCard}
+          onDeleteCard={(card) => kanban.handleDeleteCard(card._id)}
+          onEditColumn={kanban.openEditColumn}
+          onDeleteColumn={kanban.handleDeleteColumn}
+          onUpdateColumn={kanban.handleUpdateColumn}
+          onMoveCard={kanban.handleMoveCard}
+          onReorderColumns={kanban.handleReorderColumns}
+        />
       </div>
 
       <CardModal
@@ -66,6 +62,13 @@ export default function KanbanApp() {
         isCreating={kanban.isCreatingColumn}
         onCreateColumn={kanban.handleCreateColumn}
         onUpdateColumn={kanban.handleUpdateColumn}
+      />
+
+      <BoardModal
+        open={kanban.boardModalOpen}
+        onOpenChange={kanban.setBoardModalOpen}
+        isCreating={kanban.isCreatingBoard}
+        onCreateBoard={kanban.handleCreateBoard}
       />
     </div>
   );

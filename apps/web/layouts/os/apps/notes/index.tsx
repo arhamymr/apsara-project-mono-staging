@@ -28,6 +28,7 @@ export default function NotesApp() {
     <div className="text-foreground flex h-full flex-col">
       <NotesHeader
         selectedId={selectedId}
+        selectedTitle={title}
         isCreating={isCreating}
         isSaving={isSaving}
         onCreateNote={handleCreate}

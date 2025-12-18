@@ -61,14 +61,14 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
       </AuthLoading>
       <Unauthenticated>
         <Link href="/login" onClick={onClose}>
-          <Button className={buttonClass}>
+          <Button size="sm" className={buttonClass}>
             {signInLabel} <Kbd className="bg-black/20 text-primary-900">G</Kbd>
           </Button>
         </Link>
       </Unauthenticated>
       <Authenticated>
         <Link href="/dashboard" onClick={onClose}>
-          <Button className={buttonClass} variant="outline">
+          <Button className={buttonClass} size="sm" variant="outline">
             <Avatar className="h-5 w-5">
               <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
               <AvatarFallback className="text-xs">

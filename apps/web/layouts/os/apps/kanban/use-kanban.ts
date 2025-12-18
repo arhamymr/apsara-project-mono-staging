@@ -1,15 +1,25 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import type { BoardId, ColumnId, KanbanCard, KanbanColumn, Priority } from './types';
+import type { BoardId, ColumnColor, ColumnId, KanbanCard, KanbanColumn, Priority } from './types';
 
 export function useKanban() {
   const boards = useQuery(api.kanban.listBoards, {});
   const [selectedBoardId, setSelectedBoardId] = useState<BoardId | null>(null);
   const board = useQuery(api.kanban.getBoard, selectedBoardId ? { id: selectedBoardId } : 'skip');
+
+  // Auto-select first board when boards are loaded and no board is selected
+  useEffect(() => {
+    if (boards && boards.length > 0 && !selectedBoardId) {
+      const firstBoard = boards[0];
+      if (firstBoard) {
+        setSelectedBoardId(firstBoard._id);
+      }
+    }
+  }, [boards, selectedBoardId]);
 
   // Mutations
   const createBoardMutation = useMutation(api.kanban.createBoard);
@@ -36,13 +46,17 @@ export function useKanban() {
   const [editingColumn, setEditingColumn] = useState<KanbanColumn | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<ColumnId | null>(null);
 
+  // Board modal state
+  const [boardModalOpen, setBoardModalOpen] = useState(false);
+
   // Board actions
-  const handleCreateBoard = useCallback(async (name: string) => {
+  const handleCreateBoard = useCallback(async (name: string, templateColumns?: string[]) => {
     if (isCreatingBoard) return;
     setIsCreatingBoard(true);
     try {
-      const id = await createBoardMutation({ name });
+      const id = await createBoardMutation({ name, templateColumns });
       setSelectedBoardId(id);
+      setBoardModalOpen(false);
       toast.success('Board created');
     } catch {
       toast.error('Failed to create board');
@@ -85,9 +99,9 @@ export function useKanban() {
     }
   }, [createColumnMutation, selectedBoardId, isCreatingColumn]);
 
-  const handleUpdateColumn = useCallback(async (id: ColumnId, name: string) => {
+  const handleUpdateColumn = useCallback(async (id: ColumnId, data: { name?: string; color?: ColumnColor }) => {
     try {
-      await updateColumnMutation({ id, name });
+      await updateColumnMutation({ id, ...data });
       setColumnModalOpen(false);
       setEditingColumn(null);
       toast.success('Column updated');
@@ -203,6 +217,7 @@ export function useKanban() {
     // Modal states
     cardModalOpen,
     columnModalOpen,
+    boardModalOpen,
     editingCard,
     editingColumn,
     activeColumnId,
@@ -210,6 +225,7 @@ export function useKanban() {
     setSelectedBoardId,
     setCardModalOpen,
     setColumnModalOpen,
+    setBoardModalOpen,
     // Board actions
     handleCreateBoard,
     handleUpdateBoard,

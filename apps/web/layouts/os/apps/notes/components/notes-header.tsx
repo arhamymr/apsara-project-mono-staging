@@ -3,9 +3,11 @@
 import { Button } from '@workspace/ui/components/button';
 import { FileText, Plus, Loader2 } from 'lucide-react';
 import type { NoteId } from '../types';
+import { ShareWithOrgButton } from '../../organizations/components/share-with-org-button';
 
 interface NotesHeaderProps {
   selectedId: NoteId | null;
+  selectedTitle?: string;
   isCreating: boolean;
   isSaving: boolean;
   onCreateNote: () => void;
@@ -14,6 +16,7 @@ interface NotesHeaderProps {
 
 export function NotesHeader({
   selectedId,
+  selectedTitle,
   isCreating,
   isSaving,
   onCreateNote,
@@ -26,6 +29,15 @@ export function NotesHeader({
         <h2 className="text-base font-semibold">Notes</h2>
       </div>
       <div className="flex items-center gap-2">
+        {selectedId && (
+          <ShareWithOrgButton
+            resourceType="note"
+            resourceId={selectedId}
+            resourceName={selectedTitle || 'Untitled'}
+            variant="outline"
+            size="sm"
+          />
+        )}
         <Button size="sm" variant="outline" onClick={onCreateNote} disabled={isCreating}>
           {isCreating ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

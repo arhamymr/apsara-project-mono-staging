@@ -9,6 +9,8 @@ export interface ActivityLogItem {
 }
 
 export interface ChatPanelProps {
+  sessionId: string;
+  sessionTitle?: string;
   messages: AgentMessage[];
   inputMessage: string;
   isStreaming: boolean;

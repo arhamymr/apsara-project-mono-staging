@@ -51,18 +51,36 @@ export const getBoard = query({
 });
 
 export const createBoard = mutation({
-  args: { name: v.string() },
+  args: { 
+    name: v.string(),
+    templateColumns: v.optional(v.array(v.string())),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
     const now = Date.now();
-    return await ctx.db.insert("kanbanBoards", {
+    const boardId = await ctx.db.insert("kanbanBoards", {
       name: args.name,
       userId,
       createdAt: now,
       updatedAt: now,
     });
+
+    // Create template columns if provided
+    if (args.templateColumns && args.templateColumns.length > 0) {
+      for (let i = 0; i < args.templateColumns.length; i++) {
+        await ctx.db.insert("kanbanColumns", {
+          boardId,
+          name: args.templateColumns[i],
+          position: i,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    }
+
+    return boardId;
   },
 });
 
@@ -142,7 +160,22 @@ export const createColumn = mutation({
 });
 
 export const updateColumn = mutation({
-  args: { id: v.id("kanbanColumns"), name: v.string() },
+  args: {
+    id: v.id("kanbanColumns"),
+    name: v.optional(v.string()),
+    color: v.optional(
+      v.union(
+        v.literal("default"),
+        v.literal("red"),
+        v.literal("orange"),
+        v.literal("yellow"),
+        v.literal("green"),
+        v.literal("blue"),
+        v.literal("purple"),
+        v.literal("pink")
+      )
+    ),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
@@ -153,8 +186,9 @@ export const updateColumn = mutation({
     const board = await ctx.db.get(column.boardId);
     if (!board || board.userId !== userId) throw new Error("Not authorized");
 
-    return await ctx.db.patch(args.id, {
-      name: args.name,
+    const { id, ...updates } = args;
+    return await ctx.db.patch(id, {
+      ...updates,
       updatedAt: Date.now(),
     });
   },

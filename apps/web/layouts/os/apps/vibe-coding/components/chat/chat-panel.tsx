@@ -14,6 +14,8 @@ const MemoizedMessageBubble = memo(MessageBubble);
 const MemoizedStreamingMessage = memo(StreamingMessage);
 
 export const ChatPanel = memo(function ChatPanel({
+  sessionId,
+  sessionTitle,
   messages,
   inputMessage,
   isStreaming,
@@ -35,7 +37,7 @@ export const ChatPanel = memo(function ChatPanel({
 
   return (
     <div className="bg-background w-[40%] max-w-[450px] min-w-[250px] flex flex-col border-r text-xs">
-      <ChatHeader isStreaming={isStreaming} onNewChat={onNewChat} />
+      <ChatHeader sessionId={sessionId} sessionTitle={sessionTitle} isStreaming={isStreaming} onNewChat={onNewChat} />
 
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">

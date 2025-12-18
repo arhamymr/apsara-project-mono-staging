@@ -13,7 +13,8 @@ import {
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Loader2 } from 'lucide-react';
-import type { ColumnId, KanbanColumn } from '../types';
+import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
+import type { ColumnColor, ColumnId, KanbanColumn } from '../types';
 
 interface ColumnModalProps {
   open: boolean;
@@ -22,7 +23,7 @@ interface ColumnModalProps {
   mode: 'create' | 'edit';
   isCreating: boolean;
   onCreateColumn: (name: string) => void;
-  onUpdateColumn: (id: ColumnId, name: string) => void;
+  onUpdateColumn: (id: ColumnId, data: { name?: string; color?: ColumnColor }) => void;
 }
 
 export function ColumnModal({
@@ -35,6 +36,7 @@ export function ColumnModal({
   onUpdateColumn,
 }: ColumnModalProps) {
   const [name, setName] = useState('');
+  const portalContainer = useWindowPortalContainer();
 
   useEffect(() => {
     if (open) {
@@ -53,13 +55,13 @@ export function ColumnModal({
     if (mode === 'create') {
       onCreateColumn(name.trim());
     } else if (mode === 'edit' && column) {
-      onUpdateColumn(column._id, name.trim());
+      onUpdateColumn(column._id, { name: name.trim() });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[350px]">
+      <DialogContent className="sm:max-w-[350px]" portalContainer={portalContainer?.current ?? undefined}>
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Create Column' : 'Edit Column'}</DialogTitle>
           <DialogDescription>

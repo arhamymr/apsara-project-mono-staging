@@ -22,7 +22,7 @@ export default function NotificationBell() {
   const notifications = useQuery(api.notifications.getNotifications, {
     limit: 50,
   }) || [];
-  
+
   const markAsRead = useMutation(api.notifications.markAsRead);
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
   const deleteNotification = useMutation(api.notifications.deleteNotification);
@@ -48,7 +48,7 @@ export default function NotificationBell() {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger className="relative inline-flex items-center justify-center rounded-md hover:bg-white/10">
+      <DropdownMenuTrigger asChild>
         <Button className="flex gap-1" variant={"ghost"}>
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
