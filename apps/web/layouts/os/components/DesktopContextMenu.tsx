@@ -10,7 +10,7 @@ import {
 } from '@workspace/ui/components/context-menu';
 import { useWindowContext } from '@/layouts/os/WindowContext';
 import { useWidgets } from '@/layouts/os/widgets/WidgetsContext';
-import { FilePlus, Plus, RefreshCcw, Settings, XCircle } from 'lucide-react';
+import { Dock, FilePlus, Plus, RefreshCcw, Settings, XCircle } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
 export default function DesktopContextMenu({ children }: PropsWithChildren) {
@@ -33,6 +33,10 @@ export default function DesktopContextMenu({ children }: PropsWithChildren) {
         <ContextMenuItem onSelect={() => openAppById('desktop-settings')}>
           <Settings className="mr-2 h-4 w-4" />
           Change Wallpaper
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={() => openAppById('dock-manager')}>
+          <Dock className="mr-2 h-4 w-4" />
+          Manage Dock
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem onSelect={() => openAppById('widget-manager')}>

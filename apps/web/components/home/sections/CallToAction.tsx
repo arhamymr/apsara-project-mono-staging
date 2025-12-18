@@ -4,6 +4,7 @@ import { Section } from '@/components/home/components';
 import { Button } from '@workspace/ui/components/button';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
+import { getWhatsAppNumber } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { ArrowRight, Rocket, LucideIcon } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export function CallToAction({
   subtitle,
   buttonText,
   whatsappMessage,
-  whatsappNumber = '6289669594959',
+  whatsappNumber = getWhatsAppNumber(),
   note,
 }: CallToActionProps = {}) {
   const s = useStrings();

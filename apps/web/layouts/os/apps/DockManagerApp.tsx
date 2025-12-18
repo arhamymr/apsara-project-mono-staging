@@ -7,7 +7,7 @@ import type { AppDef } from '@/layouts/os/types';
 import { MAX_DOCK_ITEMS } from '@/layouts/os/useDesktopState';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Check } from 'lucide-react';
+import { Check, Search } from 'lucide-react';
 
 const toId = (v: unknown) => String(v);
 
@@ -162,7 +162,12 @@ export default function DockManagerApp() {
       {/* Grid View */}
       <ScrollArea className="flex-1 px-3 pb-3">
         {filtered.length === 0 ? (
-          <p className="text-muted-foreground py-8 text-center text-sm">{s.none}</p>
+          <div className="flex h-full flex-col items-center justify-center py-12">
+            <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <Search className="text-muted-foreground h-8 w-8" />
+            </div>
+            <p className="text-muted-foreground text-sm">{s.none}</p>
+          </div>
         ) : (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
             {filtered.map((app) => {

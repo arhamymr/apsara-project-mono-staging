@@ -1,6 +1,7 @@
 'use client';
 
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
+import { getWhatsAppUrl } from '@/lib/utils';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import Link from 'next/link';
@@ -114,7 +115,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://wa.me/6289669594959"
+                    href={getWhatsAppUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-foreground transition-colors"

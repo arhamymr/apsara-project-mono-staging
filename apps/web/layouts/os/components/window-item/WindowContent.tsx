@@ -17,13 +17,13 @@ interface WindowContentProps {
  * Memoized window content wrapper
  * Prevents re-renders when only parent window state changes
  */
-const MemoizedContent = memo(function MemoizedContent({ 
-  content 
-}: { 
-  content: ReactNode 
+const MemoizedContent = memo(function MemoizedContent({
+  content
+}: {
+  content: ReactNode
 }) {
   return (
-    <div className="bg-card flex-1 overflow-hidden select-text">
+    <div className="bg-card flex-1 h-full w-full relative overflow-hidden select-text">
       {content}
     </div>
   );
@@ -47,9 +47,9 @@ export const WindowContent = forwardRef<HTMLDivElement, WindowContentProps>(
     const containerClassName = useMemo(() => cn(
       'bg-muted @container flex h-full w-full flex-col overflow-hidden rounded-sm border transition-shadow',
       active &&
-        (isSub
-          ? 'ring-1 ring-amber-500/30 ring-offset-1 ring-offset-transparent'
-          : 'ring-1 ring-green-500/20 ring-offset-1 ring-offset-transparent'),
+      (isSub
+        ? 'ring-1 ring-amber-500/30 ring-offset-1 ring-offset-transparent'
+        : 'ring-1 ring-green-500/20 ring-offset-1 ring-offset-transparent'),
     ), [active, isSub]);
 
     return (

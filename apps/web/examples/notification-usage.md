@@ -139,9 +139,9 @@ export function NotificationsListExample() {
   if (!notifications) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="space-y-2">
       {notifications.map((notification) => (
-        <div key={notification.id}>
+        <div key={notification.id} className="p-4 border rounded">
           <h3>{notification.data.title}</h3>
           <p>{notification.data.message}</p>
           <p>{notification.created_at}</p>
@@ -165,7 +165,7 @@ export function ManageNotificationsExample() {
   const clearAllNotifications = useMutation(api.notifications.clearAllNotifications);
 
   return (
-    <div>
+    <div className="flex gap-2">
       <button onClick={() => markAllAsRead()}>Mark All as Read</button>
       <button onClick={() => clearAllNotifications()}>Clear All</button>
     </div>

@@ -9,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
+import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { useWindowContext } from '@/layouts/os/WindowContext';
-import { Code, Loader2, Send } from 'lucide-react';
+import { getWhatsAppUrl } from '@/lib/utils';
+import { Code, Construction, Loader2, Send, ExternalLink } from 'lucide-react';
 import VibeCodeEditor from './editor';
 import { useVibeCodeConvex } from './hooks/use-vibe-code';
 
@@ -106,6 +108,30 @@ export default function VibeCodeRoot() {
       <ScrollArea className="flex-1">
         <div className="flex min-h-screen w-full items-center justify-center p-6">
           <div className="flex w-full flex-col items-center justify-center space-y-8">
+            <Alert className="mb-4 max-w-xl border-yellow-500/50 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
+              <Construction className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              <AlertDescription className="flex flex-col gap-3">
+                <span>
+                  This feature is not available yet. Want a custom website? Request professional web development and I&apos;ll build it for you manually.
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-fit border-yellow-500/50 hover:bg-yellow-500/20"
+                  asChild
+                >
+                  <a 
+                    href={getWhatsAppUrl('Hi, I would like to request website development.')}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Request Website Development
+                  </a>
+                </Button>
+              </AlertDescription>
+            </Alert>
+
             <div className="text-center">
               <h1 className="text-foreground mb-2 text-3xl font-bold">
                 Vibe Code Agent

@@ -137,9 +137,11 @@ export const PORTFOLIO_GALLERY = [
   },
 ];
 
+import { getWhatsAppUrl } from '@/lib/utils';
+
 export const CONTACT_INFO = {
   location: 'Jakarta Barat',
   phone: '(+62) 89669594959',
-  whatsapp: 'https://wa.me/6289669594959',
+  whatsapp: getWhatsAppUrl(),
   email: 'arhamymr@gmail.com',
 };
