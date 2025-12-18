@@ -77,13 +77,7 @@ export const DEFAULT_SHORTCUTS: DesktopAppShortcut[] = [
     label: 'Knowledge Base',
     icon: <span className="text-4xl">📚</span>,
   },
-  {
-    type: 'app',
-    id: 'website-builder',
-    appId: 'website-builder',
-    label: 'Site Builder',
-    icon: <span className="text-4xl">🧩</span>,
-  },
+
   {
     type: 'app',
     id: 'chatbot',
@@ -166,7 +160,6 @@ export const createDefaultDesktopItems = (): DesktopItem[] => {
     essentialsGroup,
     cloneShortcut(shortcutLookup.get('graphicdesignerai')!),
     cloneShortcut(shortcutLookup.get('knowledgebase')!),
-    cloneShortcut(shortcutLookup.get('website-builder')!),
     cloneShortcut(shortcutLookup.get('chatbot')!),
   );
   return items;

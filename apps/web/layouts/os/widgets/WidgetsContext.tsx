@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-export type WidgetType = 'clock' | 'site-builder' | 'note';
+export type WidgetType = 'clock' | 'note';
 
 export type WidgetModel = {
   id: string;

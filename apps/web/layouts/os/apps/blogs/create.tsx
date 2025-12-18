@@ -140,18 +140,19 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
       setCoverImage(undefined);
       setStatus('draft');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create article';
+      const errorMessage = error instanceof Error ? error.message : String(error);
       
-      // Handle slug already exists error
-      if (errorMessage.includes('SLUG_EXISTS:')) {
-        const existingSlug = errorMessage.split('SLUG_EXISTS:')[1];
+      // Handle slug already exists error - extract slug from SLUG_EXISTS:xxx pattern
+      const slugMatch = errorMessage.match(/SLUG_EXISTS:([^\s]+)/);
+      if (slugMatch) {
+        const existingSlug = slugMatch[1];
         const suggestedSlug = `${existingSlug}-${Date.now().toString(36)}`;
         setSlug(suggestedSlug);
-        toast.error(`Slug "${existingSlug}" already exists. Try "${suggestedSlug}" instead.`, {
+        toast.error(`Slug "${existingSlug}" already exists. Suggested: "${suggestedSlug}"`, {
           duration: 5000,
         });
       } else {
-        toast.error(errorMessage);
+        toast.error('Failed to create article. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

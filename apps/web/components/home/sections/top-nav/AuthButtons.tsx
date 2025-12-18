@@ -9,6 +9,7 @@ import { api } from '@/convex/_generated/api';
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
+import { cn } from '@/lib/utils';
 
 type AuthButtonsProps = {
   signInLabel: string;
@@ -21,6 +22,9 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
   const router = useRouter();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(api.user.profile);
+
+
+  console.log(user, "user")
 
   // Keyboard shortcut: G to go to login/dashboard
   useEffect(() => {
@@ -64,14 +68,14 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
       </Unauthenticated>
       <Authenticated>
         <Link href="/dashboard" onClick={onClose}>
-          <Button variant="outline" className={buttonClass}>
+          <Button className={buttonClass} variant="outline">
             <Avatar className="h-5 w-5">
               <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
               <AvatarFallback className="text-xs">
                 {user?.name?.charAt(0)?.toUpperCase() ?? <User className="h-3 w-3" />}
               </AvatarFallback>
             </Avatar>
-            Dashboard <Kbd className="bg-black/20 text-primary-900">G</Kbd>
+            {user?.name}
           </Button>
         </Link>
       </Authenticated>

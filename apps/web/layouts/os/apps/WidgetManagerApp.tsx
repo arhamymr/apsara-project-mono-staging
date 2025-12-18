@@ -35,13 +35,6 @@ const CATALOG: CatalogItem[] = [
     emoji: '📝',
     tags: ['notes', 'productivity'],
   },
-  {
-    type: 'site-builder',
-    label: 'Site Builder',
-    description: 'Shortcut widget to open your site builder workspace.',
-    emoji: '🧱',
-    tags: ['builder', 'shortcut'],
-  },
 ];
 
 type TagFilter =
@@ -49,9 +42,7 @@ type TagFilter =
   | 'utility'
   | 'time'
   | 'notes'
-  | 'productivity'
-  | 'builder'
-  | 'shortcut';
+  | 'productivity';
 
 export default function WidgetManagerApp() {
   const { addWidget } = useWidgets();
@@ -168,8 +159,6 @@ function TagChips({
     'time',
     'notes',
     'productivity',
-    'builder',
-    'shortcut',
   ];
 
   return (

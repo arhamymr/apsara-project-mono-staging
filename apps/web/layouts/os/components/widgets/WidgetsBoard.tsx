@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog';
 import { Input } from '@workspace/ui/components/input';
-import { SiteBuilderWidget } from '@/layouts/os/components/widgets/bodies/SiteBuilderWidget';
 import { cn } from '@/lib/utils';
 import { GripVertical, Settings, Trash } from 'lucide-react';
 import * as React from 'react';
@@ -204,9 +203,7 @@ function WidgetSettingsDialog({
             <label htmlFor="clock-seconds">Show seconds</label>
           </div>
         )}
-        {widget?.type === 'site-builder' && (
-          <p className="text-muted-foreground text-xs">No settings for this widget.</p>
-        )}
+
         <DialogFooter className="mt-4">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
@@ -253,7 +250,6 @@ export function WidgetsBoard() {
   const renderBody = (w: WidgetModel) => {
     if (w.type === 'clock') return <ClockWidget showSeconds={Boolean(w.settings?.showSeconds)} />;
     if (w.type === 'note') return <NoteWidget text={String(w.settings?.text ?? '')} />;
-    if (w.type === 'site-builder') return <SiteBuilderWidget />;
     return null;
   };
 

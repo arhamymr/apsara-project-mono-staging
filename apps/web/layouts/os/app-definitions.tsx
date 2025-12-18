@@ -23,7 +23,6 @@ import SketchApp from '@/layouts/os/apps/SketchApp';
 import TasksApp from '@/layouts/os/apps/TasksApp';
 import UnifiedAnalyticsApp from '@/layouts/os/apps/UnifiedAnalyticsApp';
 import VibeCodeApp from '@/layouts/os/apps/VibeCodeApp';
-import WebsiteBuilderApp from '@/layouts/os/apps/WebsiteBuilderApp';
 import WidgetManagerApp from '@/layouts/os/apps/WidgetManagerApp';
 
 import type { AppDef } from '@/layouts/os/types';
@@ -122,13 +121,7 @@ export function createDefaultApps(): AppDef[] {
       content: <KnowledgeBaseApp />,
       defaultSize: { width: 1100 },
     },
-    {
-      id: 'website-builder',
-      name: 'Site Builder',
-      icon: '🧩',
-      content: <WebsiteBuilderApp />,
-      defaultSize: { width: 1200 },
-    },
+
     {
       id: 'chatbot',
       name: 'Chatbot AI',

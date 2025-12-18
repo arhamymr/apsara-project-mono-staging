@@ -22,6 +22,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'cdn.prod.website-files.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
     ],
   },
   // Required for WebContainers (SharedArrayBuffer support)
