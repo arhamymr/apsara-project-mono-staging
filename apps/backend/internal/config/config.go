@@ -1,12 +1,16 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 type Config struct {
 	LivekitHost   string
 	LivekitAPIKey string
 	LivekitSecret string
 	Port          string
+	CORSOrigins   []string
 	// R2 Configuration
 	R2AccessKeyID     string
 	R2SecretAccessKey string
@@ -19,11 +23,20 @@ type Config struct {
 }
 
 func Load() *Config {
+	corsOrigins := []string{"http://localhost:3000", "http://127.0.0.1:3000"}
+	if customOrigins := getEnv("CORS_ORIGINS", ""); customOrigins != "" {
+		corsOrigins = strings.Split(customOrigins, ",")
+		for i := range corsOrigins {
+			corsOrigins[i] = strings.TrimSpace(corsOrigins[i])
+		}
+	}
+
 	return &Config{
 		LivekitHost:       getEnv("LIVEKIT_URL", "https://your-project.livekit.cloud"),
 		LivekitAPIKey:     getEnv("LIVEKIT_API_KEY", ""),
 		LivekitSecret:     getEnv("LIVEKIT_API_SECRET", ""),
 		Port:              getEnv("PORT", ":1323"),
+		CORSOrigins:       corsOrigins,
 		R2AccessKeyID:     getEnv("R2_ACCESS_KEY_ID", ""),
 		R2SecretAccessKey: getEnv("R2_SECRET_ACCESS_KEY", ""),
 		R2Bucket:          getEnv("R2_BUCKET", ""),

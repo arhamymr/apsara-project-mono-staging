@@ -1,4 +1,4 @@
-export type WallpaperKind = 'gradient' | 'solid' | 'image';
+export type WallpaperKind = 'gradient' | 'solid' | 'image' | 'spinner';
 export type Wallpaper = {
   kind: WallpaperKind;
   value?: string; // hex for solid, URL for image
@@ -25,6 +25,9 @@ export function getWallpaper(): Wallpaper {
     }
     if (parsed.kind === 'image' && typeof parsed.value === 'string') {
       return { kind: 'image', value: parsed.value };
+    }
+    if (parsed.kind === 'spinner') {
+      return { kind: 'spinner' };
     }
     return { kind: 'gradient', value: 'aurora' };
   } catch {

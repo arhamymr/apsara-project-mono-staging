@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { AppLocaleProvider } from "@/i18n/LocaleContext";
 import {ConvexClientProvider} from "@/provider/convex";
+import { WelcomeNotificationInitializer } from "./WelcomeNotificationInitializer";
 
 const queryClientOptions = {
   defaultOptions: {
@@ -29,7 +30,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableColorScheme
       >
         <AppLocaleProvider>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            <WelcomeNotificationInitializer />
+            {children}
+          </ConvexClientProvider>
         </AppLocaleProvider>
       </NextThemesProvider>
     </QueryClientProvider>

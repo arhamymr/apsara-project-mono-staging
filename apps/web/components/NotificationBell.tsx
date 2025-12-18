@@ -11,57 +11,25 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@/lib/utils";
 import { Bell, Check, Trash2, X } from "lucide-react";
 import { useState } from "react";
-
-type Notification = {
-  id: string;
-  type: string;
-  data: {
-    title: string;
-    message: string;
-    icon?: string;
-    type?: string;
-    action_url?: string;
-    action_text?: string;
-  };
-  read_at: string | null;
-  created_at: string;
-};
-
-// Mock data for UI preview
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "info",
-    data: {
-      title: "Welcome!",
-      message: "Thanks for joining us.",
-      icon: "👋",
-    },
-    read_at: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    type: "update",
-    data: {
-      title: "New feature available",
-      message: "Check out the latest updates.",
-      icon: "🚀",
-      action_url: "#",
-      action_text: "Learn more",
-    },
-    read_at: new Date().toISOString(),
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-  },
-];
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // TODO: Replace with real data
-  const notifications = mockNotifications;
+  // Convex queries and mutations
+  const notifications = useQuery(api.notifications.getNotifications, {
+    limit: 50,
+  }) || [];
+  
+  const markAsRead = useMutation(api.notifications.markAsRead);
+  const markAllAsRead = useMutation(api.notifications.markAllAsRead);
+  const deleteNotification = useMutation(api.notifications.deleteNotification);
+  const clearAllNotifications = useMutation(api.notifications.clearAllNotifications);
+
   const unreadCount = notifications.filter((n) => !n.read_at).length;
-  const loading = false;
+  const loading = notifications === undefined;
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -106,9 +74,7 @@ export default function NotificationBell() {
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-xs"
-                  onClick={() => {
-                    /* TODO: mark all read */
-                  }}
+                  onClick={() => markAllAsRead()}
                 >
                   <Check className="mr-1 h-3 w-3" />
                   Mark all read
@@ -118,9 +84,7 @@ export default function NotificationBell() {
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs"
-                onClick={() => {
-                  /* TODO: clear all */
-                }}
+                onClick={() => clearAllNotifications()}
               >
                 <Trash2 className="mr-1 h-3 w-3" />
                 Clear all
@@ -135,8 +99,8 @@ export default function NotificationBell() {
               <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Bell className="text-muted-foreground/50 mb-2 h-12 w-12" />
+            <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+              <Bell className="text-muted-foreground/50 mb-3 h-12 w-12" />
               <p className="text-muted-foreground text-sm font-medium">
                 No notifications yet
               </p>
@@ -168,9 +132,7 @@ export default function NotificationBell() {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() => {
-                          /* TODO: delete notification */
-                        }}
+                        onClick={() => deleteNotification({ notificationId: notification.id as Id<"notifications"> })}
                       >
                         <X className="h-3 w-3" />
                       </Button>
@@ -195,9 +157,7 @@ export default function NotificationBell() {
                           variant="ghost"
                           size="sm"
                           className="h-6 px-2 text-xs"
-                          onClick={() => {
-                            /* TODO: mark as read */
-                          }}
+                          onClick={() => markAsRead({ notificationId: notification.id as Id<"notifications"> })}
                         >
                           Mark as read
                         </Button>

@@ -40,9 +40,18 @@ export default function ArticleManagerApp() {
 
   const openDetail = (id: Id<"blogs">, title?: string) => {
     if (!activeId) return;
-    openSubWindow(activeId, {
+    let subId: string | undefined;
+    subId = openSubWindow(activeId, {
       title: title ? `Edit: ${title}` : 'Article',
-      content: <EditArticleWindow id={id} onUpdated={() => {}} />,
+      content: (
+        <EditArticleWindow
+          id={id}
+          onUpdated={() => {}}
+          onClose={() => {
+            if (subId) closeWindow(subId);
+          }}
+        />
+      ),
       width: 820,
       height: 600,
     });

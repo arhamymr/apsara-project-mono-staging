@@ -14,6 +14,7 @@ import type * as chat from "../chat.js";
 import type * as http from "../http.js";
 import type * as kanban from "../kanban.js";
 import type * as notes from "../notes.js";
+import type * as notifications from "../notifications.js";
 import type * as user from "../user.js";
 import type * as vibeCoding from "../vibeCoding.js";
 
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   kanban: typeof kanban;
   notes: typeof notes;
+  notifications: typeof notifications;
   user: typeof user;
   vibeCoding: typeof vibeCoding;
 }>;

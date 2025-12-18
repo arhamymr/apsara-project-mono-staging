@@ -216,6 +216,7 @@ export default function CreateArticleWindow({ onCreated }: CreateArticleWindowPr
             <Editor
               editorSerializedState={content}
               onSerializedChange={setContent}
+              lite={true}
             />
           </div>
         </div>

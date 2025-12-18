@@ -19,7 +19,6 @@ import MapsApp from '@/layouts/os/apps/MapsApp';
 import NotesApp from '@/layouts/os/apps/notes';
 import PhotosApp from '@/layouts/os/apps/PhotosApp';
 import ProductsApp from '@/layouts/os/apps/ProductsApp';
-import SettingsHubApp from '@/layouts/os/apps/SettingsHubApp';
 import SketchApp from '@/layouts/os/apps/SketchApp';
 import TasksApp from '@/layouts/os/apps/TasksApp';
 import UnifiedAnalyticsApp from '@/layouts/os/apps/UnifiedAnalyticsApp';
@@ -44,13 +43,6 @@ export function createDefaultApps(): AppDef[] {
       icon: '🗣️',
       content: <LanguageConversationApp />,
       defaultSize: { width: 357 },
-    },
-    {
-      id: 'settings-hub',
-      name: 'Desktop Settings',
-      icon: '⚙️',
-      content: <SettingsHubApp />,
-      defaultSize: { width: 780, height: 500 },
     },
     {
       id: 'widget-manager',

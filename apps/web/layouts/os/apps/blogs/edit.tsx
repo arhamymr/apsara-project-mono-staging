@@ -4,6 +4,17 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Kbd } from '@workspace/ui/components/kbd';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@workspace/ui/components/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -18,6 +29,7 @@ import { CoverImagePicker } from './components/upload-cover';
 import { Editor } from '@/components/blocks/editor-x/editor';
 import type { SerializedEditorState } from 'lexical';
 import type { Id } from '@/convex/_generated/dataModel';
+import { Trash2 } from 'lucide-react';
 
 type BlogStatus = 'draft' | 'published';
 
@@ -49,12 +61,10 @@ function extractTextFromLexical(state: SerializedEditorState, maxLength = 200): 
     if (!node || typeof node !== 'object') return;
     const n = node as Record<string, unknown>;
 
-    // If it's a text node, extract the text
     if (n.type === 'text' && typeof n.text === 'string') {
       texts.push(n.text);
     }
 
-    // Recursively traverse children
     if (Array.isArray(n.children)) {
       for (const child of n.children) {
         traverse(child);
@@ -72,9 +82,10 @@ function extractTextFromLexical(state: SerializedEditorState, maxLength = 200): 
 interface EditArticleWindowProps {
   id: Id<'blogs'>;
   onUpdated?: () => void;
+  onClose?: () => void;
 }
 
-export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowProps) {
+export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticleWindowProps) {
   const blog = useBlog(id);
   const updateBlog = useUpdateBlog();
   const deleteBlog = useDeleteBlog();
@@ -88,7 +99,6 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editorKey, setEditorKey] = useState(0);
 
-  // Sync state when blog loads
   useEffect(() => {
     if (blog) {
       setTitle(blog.title);
@@ -99,7 +109,7 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
       try {
         const parsed = JSON.parse(blog.content);
         setContent(parsed);
-        setEditorKey((k) => k + 1); // Force editor remount with new content
+        setEditorKey((k) => k + 1);
       } catch {
         setContent(initialEditorState);
       }
@@ -145,21 +155,20 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
 
   const handleDelete = useCallback(async () => {
     if (!blog) return;
-    const ok = window.confirm('Delete this article? This cannot be undone.');
-    if (!ok) return;
 
     setIsSubmitting(true);
     try {
       await deleteBlog({ id: blog._id });
       toast.success('Article deleted');
       onUpdated?.();
+      onClose?.();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete';
       toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
-  }, [blog, deleteBlog, onUpdated]);
+  }, [blog, deleteBlog, onUpdated, onClose]);
 
   if (blog === undefined) return <div className="p-4 text-sm">Loading…</div>;
   if (blog === null) return <div className="p-4 text-sm">Not found</div>;
@@ -184,9 +193,32 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
         </div>
 
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
-            Delete
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="destructive" disabled={isSubmitting}>
+                <Trash2 className="mr-1 h-4 w-4" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="z-[99999]">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Article</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete &ldquo;{title || 'this article'}&rdquo;? This
+                  action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button size="sm" onClick={handleUpdate} disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : 'Save Changes'}
             <Kbd className="text-primary-900 bg-black/20">S</Kbd>
@@ -199,9 +231,7 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Sidebar */}
           <aside className="space-y-3">
-            <p className="text-muted-foreground text-xs">
-              Make changes and save when ready.
-            </p>
+            <p className="text-muted-foreground text-xs">Make changes and save when ready.</p>
 
             <div>
               <label className="text-xs">Title</label>
@@ -239,6 +269,7 @@ export default function EditArticleWindow({ id, onUpdated }: EditArticleWindowPr
               key={editorKey}
               editorSerializedState={content}
               onSerializedChange={setContent}
+              lite={true}
             />
           </div>
         </div>

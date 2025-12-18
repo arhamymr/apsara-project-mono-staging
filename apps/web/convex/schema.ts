@@ -113,6 +113,21 @@ const schema = defineSchema({
     updatedAt: v.number(),
   })
     .index("by_column", ["columnId"]),
+
+  notifications: defineTable({
+    userId: v.id("users"),
+    type: v.string(),
+    title: v.string(),
+    message: v.string(),
+    icon: v.optional(v.string()),
+    actionUrl: v.optional(v.string()),
+    actionText: v.optional(v.string()),
+    readAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_created", ["userId", "createdAt"])
+    .index("by_user_read", ["userId", "readAt"]),
 });
 
 export default schema;
