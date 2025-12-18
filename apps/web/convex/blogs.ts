@@ -22,7 +22,9 @@ export const create = mutation({
       .query("blogs")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
-    if (existing) throw new Error("Slug already exists");
+    if (existing) {
+      throw new Error(`SLUG_EXISTS:${args.slug}`);
+    }
 
     const now = Date.now();
     return await ctx.db.insert("blogs", {
@@ -114,7 +116,9 @@ export const update = mutation({
         .query("blogs")
         .withIndex("by_slug", (q) => q.eq("slug", newSlug))
         .first();
-      if (existing) throw new Error("Slug already exists");
+      if (existing) {
+        throw new Error(`SLUG_EXISTS:${newSlug}`);
+      }
     }
 
     const { id, ...updates } = args;

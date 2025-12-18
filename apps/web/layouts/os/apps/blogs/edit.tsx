@@ -146,8 +146,17 @@ export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticl
       toast.success('Article updated');
       onUpdated?.();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update';
-      toast.error(message);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update';
+      
+      // Handle slug already exists error
+      if (errorMessage.includes('SLUG_EXISTS:')) {
+        const existingSlug = errorMessage.split('SLUG_EXISTS:')[1];
+        toast.error(`Slug "${existingSlug}" is already in use by another article.`, {
+          duration: 5000,
+        });
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsSubmitting(false);
     }
