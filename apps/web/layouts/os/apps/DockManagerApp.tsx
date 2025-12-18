@@ -160,7 +160,7 @@ export default function DockManagerApp() {
       </div>
 
       {/* Grid View */}
-      <ScrollArea className="flex-1 px-3 pb-3">
+      <ScrollArea className="flex-1 overflow-auto px-3 pb-3">
         {filtered.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center py-12">
             <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
@@ -169,7 +169,7 @@ export default function DockManagerApp() {
             <p className="text-muted-foreground text-sm">{s.none}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))' }}>
             {filtered.map((app) => {
               const checked = isPinned(app.id);
               return (

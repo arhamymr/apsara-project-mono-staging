@@ -23,7 +23,7 @@ type Config struct {
 }
 
 func Load() *Config {
-	corsOrigins := []string{"http://localhost:3000", "http://127.0.0.1:3000"}
+	corsOrigins := []string{"http://localhost:1234", "http://127.0.0.1:1234"}
 	if customOrigins := getEnv("CORS_ORIGINS", ""); customOrigins != "" {
 		corsOrigins = strings.Split(customOrigins, ",")
 		for i := range corsOrigins {

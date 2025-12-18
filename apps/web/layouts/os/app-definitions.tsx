@@ -56,14 +56,14 @@ export function createDefaultApps(): AppDef[] {
       name: 'Desktop Settings',
       icon: '🖼️',
       content: <DesktopSettingsApp />,
-      defaultSize: { width: 720 },
+      defaultSize: { width: 920 },
     },
     {
       id: 'dock-manager',
       name: 'Manage Docks',
       icon: '⚙️',
       content: <DockManagerApp />,
-      defaultSize: { width: 460 },
+      defaultSize: { width: 920 },
     },
     {
       id: 'desktop-icons',

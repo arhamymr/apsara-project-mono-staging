@@ -3,6 +3,7 @@
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { useWindowContext } from '@/layouts/os/WindowContext';
+import { FileText } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
 import { ArticleCard } from './components/card';
@@ -109,7 +110,20 @@ export default function ArticleManagerApp() {
         {isLoading ? (
           <div className="text-muted-foreground text-sm">Loading…</div>
         ) : !displayBlogs || displayBlogs.length === 0 ? (
-          <div className="text-muted-foreground text-sm">No articles yet.</div>
+          <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+            <div className="bg-muted/50 rounded-full p-4">
+              <FileText className="text-muted-foreground/60 h-10 w-10" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-muted-foreground font-medium">No articles yet</p>
+              <p className="text-muted-foreground/70 text-sm">
+                Create your first article to get started
+              </p>
+            </div>
+            <Button size="sm" onClick={openCreate} variant="outline" className="mt-2">
+              Create Article
+            </Button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3 @xl:grid-cols-5">
             {displayBlogs.map((blog: { _id: Id<"blogs">; slug: string; title: string; content: string; excerpt?: string; coverImage?: string; status: string; createdAt: number; updatedAt: number }) => (

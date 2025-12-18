@@ -54,13 +54,13 @@ export default function DesktopSettingsApp() {
   }, [wallpaper.kind, wallpaper.value]);
 
   return (
-    <div className="flex h-full flex-col pb-6">
-      <ScrollArea className="h-[calc(100%-60px)] p-4">
+    <div className="flex h-full flex-col p-4">
+      <ScrollArea className="h-full">
         <section className="mb-5">
           <h3 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
             Animated
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 p-2">
             <button
               type="button"
               onClick={() => apply({ kind: 'spinner' })}
@@ -91,7 +91,7 @@ export default function DesktopSettingsApp() {
           <h3 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
             Gradients
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 p-2">
             {GRADIENT_VARIANTS.map((v) => {
               const isActive =
                 wallpaper.kind === 'gradient' && wallpaper.value === v.id;
@@ -117,7 +117,7 @@ export default function DesktopSettingsApp() {
           <h3 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
             Solid Colors
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 p-2">
             {SWATCHES.map((c) => {
               const isActive =
                 wallpaper.kind === 'solid' && wallpaper.value === c;
@@ -142,7 +142,7 @@ export default function DesktopSettingsApp() {
           <h3 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
             Image Presets
           </h3>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 p-2">
             {IMAGE_PRESETS.map((src) => {
               const isActive =
                 wallpaper.kind === 'image' && wallpaper.value === src;
@@ -151,18 +151,18 @@ export default function DesktopSettingsApp() {
                   key={src}
                   type="button"
                   onClick={() => apply({ kind: 'image', value: src })}
-                  className={`h-20 w-full overflow-hidden rounded-md border transition-all ${isActive
+                  className={`relative h-20 w-full overflow-hidden rounded-md border transition-all ${isActive
                       ? 'ring-primary ring-offset-background ring-2 ring-offset-2'
                       : 'hover:ring-muted-foreground/20 hover:ring-1'
                     }`}
                   title="Set as wallpaper"
                 >
-                  <img
+                  <Image
                     src={src}
                     alt="Wallpaper preset"
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                    decoding="async"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 33vw, 200px"
                   />
                 </button>
               );
