@@ -12,17 +12,27 @@ import { SiteBuilderWidget } from '@/layouts/os/components/widgets/bodies/SiteBu
 import { cn } from '@/lib/utils';
 import { GripVertical, Settings, Trash } from 'lucide-react';
 import * as React from 'react';
-import { useCallback } from 'react';
 import { useWidgets, type WidgetModel } from '../../widgets/WidgetsContext';
+import { useWidgetDrag, type SnapGuide } from './hooks/useWidgetDrag';
 import ClockWidget from './bodies/ClockWidget';
 import NoteWidget from './bodies/NoteWidget';
+
+interface WidgetRect {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 type WidgetFrameProps = {
   id: string;
   x: number;
   y: number;
+  otherWidgets: WidgetRect[];
   onMove: (x: number, y: number) => void;
   onContextMenu?: (e: React.MouseEvent) => void;
+  onSnapGuidesChange?: (guides: SnapGuide[]) => void;
   children: React.ReactNode;
 };
 
@@ -30,177 +40,79 @@ const WidgetFrame = React.memo(function WidgetFrame({
   id,
   x,
   y,
+  otherWidgets,
   onMove,
   onContextMenu,
+  onSnapGuidesChange,
   children,
 }: WidgetFrameProps) {
-  const [isDragging, setIsDragging] = React.useState(false);
   const [isAltPressed, setIsAltPressed] = React.useState(false);
-  const dragging = React.useRef(false);
-  const start = React.useRef<{
-    x: number;
-    y: number;
-    mx: number;
-    my: number;
-  } | null>(null);
-  const lastPos = React.useRef<{ x: number; y: number }>({ x, y });
   const rootRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Update lastPos when x,y props change (only when not dragging)
-  React.useEffect(() => {
-    if (!dragging.current) {
-      lastPos.current = { x, y };
-    }
-  }, [x, y]);
+  const {
+    isDragging,
+    dragOffset,
+    snapGuides,
+    handleDragStart,
+    handleDragMove,
+    handleDragEnd,
+  } = useWidgetDrag({ widgetId: id, x, y, otherWidgets, onMove });
 
-  // Track Alt key state for visual feedback
+  // Notify parent of snap guides for rendering
+  React.useEffect(() => {
+    onSnapGuidesChange?.(isDragging ? snapGuides : []);
+  }, [isDragging, snapGuides, onSnapGuidesChange]);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && !isAltPressed) {
-        setIsAltPressed(true);
-      }
+      if (e.altKey && !isAltPressed) setIsAltPressed(true);
     };
-    
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (!e.altKey && isAltPressed) {
-        setIsAltPressed(false);
-      }
+      if (!e.altKey && isAltPressed) setIsAltPressed(false);
     };
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-    
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
   }, [isAltPressed]);
 
-  const handleMouseMove = React.useRef<((e: MouseEvent) => void) | null>(null);
-  const handleMouseUp = React.useRef<(() => void) | null>(null);
+  const onPointerDown = React.useCallback(
+    (e: React.PointerEvent) => {
+      if (rootRef.current) handleDragStart(e, rootRef.current);
+    },
+    [handleDragStart],
+  );
 
-  React.useEffect(() => {
-    // Use CSS transform during drag for GPU acceleration - no state updates per frame
-    handleMouseMove.current = (e: MouseEvent) => {
-      if (!dragging.current || !start.current || !rootRef.current) return;
-      const dx = e.clientX - start.current.mx;
-      const dy = e.clientY - start.current.my;
-      const nx = start.current.x + dx;
-      const ny = start.current.y + dy;
-      lastPos.current = { x: nx, y: ny };
-      // GPU-accelerated transform instead of state update
-      rootRef.current.style.transform = `translate3d(${nx}px, ${ny}px, 0)`;
-    };
-
-    handleMouseUp.current = () => {
-      if (!dragging.current) return;
-      
-      dragging.current = false;
-      setIsDragging(false);
-      start.current = null;
-      
-      // Remove event listeners
-      if (handleMouseMove.current) {
-        document.removeEventListener('mousemove', handleMouseMove.current);
-      }
-      if (handleMouseUp.current) {
-        document.removeEventListener('mouseup', handleMouseUp.current);
-      }
-
-      // Reset transform style (position will be set via props)
-      if (rootRef.current) {
-        rootRef.current.style.transform = '';
-      }
-
-      const GRID = 8;
-      const NAVBAR = 56;
-      const MARGIN = 8;
-      const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
-      const vh = typeof window !== 'undefined' ? window.innerHeight : 900;
-      const el = rootRef.current;
-      const w = el?.offsetWidth ?? 260;
-      const h = el?.offsetHeight ?? 180;
-      const rawX = lastPos.current.x;
-      const rawY = lastPos.current.y;
-      const clampX = Math.max(MARGIN, Math.min(rawX, vw - w - MARGIN));
-      const clampY = Math.max(NAVBAR + MARGIN, Math.min(rawY, vh - h - MARGIN));
-      const snap = (v: number) => Math.round(v / GRID) * GRID;
-      const sx = snap(clampX);
-      const sy = snap(clampY);
-      lastPos.current = { x: sx, y: sy };
-      // Single state update on drag end
-      onMove(sx, sy);
-    };
-  }, [onMove]);
-
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const handle = target.closest('[data-role="drag-handle"]');
-    
-    // Allow dragging from the drag handle or with Alt key anywhere
-    if (!handle && !e.altKey) return;
-    
-    // Prevent dragging if clicking on interactive elements
-    const isInteractive = target.closest('button, input, textarea, select, a, [role="button"]');
-    if (isInteractive && !e.altKey) return;
-    
-    dragging.current = true;
-    setIsDragging(true);
-    start.current = { x, y, mx: e.clientX, my: e.clientY };
-    
-    // Set initial transform position for smooth drag start
-    if (rootRef.current) {
-      rootRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    }
-    
-    // Add event listeners
-    if (handleMouseMove.current) {
-      document.addEventListener('mousemove', handleMouseMove.current, { passive: false });
-    }
-    if (handleMouseUp.current) {
-      document.addEventListener('mouseup', handleMouseUp.current, { passive: false });
-    }
-    
-    e.preventDefault();
-    e.stopPropagation();
-  }, [x, y]);
-
-  // Cleanup event listeners on unmount
-  React.useEffect(() => {
-    return () => {
-      if (dragging.current) {
-        dragging.current = false;
-        setIsDragging(false);
-        if (handleMouseMove.current) {
-          document.removeEventListener('mousemove', handleMouseMove.current);
-        }
-        if (handleMouseUp.current) {
-          document.removeEventListener('mouseup', handleMouseUp.current);
-        }
-      }
-    };
-  }, []);
-
-  // Use transform for positioning when dragging, left/top when static
-  const positionStyle = isDragging
-    ? { left: 0, top: 0 } // Position handled by transform during drag
-    : { left: x, top: y, transform: 'none' };
+  const hasOffset = dragOffset.x !== 0 || dragOffset.y !== 0;
+  const transformStyle = hasOffset
+    ? `translate3d(${dragOffset.x}px, ${dragOffset.y}px, 0)`
+    : 'translate3d(0, 0, 0)';
 
   return (
     <Card
       role="group"
       data-id={id}
       ref={rootRef}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
+      onPointerMove={isDragging ? handleDragMove : undefined}
+      onPointerUp={isDragging ? handleDragEnd : undefined}
+      onPointerCancel={isDragging ? handleDragEnd : undefined}
       onContextMenu={onContextMenu}
       className={`pointer-events-auto absolute w-[260px] rounded-md border shadow-sm backdrop-blur-md select-none hover:shadow-md ${
         isAltPressed ? 'ring-2 ring-primary/50 cursor-grab' : ''
       } ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}
-      style={{ 
-        ...positionStyle,
+      style={{
+        left: x,
+        top: y,
+        transform: transformStyle,
         zIndex: isDragging ? 400 : 300,
         cursor: isDragging ? 'grabbing' : isAltPressed ? 'grab' : 'default',
         willChange: isDragging ? 'transform' : 'auto',
+        touchAction: 'none',
+        userSelect: isDragging ? 'none' : 'auto',
       }}
     >
       <div
@@ -219,6 +131,27 @@ const WidgetFrame = React.memo(function WidgetFrame({
   );
 });
 
+// Snap guide lines component
+function SnapGuides({ guides }: { guides?: SnapGuide[] }) {
+  if (!guides || guides.length === 0) return null;
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[500]">
+      {guides.map((guide, i) => (
+        <div
+          key={`${guide.type}-${guide.position}-${i}`}
+          className="absolute bg-primary/60"
+          style={
+            guide.type === 'vertical'
+              ? { left: guide.position, top: 0, width: 1, height: '100vh' }
+              : { left: 0, top: guide.position, width: '100vw', height: 1 }
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 function WidgetSettingsDialog({
   open,
   onOpenChange,
@@ -235,12 +168,8 @@ function WidgetSettingsDialog({
 
   React.useEffect(() => {
     if (!widget) return;
-    if (widget.type === 'note') {
-      setLocalText(String(widget.settings?.text ?? ''));
-    }
-    if (widget.type === 'clock') {
-      setShowSeconds(Boolean(widget.settings?.showSeconds));
-    }
+    if (widget.type === 'note') setLocalText(String(widget.settings?.text ?? ''));
+    if (widget.type === 'clock') setShowSeconds(Boolean(widget.settings?.showSeconds));
   }, [widget]);
 
   const apply = () => {
@@ -261,10 +190,7 @@ function WidgetSettingsDialog({
         {widget?.type === 'note' && (
           <div className="space-y-2">
             <label className="text-xs font-medium">Text</label>
-            <Input
-              value={localText}
-              onChange={(e) => setLocalText(e.target.value)}
-            />
+            <Input value={localText} onChange={(e) => setLocalText(e.target.value)} />
           </div>
         )}
         {widget?.type === 'clock' && (
@@ -279,9 +205,7 @@ function WidgetSettingsDialog({
           </div>
         )}
         {widget?.type === 'site-builder' && (
-          <p className="text-muted-foreground text-xs">
-            No settings for this widget.
-          </p>
+          <p className="text-muted-foreground text-xs">No settings for this widget.</p>
         )}
         <DialogFooter className="mt-4">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
@@ -295,11 +219,23 @@ function WidgetSettingsDialog({
 }
 
 export function WidgetsBoard() {
-  const { widgets, setWidgetPosition, updateWidget, removeWidget } =
-    useWidgets();
+  const { widgets, setWidgetPosition, updateWidget, removeWidget } = useWidgets();
   const [menuTarget, setMenuTarget] = React.useState<string | null>(null);
-  const [settingsTarget, setSettingsTarget] =
-    React.useState<WidgetModel | null>(null);
+  const [settingsTarget, setSettingsTarget] = React.useState<WidgetModel | null>(null);
+  const [activeSnapGuides, setActiveSnapGuides] = React.useState<SnapGuide[]>([]);
+
+  // Convert widgets to WidgetRect format for snapping
+  const widgetRects = React.useMemo<WidgetRect[]>(
+    () =>
+      widgets.map((w) => ({
+        id: w.id,
+        x: w.x,
+        y: w.y,
+        w: w.w ?? 260,
+        h: w.h ?? 180,
+      })),
+    [widgets],
+  );
 
   const onContext = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -315,28 +251,30 @@ export function WidgetsBoard() {
   }, []);
 
   const renderBody = (w: WidgetModel) => {
-    if (w.type === 'clock')
-      return <ClockWidget showSeconds={Boolean(w.settings?.showSeconds)} />;
-    if (w.type === 'note')
-      return <NoteWidget text={String(w.settings?.text ?? '')} />;
+    if (w.type === 'clock') return <ClockWidget showSeconds={Boolean(w.settings?.showSeconds)} />;
+    if (w.type === 'note') return <NoteWidget text={String(w.settings?.text ?? '')} />;
     if (w.type === 'site-builder') return <SiteBuilderWidget />;
     return null;
   };
 
   return (
     <>
+      {/* Snap guide lines */}
+      <SnapGuides guides={activeSnapGuides} />
+
       {widgets.map((w) => (
         <WidgetFrame
           key={w.id}
           id={w.id}
           x={w.x}
           y={w.y}
+          otherWidgets={widgetRects}
           onMove={(x, y) => setWidgetPosition(w.id, x, y)}
           onContextMenu={onContext(w.id)}
+          onSnapGuidesChange={setActiveSnapGuides}
         >
           <div className="relative">
             {renderBody(w)}
-            {/* Inline menu on right click */}
             {menuTarget === w.id && (
               <div
                 className={cn(
@@ -369,9 +307,7 @@ export function WidgetsBoard() {
         open={!!settingsTarget}
         onOpenChange={(v) => !v && setSettingsTarget(null)}
         widget={settingsTarget}
-        onSave={(patch) =>
-          settingsTarget && updateWidget(settingsTarget.id, patch)
-        }
+        onSave={(patch) => settingsTarget && updateWidget(settingsTarget.id, patch)}
       />
     </>
   );

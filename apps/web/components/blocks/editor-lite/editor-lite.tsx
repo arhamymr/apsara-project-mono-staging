@@ -7,6 +7,7 @@ import { editorTheme } from '@/components/editor/themes/editor-theme';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 import { nodesLite } from './nodes-lite';
 import { PluginsLite } from './plugins-lite';
+import { useMemo } from 'react';
 
 const editorConfig: InitialConfigType = {
   namespace: 'EditorLite',
@@ -16,6 +17,14 @@ const editorConfig: InitialConfigType = {
     console.error(error);
   },
 };
+
+// Check if serialized state has valid content
+function isValidEditorState(state?: SerializedEditorState): boolean {
+  if (!state) return false;
+  if (!state.root) return false;
+  if (!state.root.children || state.root.children.length === 0) return false;
+  return true;
+}
 
 interface EditorLiteProps {
   editorState?: EditorState;
@@ -32,17 +41,26 @@ export function EditorLite({
   onSerializedChange,
   placeholder = 'Start writing...',
 }: EditorLiteProps) {
+  // Memoize the initial config to prevent unnecessary re-renders
+  const initialConfig = useMemo(() => {
+    const config = { ...editorConfig };
+    
+    if (editorState) {
+      return { ...config, editorState };
+    }
+    
+    // Only use serialized state if it's valid (has non-empty root)
+    if (isValidEditorState(editorSerializedState)) {
+      return { ...config, editorState: JSON.stringify(editorSerializedState) };
+    }
+    
+    // Return config without editorState - Lexical will create default empty state
+    return config;
+  }, [editorState, editorSerializedState]);
+
   return (
     <div className="bg-background flex h-full flex-col overflow-hidden rounded-lg border shadow">
-      <LexicalComposer
-        initialConfig={{
-          ...editorConfig,
-          ...(editorState ? { editorState } : {}),
-          ...(editorSerializedState
-            ? { editorState: JSON.stringify(editorSerializedState) }
-            : {}),
-        }}
-      >
+      <LexicalComposer initialConfig={initialConfig}>
         <TooltipProvider>
           <PluginsLite placeholder={placeholder} />
 
