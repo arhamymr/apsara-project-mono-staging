@@ -3,6 +3,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 export type BoardId = Id<'kanbanBoards'>;
 export type ColumnId = Id<'kanbanColumns'>;
 export type CardId = Id<'kanbanCards'>;
+export type CommentId = Id<'kanbanComments'>;
 
 export type Priority = 'low' | 'medium' | 'high';
 
@@ -25,7 +26,11 @@ export interface KanbanCard {
   title: string;
   description?: string;
   priority: Priority;
+  assigneeId?: Id<'users'>;
+  assignee?: { _id: Id<'users'>; name?: string; email?: string; image?: string };
   position: number;
+  isArchived?: boolean;
+  archivedAt?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -50,6 +55,16 @@ export interface KanbanBoard {
   columns: KanbanColumn[];
 }
 
+export interface KanbanComment {
+  _id: CommentId;
+  cardId: CardId;
+  userId: Id<'users'>;
+  user?: { _id: Id<'users'>; name?: string; email?: string; image?: string };
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export const formatWhen = (timestamp: number) => {
   const date = new Date(timestamp);
   const now = new Date();
@@ -59,4 +74,18 @@ export const formatWhen = (timestamp: number) => {
   if (days === 1) return 'Yesterday';
   if (days < 7) return `${days} days ago`;
   return date.toLocaleDateString();
+};
+
+export const formatTimeAgo = (timestamp: number) => {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(timestamp).toLocaleDateString();
 };

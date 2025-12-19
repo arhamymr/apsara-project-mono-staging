@@ -14,6 +14,7 @@ import KnowledgeBaseApp from '@/layouts/os/apps/knowledge-base';
 import LanguageConversationApp from '@/layouts/os/apps/LanguageConversationApp';
 import LeadManagementApp from '@/layouts/os/apps/LeadManagementApp';
 import MailApp from '@/layouts/os/apps/MailApp';
+import OrganizationApp from '@/layouts/os/apps/OrganizationApp';
 import MapsApp from '@/layouts/os/apps/MapsApp';
 import NotesApp from '@/layouts/os/apps/notes';
 import PhotosApp from '@/layouts/os/apps/PhotosApp';
@@ -185,6 +186,13 @@ export function createDefaultApps(): AppDef[] {
       icon: '📋',
       content: <KanbanApp />,
       defaultSize: { width: 1200, height: 800 },
+    },
+    {
+      id: 'organizations',
+      name: 'Organizations',
+      icon: '🏢',
+      content: <OrganizationApp />,
+      defaultSize: { width: 1000, height: 700 },
     },
   ];
 }

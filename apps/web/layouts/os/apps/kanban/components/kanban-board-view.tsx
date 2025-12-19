@@ -148,6 +148,7 @@ interface KanbanBoardViewProps {
   onCreateCard: (columnId: ColumnId) => void;
   onEditCard: (card: KanbanCard) => void;
   onDeleteCard: (card: KanbanCard) => void;
+  onArchiveCard: (card: KanbanCard) => void;
   onEditColumn: (column: KanbanColumn) => void;
   onDeleteColumn: (id: ColumnId) => void;
   onUpdateColumn: (id: ColumnId, data: { name?: string; color?: ColumnColor }) => void;
@@ -163,6 +164,7 @@ export function KanbanBoardView({
   onCreateCard,
   onEditCard,
   onDeleteCard,
+  onArchiveCard,
   onEditColumn,
   onDeleteColumn,
   onUpdateColumn,
@@ -377,6 +379,7 @@ export function KanbanBoardView({
                 onChangeColor={(color) => onUpdateColumn(column._id, { color })}
                 onCardClick={onEditCard}
                 onDeleteCard={onDeleteCard}
+                onArchiveCard={onArchiveCard}
                 isDropTarget={overColumnId === column._id && activeCard !== null}
               />
             ))}

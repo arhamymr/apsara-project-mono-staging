@@ -60,13 +60,19 @@ export function ShareWithOrgButton({
   const [isUnsharing, setIsUnsharing] = useState<string | null>(null);
   const portalContainer = useWindowPortalContainer();
 
+  // Check if user owns this resource (only owners can share)
+  const accessLevel = useQuery(api.sharedResources.canAccessResource, {
+    resourceType,
+    resourceId,
+  });
+
   // Get user's organizations
   const organizations = useQuery(api.organizations.listUserOrganizations, {});
   
-  // Get organizations this resource is already shared with
+  // Get organizations this resource is already shared with (only if user is owner)
   const sharedOrganizations = useQuery(
     api.sharedResources.getResourceOrganizations,
-    { resourceType, resourceId }
+    accessLevel === 'owner' ? { resourceType, resourceId } : 'skip'
   ) as SharedOrg[] | undefined;
 
   // Mutations
@@ -74,8 +80,11 @@ export function ShareWithOrgButton({
   const unshareResourceMutation = useMutation(api.sharedResources.unshareResource);
 
   // Filter out organizations the resource is already shared with
+  // AND organizations where user is a viewer (viewers can't share resources)
   const availableOrganizations = organizations?.filter(
-    (org) => !sharedOrganizations?.some((shared) => shared.organizationId === org._id)
+    (org) => 
+      org.userRole !== 'viewer' &&
+      !sharedOrganizations?.some((shared) => shared.organizationId === org._id)
   );
 
   const handleShare = useCallback(async () => {
@@ -113,8 +122,8 @@ export function ShareWithOrgButton({
     }
   }, [unshareResourceMutation, isUnsharing]);
 
-  // Don't render if user has no organizations
-  if (!organizations || organizations.length === 0) {
+  // Don't render if user doesn't own the resource or has no organizations
+  if (accessLevel !== 'owner' || !organizations || organizations.length === 0) {
     return null;
   }
 

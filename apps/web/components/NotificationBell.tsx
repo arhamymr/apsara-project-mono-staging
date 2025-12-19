@@ -9,11 +9,12 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@/lib/utils";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { Bell, Check, Trash2, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { toast } from "sonner";
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,10 @@ export default function NotificationBell() {
   const markAllAsRead = useMutation(api.notifications.markAllAsRead);
   const deleteNotification = useMutation(api.notifications.deleteNotification);
   const clearAllNotifications = useMutation(api.notifications.clearAllNotifications);
+  const acceptInvitation = useMutation(api.invitations.acceptInvitation);
+  const declineInvitation = useMutation(api.invitations.declineInvitation);
+
+  const [processingInvitation, setProcessingInvitation] = useState<string | null>(null);
 
   const unreadCount = notifications.filter((n) => !n.read_at).length;
   const loading = notifications === undefined;
@@ -44,6 +49,32 @@ export default function NotificationBell() {
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInDays < 7) return `${diffInDays}d ago`;
     return date.toLocaleDateString();
+  };
+
+  const handleAcceptInvitation = async (notificationId: Id<"notifications">, invitationId: string) => {
+    setProcessingInvitation(invitationId);
+    try {
+      await acceptInvitation({ invitationId: invitationId as Id<"invitations"> });
+      await deleteNotification({ notificationId });
+      toast.success("Successfully joined the organization!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to accept invitation");
+    } finally {
+      setProcessingInvitation(null);
+    }
+  };
+
+  const handleDeclineInvitation = async (notificationId: Id<"notifications">, invitationId: string) => {
+    setProcessingInvitation(invitationId);
+    try {
+      await declineInvitation({ invitationId: invitationId as Id<"invitations"> });
+      await deleteNotification({ notificationId });
+      toast.success("Invitation declined");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to decline invitation");
+    } finally {
+      setProcessingInvitation(null);
+    }
   };
 
   return (
@@ -110,62 +141,98 @@ export default function NotificationBell() {
             </div>
           ) : (
             <div className="divide-y">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors",
-                    !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
-                  )}
-                >
-                  {notification.data.icon && (
-                    <div className="flex-shrink-0 text-2xl">
-                      {notification.data.icon}
-                    </div>
-                  )}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm leading-tight font-semibold">
-                        {notification.data.title}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() => deleteNotification({ notificationId: notification.id as Id<"notifications"> })}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {notification.data.message}
-                    </p>
-                    {notification.data.action_url && (
-                      <a
-                        href={notification.data.action_url}
-                        className="text-primary inline-block text-xs font-medium hover:underline"
-                      >
-                        {notification.data.action_text || "View"}
-                      </a>
+              {notifications.map((notification) => {
+                const isInvitation = notification.type === "organization_invitation" && notification.data.metadata?.invitationId;
+                const invitationId = notification.data.metadata?.invitationId;
+                const isProcessing = processingInvitation === invitationId;
+
+                return (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      "group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors",
+                      !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
                     )}
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-xs">
-                        {formatTime(notification.created_at)}
-                      </p>
-                      {!notification.read_at && (
+                  >
+                    {notification.data.icon && (
+                      <div className="flex-shrink-0 text-2xl">
+                        {notification.data.icon}
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm leading-tight font-semibold">
+                          {notification.data.title}
+                        </p>
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs"
-                          onClick={() => markAsRead({ notificationId: notification.id as Id<"notifications"> })}
+                          size="icon"
+                          className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                          onClick={() => deleteNotification({ notificationId: notification.id as Id<"notifications"> })}
                         >
-                          Mark as read
+                          <X className="h-3 w-3" />
                         </Button>
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {notification.data.message}
+                      </p>
+                      
+                      {/* Invitation action buttons */}
+                      {isInvitation ? (
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            size="sm"
+                            className="h-7 flex-1 text-xs"
+                            onClick={() => handleAcceptInvitation(notification.id as Id<"notifications">, invitationId)}
+                            disabled={isProcessing}
+                          >
+                            {isProcessing ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <Check className="mr-1 h-3 w-3" />
+                                Accept
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={() => handleDeclineInvitation(notification.id as Id<"notifications">, invitationId)}
+                            disabled={isProcessing}
+                          >
+                            Decline
+                          </Button>
+                        </div>
+                      ) : notification.data.action_url && (
+                        <a
+                          href={notification.data.action_url}
+                          className="text-primary inline-block text-xs font-medium hover:underline"
+                        >
+                          {notification.data.action_text || "View"}
+                        </a>
                       )}
+                      
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground text-xs">
+                          {formatTime(notification.created_at)}
+                        </p>
+                        {!notification.read_at && !isInvitation && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => markAsRead({ notificationId: notification.id as Id<"notifications"> })}
+                          >
+                            Mark as read
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </ScrollArea>

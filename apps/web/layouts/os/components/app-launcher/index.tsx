@@ -9,7 +9,7 @@ import { Input } from '@workspace/ui/components/input';
 import { useWindowActions } from '@/layouts/os/WindowActionsContext';
 import { cn } from '@/lib/utils';
 import { Grid3x3, MonitorDown, Search } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import { useAppLauncher } from './hooks/useAppLauncher';
 import type { AppDef } from '@/layouts/os/types';
 
@@ -22,6 +22,7 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
     useAppLauncher({ onOpenChange });
   const { apps, openApp, addShortcutForApp, shortcuts } = useWindowActions();
   const [searchQuery, setSearchQuery] = useState('');
+  const contextMenuOpenRef = useRef(false);
 
   const filteredApps = useMemo(() => {
     if (!searchQuery.trim()) return apps;
@@ -61,6 +62,8 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
   );
 
   const handleCloseMenu = useCallback(() => {
+    // Don't close if context menu is open
+    if (contextMenuOpenRef.current) return;
     closeMenu();
     setSearchQuery('');
   }, [closeMenu]);
@@ -115,7 +118,12 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
                         typeof app.icon === 'string' ? app.icon : app.icon;
                       const alreadyOnDesktop = isOnDesktop(app.id);
                       return (
-                        <ContextMenu key={app.id}>
+                        <ContextMenu
+                          key={app.id}
+                          onOpenChange={(open) => {
+                            contextMenuOpenRef.current = open;
+                          }}
+                        >
                           <ContextMenuTrigger asChild>
                             <button
                               type="button"

@@ -29,6 +29,7 @@ interface KanbanColumnViewProps {
   onChangeColor: (color: ColumnColor) => void;
   onCardClick: (card: KanbanCard) => void;
   onDeleteCard: (card: KanbanCard) => void;
+  onArchiveCard: (card: KanbanCard) => void;
   isDragging?: boolean;
   isDropTarget?: boolean;
 }
@@ -41,6 +42,7 @@ export const KanbanColumnView = memo(function KanbanColumnView({
   onChangeColor,
   onCardClick,
   onDeleteCard,
+  onArchiveCard,
   isDragging = false,
   isDropTarget = false,
 }: KanbanColumnViewProps) {
@@ -177,6 +179,7 @@ export const KanbanColumnView = memo(function KanbanColumnView({
               card={card}
               onClick={() => onCardClick(card)}
               onDelete={() => onDeleteCard(card)}
+              onArchive={() => onArchiveCard(card)}
             />
           ))}
         </SortableContext>

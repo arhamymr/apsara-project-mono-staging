@@ -25,6 +25,7 @@ export const getNotifications = query({
         icon: n.icon,
         action_url: n.actionUrl,
         action_text: n.actionText,
+        metadata: n.metadata,
       },
       read_at: n.readAt ? new Date(n.readAt).toISOString() : null,
       created_at: new Date(n.createdAt).toISOString(),

@@ -1,5 +1,6 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -8,17 +9,38 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@workspace/ui/components/tooltip';
 import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ArrowUp, Minus, MoreVertical, Trash2 } from 'lucide-react';
+import { Archive, ArrowUp, Calendar, Minus, MoreVertical, Trash2 } from 'lucide-react';
 import { memo } from 'react';
 import type { KanbanCard, Priority } from '../types';
+import { formatWhen } from '../types';
+
+function getInitials(name?: string, email?: string): string {
+  if (name) {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  if (email) return email[0]?.toUpperCase() || '?';
+  return '?';
+}
 
 interface KanbanCardViewProps {
   card: KanbanCard;
   onClick: () => void;
   onDelete?: () => void;
+  onArchive?: () => void;
   isDragging?: boolean;
 }
 
@@ -43,7 +65,7 @@ const priorityConfig: Record<Priority, { label: string; icon: typeof Minus; clas
   },
 };
 
-export const KanbanCardView = memo(function KanbanCardView({ card, onClick, onDelete, isDragging = false }: KanbanCardViewProps) {
+export const KanbanCardView = memo(function KanbanCardView({ card, onClick, onDelete, onArchive, isDragging = false }: KanbanCardViewProps) {
   const {
     attributes,
     listeners,
@@ -91,8 +113,8 @@ export const KanbanCardView = memo(function KanbanCardView({ card, onClick, onDe
       <div className={cn('absolute top-0 left-0 h-full w-1 rounded-l-lg', priority.dotColor, 'opacity-60 group-hover:opacity-100')} />
 
       {/* Dropdown Menu */}
-      {onDelete && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      {(onDelete || onArchive) && (
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -104,17 +126,30 @@ export const KanbanCardView = memo(function KanbanCardView({ card, onClick, onDe
                 <MoreVertical className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-36">
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove Card
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-36 z-[99999]">
+              {onArchive && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onArchive();
+                  }}
+                >
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archive
+                </DropdownMenuItem>
+              )}
+              {onDelete && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -130,10 +165,33 @@ export const KanbanCardView = memo(function KanbanCardView({ card, onClick, onDe
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-2 pl-1">
-        <Badge variant="outline" className={cn('text-xs font-medium', priority.className)}>
-          <PriorityIcon className="mr-1 h-3 w-3" />
-          {priority.label}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className={cn('text-xs font-medium', priority.className)}>
+            <PriorityIcon className="mr-1 h-3 w-3" />
+            {priority.label}
+          </Badge>
+          <span className="text-muted-foreground flex items-center gap-1 text-xs">
+            <Calendar className="h-3 w-3" />
+            {formatWhen(card.createdAt)}
+          </span>
+        </div>
+        {card.assignee && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Avatar className="h-6 w-6 border">
+                  <AvatarImage src={card.assignee.image} />
+                  <AvatarFallback className="text-[10px]">
+                    {getInitials(card.assignee.name, card.assignee.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{card.assignee.name || card.assignee.email}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     </div>
   );

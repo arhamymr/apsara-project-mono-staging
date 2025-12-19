@@ -22,6 +22,7 @@ import {
 } from "@workspace/ui/components/alert-dialog";
 import { cn } from "@/lib/utils";
 import {
+  Archive,
   ChevronDown,
   Kanban,
   Loader2,
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 import type { BoardId, KanbanBoard } from "../types";
 import { ShareWithOrgButton } from "../../organizations/components/share-with-org-button";
+import { OrgMembersAvatars } from "../../organizations/components/org-members-avatars";
 
 interface Board {
   _id: BoardId;
@@ -45,11 +47,13 @@ interface KanbanHeaderProps {
   selectedBoardId: BoardId | null;
   isCreatingColumn: boolean;
   isCreatingBoard: boolean;
+  archivedCount?: number;
   onCreateColumn: () => void;
   onSelectBoard: (id: BoardId) => void;
   onOpenBoardModal: () => void;
   onDeleteBoard: (id: BoardId) => void;
   onUpdateBoard: (id: BoardId, name: string) => void;
+  onOpenArchive: () => void;
 }
 
 export function KanbanHeader({
@@ -58,11 +62,13 @@ export function KanbanHeader({
   selectedBoardId,
   isCreatingColumn,
   isCreatingBoard,
+  archivedCount = 0,
   onCreateColumn,
   onSelectBoard,
   onOpenBoardModal,
   onDeleteBoard,
   onUpdateBoard,
+  onOpenArchive,
 }: KanbanHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState<{
@@ -224,6 +230,12 @@ export function KanbanHeader({
         </div>
         <div className="flex items-center gap-2">
           {board && (
+            <OrgMembersAvatars
+              resourceType="kanbanBoard"
+              resourceId={board._id}
+            />
+          )}
+          {board && (
             <ShareWithOrgButton
               resourceType="kanbanBoard"
               resourceId={board._id}
@@ -258,6 +270,21 @@ export function KanbanHeader({
                 <Plus className="mr-2 h-4 w-4" />
               )}
               Add Column
+            </Button>
+          )}
+          {board && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onOpenArchive}
+              className="relative"
+            >
+              <Archive className="h-4 w-4" />
+              {archivedCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                  {archivedCount > 9 ? '9+' : archivedCount}
+                </span>
+              )}
             </Button>
           )}
         </div>

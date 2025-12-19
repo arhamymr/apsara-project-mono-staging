@@ -1,6 +1,68 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
+
+/**
+ * Helper function to check if user can access a chat session
+ * Returns access level: "owner", "edit", "view", or "none"
+ */
+async function checkSessionAccess(
+  ctx: QueryCtx,
+  sessionId: Id<"chatSessions">,
+  userId: Id<"users">
+): Promise<"owner" | "edit" | "view" | "none"> {
+  const session = await ctx.db.get(sessionId);
+  if (!session) return "none";
+
+  // Check if user is the owner
+  if (session.userId === userId) return "owner";
+
+  // Check if session is shared with any organization the user is a member of
+  const sharedResources = await ctx.db
+    .query("sharedResources")
+    .withIndex("by_resource", (q) =>
+      q.eq("resourceType", "chatSession").eq("resourceId", sessionId)
+    )
+    .collect();
+
+  if (sharedResources.length === 0) return "none";
+
+  // Check user's membership in each organization
+  let highestAccess: "edit" | "view" | "none" = "none";
+
+  for (const sharedResource of sharedResources) {
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", sharedResource.organizationId).eq("userId", userId)
+      )
+      .unique();
+
+    if (membership) {
+      if (membership.role === "owner" || membership.role === "admin" || membership.role === "editor") {
+        highestAccess = "edit";
+        break;
+      } else if (membership.role === "viewer" && highestAccess === "none") {
+        highestAccess = "view";
+      }
+    }
+  }
+
+  return highestAccess;
+}
+
+/**
+ * Helper function to check if user can edit a session (for mutations)
+ */
+async function canEditSession(
+  ctx: QueryCtx,
+  sessionId: Id<"chatSessions">,
+  userId: Id<"users">
+): Promise<boolean> {
+  const accessLevel = await checkSessionAccess(ctx, sessionId, userId);
+  return accessLevel === "owner" || accessLevel === "edit";
+}
 
 // Create a new vibe-coding session with initial message
 export const createVibeCodeSession = mutation({
@@ -41,22 +103,52 @@ export const createVibeCodeSession = mutation({
   },
 });
 
-// Get vibe-coding sessions for the current user
+// Get vibe-coding sessions for the current user (including shared sessions)
 export const getVibeCodeSessions = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    const sessions = await ctx.db
+    // Get user's own sessions
+    const ownSessions = await ctx.db
       .query("chatSessions")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
 
+    // Get sessions shared with user through organizations
+    const userMemberships = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const sharedSessionIds = new Set<string>();
+    const sharedSessions: typeof ownSessions = [];
+
+    for (const membership of userMemberships) {
+      const sharedResources = await ctx.db
+        .query("sharedResources")
+        .withIndex("by_organization", (q) => q.eq("organizationId", membership.organizationId))
+        .collect();
+
+      for (const resource of sharedResources) {
+        if (resource.resourceType === "chatSession" && !sharedSessionIds.has(resource.resourceId)) {
+          sharedSessionIds.add(resource.resourceId);
+          const session = await ctx.db.get(resource.resourceId as Id<"chatSessions">);
+          if (session && session.userId !== userId) {
+            sharedSessions.push(session);
+          }
+        }
+      }
+    }
+
+    // Combine all sessions
+    const allSessions = [...ownSessions, ...sharedSessions];
+
     const vibeCodeSessions = [];
     
-    for (const session of sessions) {
+    for (const session of allSessions) {
       const firstMessage = await ctx.db
         .query("chatMessages")
         .withIndex("by_session", (q) => q.eq("sessionId", session._id))
@@ -75,11 +167,12 @@ export const getVibeCodeSessions = query({
       }
     }
 
-    return vibeCodeSessions;
+    // Sort by updatedAt
+    return vibeCodeSessions.sort((a, b) => b.updatedAt - a.updatedAt);
   },
 });
 
-// Send a message in an existing vibe-coding session
+// Send a message in an existing vibe-coding session (with shared access support)
 export const sendVibeCodeMessage = mutation({
   args: {
     sessionId: v.id("chatSessions"),
@@ -89,8 +182,8 @@ export const sendVibeCodeMessage = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) {
+    // Check if user can edit this session
+    if (!(await canEditSession(ctx, sessionId, userId))) {
       throw new Error("Session not found or access denied");
     }
 
@@ -115,7 +208,7 @@ export const sendVibeCodeMessage = mutation({
   },
 });
 
-// Save generated artifact from coding agent (creates new version)
+// Save generated artifact from coding agent (creates new version) - with shared access support
 export const saveGeneratedArtifact = mutation({
   args: {
     sessionId: v.id("chatSessions"),
@@ -133,8 +226,8 @@ export const saveGeneratedArtifact = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) {
+    // Check if user can edit this session
+    if (!(await canEditSession(ctx, sessionId, userId))) {
       throw new Error("Session not found or access denied");
     }
 
@@ -166,15 +259,16 @@ export const saveGeneratedArtifact = mutation({
   },
 });
 
-// Get all artifact versions for a session (version history)
+// Get all artifact versions for a session (version history) - with shared access support
 export const getSessionArtifacts = query({
   args: { sessionId: v.id("chatSessions") },
   handler: async (ctx, { sessionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) return [];
+    // Check if user has access to this session
+    const accessLevel = await checkSessionAccess(ctx, sessionId, userId);
+    if (accessLevel === "none") return [];
 
     const artifacts = await ctx.db
       .query("artifacts")
@@ -189,15 +283,16 @@ export const getSessionArtifacts = query({
   },
 });
 
-// Get the latest artifact for a session
+// Get the latest artifact for a session - with shared access support
 export const getLatestArtifact = query({
   args: { sessionId: v.id("chatSessions") },
   handler: async (ctx, { sessionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) return null;
+    // Check if user has access to this session
+    const accessLevel = await checkSessionAccess(ctx, sessionId, userId);
+    if (accessLevel === "none") return null;
 
     const artifact = await ctx.db
       .query("artifacts")
@@ -216,7 +311,7 @@ export const getLatestArtifact = query({
   },
 });
 
-// Get a specific artifact version
+// Get a specific artifact version - with shared access support
 export const getArtifactByVersion = query({
   args: { 
     sessionId: v.id("chatSessions"),
@@ -226,8 +321,9 @@ export const getArtifactByVersion = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) return null;
+    // Check if user has access to this session
+    const accessLevel = await checkSessionAccess(ctx, sessionId, userId);
+    if (accessLevel === "none") return null;
 
     const artifact = await ctx.db
       .query("artifacts")
@@ -247,15 +343,16 @@ export const getArtifactByVersion = query({
   },
 });
 
-// Get version history summary (lightweight - without file contents)
+// Get version history summary (lightweight - without file contents) - with shared access support
 export const getVersionHistory = query({
   args: { sessionId: v.id("chatSessions") },
   handler: async (ctx, { sessionId }) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) return [];
+    // Check if user has access to this session
+    const accessLevel = await checkSessionAccess(ctx, sessionId, userId);
+    if (accessLevel === "none") return [];
 
     const artifacts = await ctx.db
       .query("artifacts")
@@ -280,7 +377,7 @@ export const getVersionHistory = query({
 });
 
 
-// Update a single file in the latest artifact (for manual edits)
+// Update a single file in the latest artifact (for manual edits) - with shared access support
 export const updateArtifactFile = mutation({
   args: {
     sessionId: v.id("chatSessions"),
@@ -291,8 +388,8 @@ export const updateArtifactFile = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const session = await ctx.db.get(sessionId);
-    if (!session || session.userId !== userId) {
+    // Check if user can edit this session
+    if (!(await canEditSession(ctx, sessionId, userId))) {
       throw new Error("Session not found or access denied");
     }
 

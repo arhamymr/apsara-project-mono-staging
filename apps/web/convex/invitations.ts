@@ -109,8 +109,8 @@ export const createInvitation = mutation({
         title: "Organization Invitation",
         message: `${inviterName} invited you to join "${organization.name}"`,
         icon: "📧",
-        actionUrl: "/organizations/invitations",
-        actionText: "View Invitation",
+        actionText: "Accept Invitation",
+        metadata: { invitationId: invitationId, organizationName: organization.name },
         createdAt: now,
       });
     }
@@ -192,6 +192,16 @@ export const acceptInvitation = mutation({
         createdAt: now,
       });
     }
+
+    // Send success notification to the user who accepted the invitation
+    await ctx.db.insert("notifications", {
+      userId,
+      type: "success",
+      title: "Successfully Joined! 🎉",
+      message: `You are now a member of "${organization.name}"`,
+      icon: "🎉",
+      createdAt: now,
+    });
 
     return { success: true, organizationId: invitation.organizationId };
   },
@@ -370,5 +380,76 @@ export const getOrganizationInvitations = query({
 
     // Sort by creation date (newest first)
     return enrichedInvitations.sort((a, b) => b.createdAt - a.createdAt);
+  },
+});
+
+
+/**
+ * Resend invitation notification to a user
+ * - Only owners and admins can resend invitations
+ * - Only works for pending invitations
+ * - Only sends notification if user has an account
+ */
+export const resendInvitation = mutation({
+  args: {
+    invitationId: v.id("invitations"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    // Get the invitation
+    const invitation = await ctx.db.get(args.invitationId);
+    if (!invitation) throw new Error("Invitation not found");
+
+    if (invitation.status !== "pending") {
+      throw new Error("Can only resend pending invitations");
+    }
+
+    // Check if user is owner or admin of the organization
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", invitation.organizationId).eq("userId", userId)
+      )
+      .unique();
+
+    if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+      throw new Error("You don't have permission to perform this action");
+    }
+
+    // Get the organization
+    const organization = await ctx.db.get(invitation.organizationId);
+    if (!organization) throw new Error("Organization not found");
+
+    // Find if there's a user with this email
+    const invitedUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), invitation.email))
+      .first();
+
+    if (!invitedUser) {
+      throw new Error("User does not have an account yet. They will see the invitation when they sign up.");
+    }
+
+    // Get inviter's name
+    const inviter = await ctx.db.get(userId);
+    const inviterName = inviter?.name || inviter?.email || "Someone";
+
+    const now = Date.now();
+
+    // Send a new notification
+    await ctx.db.insert("notifications", {
+      userId: invitedUser._id,
+      type: "organization_invitation",
+      title: "Invitation Reminder",
+      message: `${inviterName} is waiting for you to join "${organization.name}"`,
+      icon: "🔔",
+      actionText: "Accept Invitation",
+      metadata: { invitationId: invitation._id, organizationName: organization.name },
+      createdAt: now,
+    });
+
+    return { success: true };
   },
 });

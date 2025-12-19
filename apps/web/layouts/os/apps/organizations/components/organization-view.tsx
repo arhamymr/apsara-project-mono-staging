@@ -1,6 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
+import { useMutation } from 'convex/react';
+import { toast } from 'sonner';
+import { api } from '@/convex/_generated/api';
 import { Button } from '@workspace/ui/components/button';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
@@ -13,8 +17,9 @@ import {
   Users,
   Mail,
   Clock,
+  RefreshCw,
 } from 'lucide-react';
-import type { Organization, SharedResource, Member, Invitation } from '../types';
+import type { Organization, SharedResource, Member, Invitation, InvitationId } from '../types';
 
 interface OrganizationViewProps {
   organization: Organization | null | undefined;
@@ -69,6 +74,22 @@ export function OrganizationView({
   onOpenInviteDialog,
   canManageMembers,
 }: OrganizationViewProps) {
+  const [resendingId, setResendingId] = useState<InvitationId | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resendInvitationMutation = useMutation((api as any).invitations.resendInvitation);
+
+  const handleResendInvitation = async (invitationId: InvitationId) => {
+    setResendingId(invitationId);
+    try {
+      await resendInvitationMutation({ invitationId });
+      toast.success('Invitation reminder sent!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to resend invitation');
+    } finally {
+      setResendingId(null);
+    }
+  };
+
   if (!organization) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -258,6 +279,20 @@ export function OrganizationView({
                             Invited by {invitation.inviterName} • {formatRelativeTime(invitation.createdAt)}
                           </p>
                         </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleResendInvitation(invitation._id)}
+                          disabled={resendingId === invitation._id}
+                          title="Resend invitation notification"
+                        >
+                          <RefreshCw
+                            className={cn(
+                              'h-4 w-4',
+                              resendingId === invitation._id && 'animate-spin'
+                            )}
+                          />
+                        </Button>
                         <span className="bg-muted text-muted-foreground rounded-full px-2 py-1 text-xs font-medium capitalize">
                           {invitation.role}
                         </span>

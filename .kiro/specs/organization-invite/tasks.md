@@ -307,29 +307,38 @@
 
 
 
-- [-] 14. Integrate organization features with existing apps
-
-
-
-  - [ ] 14.1 Add share button to Kanban board header
+- [x] 14. Integrate organization features with existing apps
+  - [x] 14.1 Add share button to Kanban board header
     - _Requirements: 5.1_
   - [x] 14.2 Add share button to Notes app
-
-
     - _Requirements: 5.1_
-  - [-] 14.3 Add share button to Vibe Coding sessions
-
+  - [x] 14.3 Add share button to Vibe Coding sessions
     - _Requirements: 5.1_
-  - [ ] 14.4 Update resource access checks in existing apps
+  - [x] 14.4 Update resource access checks in existing apps
     - Check organization membership and role for shared resources
     - _Requirements: 5.4, 5.5, 6.3_
 
-- [ ] 15. Create Organization app entry point
+- [x] 15. Create Organization app entry point
 
-  - [ ] 15.1 Create `OrganizationApp.tsx` main component
-  - [ ] 15.2 Add organization app to app-definitions.tsx
-  - [ ] 15.3 Add organization icon to dock/launcher
+  - [x] 15.1 Create `OrganizationApp.tsx` main component
+  - [x] 15.2 Add organization app to app-definitions.tsx
 
-- [ ] 16. Final Checkpoint - Ensure all tests pass
+  - [x] 15.3 Add organization icon to dock/launcher
+
+- [x] 16. Final Checkpoint - Ensure all tests pass
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   - Ensure all tests pass, ask the user if questions arise.
+

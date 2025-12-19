@@ -120,11 +120,26 @@ const schema = defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    assigneeId: v.optional(v.id("users")),
     position: v.number(),
+    isArchived: v.optional(v.boolean()),
+    archivedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index("by_column", ["columnId"]),
+    .index("by_column", ["columnId"])
+    .index("by_assignee", ["assigneeId"])
+    .index("by_archived", ["isArchived"]),
+
+  kanbanComments: defineTable({
+    cardId: v.id("kanbanCards"),
+    userId: v.id("users"),
+    content: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_card", ["cardId"])
+    .index("by_user", ["userId"]),
 
   notifications: defineTable({
     userId: v.id("users"),
@@ -134,6 +149,7 @@ const schema = defineSchema({
     icon: v.optional(v.string()),
     actionUrl: v.optional(v.string()),
     actionText: v.optional(v.string()),
+    metadata: v.optional(v.any()), // For storing additional data like invitationId
     readAt: v.optional(v.number()),
     createdAt: v.number(),
   })

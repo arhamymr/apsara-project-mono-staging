@@ -80,31 +80,34 @@ export function InvitationCard({
           className="flex-1"
         >
           {isAccepting ? (
-            <span className="animate-pulse">Accepting...</span>
+            <span className="animate-pulse">Joining...</span>
           ) : (
             <>
               <Check className="mr-1.5 h-4 w-4" />
-              Accept
+              Accept Invitation
             </>
           )}
         </Button>
         <Button
           size="sm"
-          variant="outline"
+          variant="ghost"
           onClick={() => onDecline(invitation._id)}
           disabled={isLoading}
-          className="flex-1"
+          className="text-muted-foreground hover:text-destructive"
         >
           {isDeclining ? (
-            <span className="animate-pulse">Declining...</span>
+            <span className="animate-pulse">Ignoring...</span>
           ) : (
             <>
               <X className="mr-1.5 h-4 w-4" />
-              Decline
+              Ignore
             </>
           )}
         </Button>
       </div>
+      <p className="text-muted-foreground mt-2 text-xs">
+        Click Ignore if you don&apos;t want to join this organization
+      </p>
     </div>
   );
 }

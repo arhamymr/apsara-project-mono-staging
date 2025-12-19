@@ -6,20 +6,39 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import type { BoardId, ColumnColor, ColumnId, KanbanCard, KanbanColumn, Priority } from './types';
 
+const STORAGE_KEY = 'kanban-selected-board';
+
 export function useKanban() {
   const boards = useQuery(api.kanban.listBoards, {});
-  const [selectedBoardId, setSelectedBoardId] = useState<BoardId | null>(null);
+  const [selectedBoardId, setSelectedBoardIdState] = useState<BoardId | null>(null);
   const board = useQuery(api.kanban.getBoard, selectedBoardId ? { id: selectedBoardId } : 'skip');
 
-  // Auto-select first board when boards are loaded and no board is selected
+  // Wrapper to persist selection to localStorage
+  const setSelectedBoardId = useCallback((id: BoardId | null) => {
+    setSelectedBoardIdState(id);
+    if (id) {
+      localStorage.setItem(STORAGE_KEY, id);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  // Restore from localStorage or auto-select first board
   useEffect(() => {
     if (boards && boards.length > 0 && !selectedBoardId) {
-      const firstBoard = boards[0];
-      if (firstBoard) {
-        setSelectedBoardId(firstBoard._id);
+      const savedId = localStorage.getItem(STORAGE_KEY) as BoardId | null;
+      const savedBoardExists = savedId && boards.some(b => b._id === savedId);
+      
+      if (savedBoardExists) {
+        setSelectedBoardIdState(savedId);
+      } else {
+        const firstBoard = boards[0];
+        if (firstBoard) {
+          setSelectedBoardId(firstBoard._id);
+        }
       }
     }
-  }, [boards, selectedBoardId]);
+  }, [boards, selectedBoardId, setSelectedBoardId]);
 
   // Mutations
   const createBoardMutation = useMutation(api.kanban.createBoard);
@@ -33,6 +52,14 @@ export function useKanban() {
   const updateCardMutation = useMutation(api.kanban.updateCard);
   const deleteCardMutation = useMutation(api.kanban.deleteCard);
   const moveCardMutation = useMutation(api.kanban.moveCard);
+  const archiveCardMutation = useMutation(api.kanban.archiveCard);
+  const unarchiveCardMutation = useMutation(api.kanban.unarchiveCard);
+
+  // Archived cards query
+  const archivedCards = useQuery(
+    api.kanban.getArchivedCards,
+    selectedBoardId ? { boardId: selectedBoardId } : 'skip'
+  );
 
   // Loading states
   const [isCreatingBoard, setIsCreatingBoard] = useState(false);
@@ -48,6 +75,9 @@ export function useKanban() {
 
   // Board modal state
   const [boardModalOpen, setBoardModalOpen] = useState(false);
+
+  // Archive drawer state
+  const [archiveDrawerOpen, setArchiveDrawerOpen] = useState(false);
 
   // Board actions
   const handleCreateBoard = useCallback(async (name: string, templateColumns?: string[]) => {
@@ -82,7 +112,7 @@ export function useKanban() {
     } catch {
       toast.error('Failed to delete board');
     }
-  }, [deleteBoardMutation, selectedBoardId]);
+  }, [deleteBoardMutation, selectedBoardId, setSelectedBoardId]);
 
   // Column actions
   const handleCreateColumn = useCallback(async (name: string) => {
@@ -131,11 +161,16 @@ export function useKanban() {
   }, [reorderColumnsMutation, selectedBoardId]);
 
   // Card actions
-  const handleCreateCard = useCallback(async (columnId: ColumnId, title: string, priority: Priority = 'medium') => {
+  const handleCreateCard = useCallback(async (
+    columnId: ColumnId,
+    title: string,
+    priority: Priority = 'medium',
+    assigneeId?: Parameters<typeof createCardMutation>[0]['assigneeId']
+  ) => {
     if (isCreatingCard) return;
     setIsCreatingCard(true);
     try {
-      await createCardMutation({ columnId, title, priority });
+      await createCardMutation({ columnId, title, priority, assigneeId });
       setCardModalOpen(false);
       toast.success('Card created');
     } catch {
@@ -182,6 +217,26 @@ export function useKanban() {
     }
   }, [moveCardMutation]);
 
+  const handleArchiveCard = useCallback(async (id: Parameters<typeof archiveCardMutation>[0]['id']) => {
+    try {
+      await archiveCardMutation({ id });
+      setCardModalOpen(false);
+      setEditingCard(null);
+      toast.success('Card archived');
+    } catch {
+      toast.error('Failed to archive card');
+    }
+  }, [archiveCardMutation]);
+
+  const handleUnarchiveCard = useCallback(async (id: Parameters<typeof unarchiveCardMutation>[0]['id']) => {
+    try {
+      await unarchiveCardMutation({ id });
+      toast.success('Card restored');
+    } catch {
+      toast.error('Failed to restore card');
+    }
+  }, [unarchiveCardMutation]);
+
   // Modal helpers
   const openCreateCard = (columnId: ColumnId) => {
     setActiveColumnId(columnId);
@@ -210,6 +265,7 @@ export function useKanban() {
     boards,
     board,
     selectedBoardId,
+    archivedCards,
     // Loading states
     isCreatingBoard,
     isCreatingColumn,
@@ -218,6 +274,7 @@ export function useKanban() {
     cardModalOpen,
     columnModalOpen,
     boardModalOpen,
+    archiveDrawerOpen,
     editingCard,
     editingColumn,
     activeColumnId,
@@ -226,6 +283,7 @@ export function useKanban() {
     setCardModalOpen,
     setColumnModalOpen,
     setBoardModalOpen,
+    setArchiveDrawerOpen,
     // Board actions
     handleCreateBoard,
     handleUpdateBoard,
@@ -240,6 +298,8 @@ export function useKanban() {
     handleUpdateCard,
     handleDeleteCard,
     handleMoveCard,
+    handleArchiveCard,
+    handleUnarchiveCard,
     // Modal helpers
     openCreateCard,
     openEditCard,
