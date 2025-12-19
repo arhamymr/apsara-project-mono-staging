@@ -19,7 +19,7 @@ export function WindowTitleBar({
   return (
     <div
       className={cn(
-        'text-muted-foreground flex',
+        'text-muted-foreground flex select-none',
         maximized
           ? 'cursor-default'
           : 'cursor-all-scroll active:cursor-all-scroll',

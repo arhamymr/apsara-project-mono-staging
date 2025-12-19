@@ -1,6 +1,7 @@
 import { AssetPicker } from '@/components/asset-picker';
 import { Button } from '@workspace/ui/components/button';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import React from 'react';
 
 interface CoverImagePickerProps {
@@ -31,10 +32,13 @@ export function CoverImagePicker({
       >
         {imageUrl ? (
           <div className="relative w-full">
-            <img
+            <Image
               src={imageUrl}
               alt="Cover preview"
+              width={400}
+              height={160}
               className="h-40 w-full rounded-md object-cover"
+              unoptimized
             />
             <div className="absolute top-2 right-2 flex gap-2">
               <Button

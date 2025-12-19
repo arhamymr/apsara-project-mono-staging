@@ -9,6 +9,10 @@ import {
 } from 'react';
 import type { AppDef, DesktopItem, WinState } from './types';
 
+// Re-export split contexts for gradual migration
+export { useWindowState, useIsWindowActive, useWindowById, useParentWindowTitle } from './WindowStateContext';
+export { useWindowActions } from './WindowActionsContext';
+
 export type WindowInteractionState = {
   draggingWindowId: string | null;
   resizingWindowId: string | null;
@@ -67,6 +71,7 @@ export type WindowContextType = {
   ) => string; // returns new subwindow id
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
+  restoreWindow: (id: string) => void;
   toggleMaximizeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   updateWindowPosition: (id: string, x: number, y: number) => void;
@@ -87,6 +92,10 @@ export type WindowContextType = {
 
 const WindowContext = createContext<WindowContextType | null>(null);
 
+/**
+ * @deprecated Use useWindowActions() for actions and useWindowState() for state
+ * This combined context causes unnecessary re-renders
+ */
 export function useWindowContext() {
   const context = useContext(WindowContext);
   if (!context) {

@@ -7,6 +7,7 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { useLocale } from '@/i18n/LocaleContext';
 import { INSTAGRAM_POST_STRINGS } from '@/i18n/instagram-post';
+import { getWhatsAppUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -102,7 +103,7 @@ function HeroSection() {
           >
             <Button size="lg" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={getWhatsAppUrl(s.hero.whatsapp_message)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -292,7 +293,7 @@ function PricingSection() {
 
             <Button size="lg" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={getWhatsAppUrl(s.hero.whatsapp_message)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -342,7 +343,7 @@ function PricingSection() {
 
             <Button size="lg" variant="secondary" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(s.hero.whatsapp_message)}`}
+                href={getWhatsAppUrl(s.hero.whatsapp_message)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

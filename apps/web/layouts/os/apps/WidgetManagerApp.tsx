@@ -35,13 +35,6 @@ const CATALOG: CatalogItem[] = [
     emoji: '📝',
     tags: ['notes', 'productivity'],
   },
-  {
-    type: 'site-builder',
-    label: 'Site Builder',
-    description: 'Shortcut widget to open your site builder workspace.',
-    emoji: '🧱',
-    tags: ['builder', 'shortcut'],
-  },
 ];
 
 type TagFilter =
@@ -49,9 +42,7 @@ type TagFilter =
   | 'utility'
   | 'time'
   | 'notes'
-  | 'productivity'
-  | 'builder'
-  | 'shortcut';
+  | 'productivity';
 
 export default function WidgetManagerApp() {
   const { addWidget } = useWidgets();
@@ -131,7 +122,15 @@ export default function WidgetManagerApp() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div 
+            className={cn(
+              "grid gap-4",
+              filtered.length === 1 && "grid-cols-1",
+              filtered.length === 2 && "grid-cols-1 sm:grid-cols-2",
+              filtered.length === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+              filtered.length >= 4 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            )}
+          >
             {filtered.map((item) => (
               <CatalogCard key={item.type} item={item} onAdd={add(item.type)} />
             ))}
@@ -160,8 +159,6 @@ function TagChips({
     'time',
     'notes',
     'productivity',
-    'builder',
-    'shortcut',
   ];
 
   return (

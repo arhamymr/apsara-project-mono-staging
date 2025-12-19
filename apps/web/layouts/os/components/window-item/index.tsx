@@ -1,247 +1,175 @@
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from '@workspace/ui/components/context-menu';
-import { useWindowContext } from '@/layouts/os/WindowContext';
+import { useIsWindowActive, useParentWindowTitle } from '@/layouts/os/WindowStateContext';
+import { useWindowActions } from '@/layouts/os/WindowActionsContext';
 import { WindowPortalProvider } from '@/layouts/os/WindowPortalContext';
-import { cn } from '@/lib/utils';
-import { memo, useEffect, useRef, useState } from 'react';
-import { Rnd } from 'react-rnd';
+import { memo, useCallback, useMemo, useRef, type RefObject, type CSSProperties } from 'react';
 import type { WinState } from '../../types';
-import { WindowTitleBar } from './WindowTitleBar';
-import { useViewportSize } from './hooks/useViewportSize';
+import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from './constants';
+import { useDeviceDetection } from './hooks/useDeviceDetection';
+import { useDndKitDrag } from './hooks/useDndKitDrag';
+import { useWindowResize } from './hooks/useWindowResize';
+import { ResizeHandles } from './ResizeHandles';
+import { WindowContent } from './WindowContent';
+import { WindowContextMenu } from './WindowContextMenu';
 
-const WindowItem = memo(function WindowItem({ win }: { win: WinState }) {
+interface WindowItemProps {
+  win: WinState;
+}
+
+/**
+ * WindowItem component using CSS transforms for smooth 60fps dragging
+ */
+const WindowItem = memo(function WindowItem({ win }: WindowItemProps) {
+  const { closeWindow, minimizeWindow, toggleMaximizeWindow, focusWindow } = useWindowActions();
+  
+  const active = useIsWindowActive(win.id);
+  const parentTitle = useParentWindowTitle(win.parentId);
+
+  const portalContainerRef = useRef<HTMLDivElement>(null);
+  const isLowSpecDevice = useDeviceDetection();
+
+  const isMaximized = win.maximized ?? false;
+
+  // Drag handling with local offset for smooth movement
   const {
-    windows,
-    activeId,
-    closeWindow,
-    minimizeWindow,
-    toggleMaximizeWindow,
-    focusWindow,
-    updateWindowPosition,
-    updateWindowSize,
-    setDraggingWindow,
-    setResizingWindow,
-  } = useWindowContext();
-  const active = activeId === win.id;
-  const portalContainerRef = useRef<HTMLDivElement | null>(null);
-  const viewport = useViewportSize();
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [isLowSpecDevice, setIsLowSpecDevice] = useState(false);
+    isDragging,
+    isAnimating,
+    dragOffset,
+    handleDragStart,
+    handleDragMove,
+    handleDragEnd,
+    handleFocus,
+  } = useDndKitDrag({
+    windowId: win.id,
+    x: win.x,
+    y: win.y,
+    width: win.w,
+    height: win.h,
+  });
 
-  // Detect low-spec devices
-  useEffect(() => {
-    // Simple performance detection based on device memory and cores
-    const isLowSpec =
-      (navigator.deviceMemory && navigator.deviceMemory < 4) ||
-      (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) ||
-      /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
-      );
+  // Resize handling
+  const {
+    handleResizeStart,
+    handleResizeMove,
+    handleResizeEnd,
+  } = useWindowResize({
+    windowId: win.id,
+    x: win.x,
+    y: win.y,
+    width: win.w,
+    height: win.h,
+  });
 
-    setIsLowSpecDevice(!!isLowSpec);
-  }, []);
+  // Memoize window title computation
+  const windowTitle = useMemo(() => {
+    if (win.sub && win.parentId) {
+      return `${parentTitle ?? 'Window'} / ${win.title}`;
+    }
+    return win.title;
+  }, [win.sub, win.parentId, win.title, parentTitle]);
 
-  // Calculate edge positions for snapping
-  const calculateEdgePosition = (
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  ) => {
-    if (!viewport.width || !viewport.height) {
-      return { x, y };
+  // Memoize style object - use transform for GPU-accelerated movement
+  const windowStyle = useMemo((): CSSProperties => {
+    const shouldAnimate = isAnimating && !isLowSpecDevice;
+    
+    if (isMaximized) {
+      return {
+        position: 'fixed',
+        zIndex: win.z + 333,
+        left: 0,
+        top: 0,
+        width: '100vw',
+        height: '100vh',
+        transform: 'none',
+        transition: shouldAnimate ? 'all 0.3s ease-out' : 'none',
+      };
     }
 
-    // Define minimum visible area (50% of window dimensions) when window is at edge
-    const minVisibleWidth = width * 0.5;
-    const minVisibleHeight = height * 0.5;
+    // Use transform for drag offset (GPU accelerated, no layout thrashing)
+    const translateX = dragOffset.x;
+    const translateY = dragOffset.y;
+    const hasOffset = translateX !== 0 || translateY !== 0;
 
-    // Calculate edge positions
-    const leftEdge = -width + minVisibleWidth;
-    const rightEdge = viewport.width - minVisibleWidth;
-    const topEdge = 0; // Prevent windows from going above the top of screen
-    const bottomEdge = viewport.height - minVisibleHeight;
+    return {
+      position: 'fixed',
+      zIndex: win.z + 333,
+      left: win.x,
+      top: win.y,
+      width: win.w,
+      height: win.h,
+      minWidth: MIN_WINDOW_WIDTH,
+      minHeight: MIN_WINDOW_HEIGHT,
+      // Use translate3d for GPU acceleration
+      transform: hasOffset ? `translate3d(${translateX}px, ${translateY}px, 0)` : 'translate3d(0, 0, 0)',
+      // Only animate when snapping back, not during drag
+      transition: shouldAnimate ? 'left 0.3s ease-out, top 0.3s ease-out' : 'none',
+      // Hint to browser for optimization during drag
+      willChange: isDragging ? 'transform' : 'auto',
+      touchAction: 'none',
+      // Prevent content selection during drag
+      userSelect: isDragging ? 'none' : 'auto',
+    };
+  }, [
+    win.z,
+    win.x,
+    win.y,
+    win.w,
+    win.h,
+    isMaximized,
+    isAnimating,
+    isLowSpecDevice,
+    isDragging,
+    dragOffset,
+  ]);
 
-    // Determine which edge to snap to based on current position
-    let targetX = x;
-    let targetY = y;
-
-    // Check if window is outside viewport horizontally
-    if (x + width < 0) {
-      // Window is completely to the left of viewport, snap to left edge
-      targetX = leftEdge;
-    } else if (x > viewport.width) {
-      // Window is completely to the right of viewport, snap to right edge
-      targetX = rightEdge;
-    }
-
-    // Check if window is outside viewport vertically
-    if (y + height < 0) {
-      // Window is completely above viewport, snap to top edge (at y=0)
-      targetY = topEdge;
-    } else if (y > viewport.height) {
-      // Window is completely below viewport, snap to bottom edge
-      targetY = bottomEdge;
-    }
-
-    // Ensure window doesn't go above the top of the screen
-    targetY = Math.max(0, targetY);
-
-    return { x: targetX, y: targetY };
-  };
-
-  // Throttle drag updates for better performance
-  const handleDrag = () => {
-    // For now, we're not updating position during drag for performance
-    // Position will be updated only on drag stop
-  };
-
-  const handleDragStop = (_event: unknown, data: { x: number; y: number }) => {
-    // Calculate if the window should snap to an edge
-    const edgePosition = calculateEdgePosition(data.x, data.y, win.w, win.h);
-
-    if (edgePosition.x !== data.x || edgePosition.y !== data.y) {
-      // Window is outside viewport, animate to edge position
-      setIsAnimating(true);
-
-      // Update position immediately to edge position
-      updateWindowPosition(win.id, edgePosition.x, edgePosition.y);
-
-      // Reset animation state after a short delay to allow animation to complete
-      setTimeout(() => {
-        setIsAnimating(false);
-        setDraggingWindow(null);
-      }, 300); // Match CSS transition duration
-    } else {
-      // Window is within viewport, just update position normally
-      updateWindowPosition(win.id, data.x, data.y);
-      setDraggingWindow(null);
-    }
-  };
+  // Memoize callbacks
+  const handleBringToFront = useCallback(() => focusWindow(win.id), [focusWindow, win.id]);
+  const handleMinimize = useCallback(() => minimizeWindow(win.id), [minimizeWindow, win.id]);
+  const handleToggleMaximize = useCallback(() => toggleMaximizeWindow(win.id), [toggleMaximizeWindow, win.id]);
+  const handleClose = useCallback(() => closeWindow(win.id), [closeWindow, win.id]);
 
   return (
-    <WindowPortalProvider value={portalContainerRef}>
-      <Rnd
-        position={{ x: win.x, y: win.y }}
-        size={{ width: win.w, height: win.h }}
-        onDragStart={() => {
-          focusWindow(win.id);
-          setDraggingWindow(win.id);
-        }}
-        onDrag={handleDrag}
-        onDragStop={handleDragStop}
-        onResizeStart={() => {
-          focusWindow(win.id);
-          setResizingWindow(win.id);
-        }}
-        onResizeStop={(_event, _direction, ref, _delta, position) => {
-          updateWindowSize(
-            win.id,
-            parseInt(ref.style.width, 10),
-            parseInt(ref.style.height, 10),
-            position.x,
-            position.y,
-          );
-          setResizingWindow(null);
-        }}
-        dragHandleClassName="window-drag-handle"
-        disableDragging={win.maximized}
-        enableResizing={!win.maximized}
-        minWidth={320}
-        minHeight={200}
-        resizeHandleStyles={{
-          bottom: { cursor: 'ns-resize', height: '4px' },
-          right: { cursor: 'ew-resize', width: '4px' },
-          bottomRight: { cursor: 'nwse-resize', width: '8px', height: '8px' },
-          bottomLeft: { cursor: 'nesw-resize', width: '8px', height: '8px' },
-          topRight: { cursor: 'nesw-resize', width: '8px', height: '8px' },
-          topLeft: { cursor: 'nwse-resize', width: '8px', height: '8px' },
-          top: { cursor: 'ns-resize', height: '4px' },
-          left: { cursor: 'ew-resize', width: '4px' },
-        }}
-        resizeHandleClasses={{
-          bottom: 'resize-handle-bottom',
-          right: 'resize-handle-right',
-          bottomRight: 'resize-handle-corner',
-          bottomLeft: 'resize-handle-corner',
-          topRight: 'resize-handle-corner',
-          topLeft: 'resize-handle-corner',
-          top: 'resize-handle-top',
-          left: 'resize-handle-left',
-        }}
-        style={{
-          zIndex: win.z + 333,
-          transition:
-            isAnimating && !isLowSpecDevice
-              ? 'transform 0.3s ease-out'
-              : 'none',
-          transform: `translate(${win.x}px, ${win.y}px)`,
-          left: 0,
-          top: 0,
-          willChange: isLowSpecDevice ? 'auto' : 'transform',
-        }}
-        onMouseDown={() => focusWindow(win.id)}
+    <WindowPortalProvider value={portalContainerRef as RefObject<HTMLElement>}>
+      <div
+        style={windowStyle}
+        onPointerDown={handleDragStart}
+        onPointerMove={isDragging ? handleDragMove : undefined}
+        onPointerUp={isDragging ? handleDragEnd : undefined}
+        onPointerCancel={isDragging ? handleDragEnd : undefined}
+        onMouseDown={handleFocus}
       >
-        <ContextMenu>
-          <ContextMenuTrigger asChild>
-            <div
-              ref={portalContainerRef}
-              className={cn(
-                'bg-muted @container flex h-full w-full flex-col overflow-hidden rounded-sm border transition-all select-none',
-                active &&
-                  (win.sub
-                    ? 'ring-1 ring-amber-500/30 ring-offset-1 ring-offset-transparent'
-                    : 'ring-1 ring-green-500/20 ring-offset-1 ring-offset-transparent'),
-              )}
-              aria-label={win.title}
-            >
-              <WindowTitleBar
-                title={
-                  win.sub && win.parentId
-                    ? `${windows.find((w) => w.id === win.parentId)?.title ?? 'Window'} / ${win.title}`
-                    : win.title
-                }
-                maximized={win.maximized ?? false}
-                onMinimize={() => minimizeWindow(win.id)}
-                onToggleMaximize={() => toggleMaximizeWindow(win.id)}
-                onClose={() => closeWindow(win.id)}
-              />
-              <div className="bg-card flex-1 overflow-hidden">
-                {win.content}
-              </div>
-            </div>
-          </ContextMenuTrigger>
-          <ContextMenuContent className="w-48">
-            <ContextMenuItem onSelect={() => focusWindow(win.id)}>
-              Bring to Front
-            </ContextMenuItem>
-            <ContextMenuSeparator />
-            <ContextMenuItem onSelect={() => minimizeWindow(win.id)}>
-              Minimize
-            </ContextMenuItem>
-            {win.maximized ? (
-              <ContextMenuItem onSelect={() => toggleMaximizeWindow(win.id)}>
-                Restore
-              </ContextMenuItem>
-            ) : (
-              <ContextMenuItem onSelect={() => toggleMaximizeWindow(win.id)}>
-                Maximize
-              </ContextMenuItem>
-            )}
-            <ContextMenuSeparator />
-            <ContextMenuItem onSelect={() => closeWindow(win.id)}>
-              Close
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
-      </Rnd>
+        <WindowContextMenu
+          maximized={isMaximized}
+          onBringToFront={handleBringToFront}
+          onMinimize={handleMinimize}
+          onToggleMaximize={handleToggleMaximize}
+          onClose={handleClose}
+        >
+          <WindowContent
+            ref={portalContainerRef}
+            title={windowTitle}
+            active={active}
+            isSub={!!win.sub}
+            maximized={isMaximized}
+            content={win.content}
+            onMinimize={handleMinimize}
+            onToggleMaximize={handleToggleMaximize}
+            onClose={handleClose}
+          />
+        </WindowContextMenu>
+
+        {/* Resize handles - only show when not maximized */}
+        {!isMaximized && (
+          <ResizeHandles
+            onResizeStart={handleResizeStart}
+            onResizeMove={handleResizeMove}
+            onResizeEnd={handleResizeEnd}
+          />
+        )}
+      </div>
     </WindowPortalProvider>
   );
 });
 
 export default WindowItem;
+
+export { WindowList } from './WindowList';

@@ -2,6 +2,7 @@ import { ContextMenu, ContextMenuTrigger } from '@workspace/ui/components/contex
 import DesktopIcon from '@/layouts/os/components/desktop-icon';
 import AppContextMenu from '@/layouts/os/components/desktop-shortcuts/AppContextMenu';
 import type { DesktopAppShortcut } from '@/layouts/os/types';
+import { memo } from 'react';
 
 type GroupLite = { id: string; label: string };
 
@@ -16,7 +17,7 @@ type Props = {
   onCreateGroupWith: (label: string, ids: string[]) => void;
 };
 
-export default function DesktopAppShortcutItem({
+const DesktopAppShortcutItem = memo(function DesktopAppShortcutItem({
   item,
   isPinned,
   groups,
@@ -52,4 +53,6 @@ export default function DesktopAppShortcutItem({
       />
     </ContextMenu>
   );
-}
+});
+
+export default DesktopAppShortcutItem;

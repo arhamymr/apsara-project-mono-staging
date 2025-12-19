@@ -1,114 +1,67 @@
-import { fetcher } from '@/lib/fetcher';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
-export function useVibeCode() {
-  const queryClient = useQueryClient();
-  const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(
-    undefined,
-  );
-  const [hasStartedChat, setHasStartedChat] = useState(false);
-  const [rightPanelTab, setRightPanelTab] = useState<
-    'code' | 'preview' | 'debug'
-  >('code');
+export function useVibeCodeConvex() {
   const [welcomeInput, setWelcomeInput] = useState('');
+  const [currentSessionId, setCurrentSessionId] = useState<Id<"chatSessions"> | undefined>();
+  const [isStarting, setIsStarting] = useState(false);
 
-  const handleNewChat = async () => {
-    setCurrentSessionId(undefined);
-    setHasStartedChat(false);
-    setWelcomeInput('');
-  };
-
-  const handleSessionSelect = async (sessionId: string) => {
-    setCurrentSessionId(sessionId);
-    setHasStartedChat(true);
-  };
-
-  const handleSessionChange = async (sessionId: string) => {
-    setCurrentSessionId(sessionId);
-    setHasStartedChat(true);
-  };
-
-  // Create session mutation
-  const createSessionMutation = useMutation({
-    mutationFn: async (message: string) => {
-      return fetcher<{ session: { id: string } }>('/api/agent/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message }),
-      });
-    },
-    onSuccess: (data) => {
-      setCurrentSessionId(data.session.id);
-      setHasStartedChat(true);
-      // Invalidate sessions query to refetch the list
-      queryClient.invalidateQueries({
-        queryKey: ['vibe-coding', 'conversations'],
-      });
-    },
-  });
+  // Query to get recent vibe-coding conversations
+  const recentConversations = useQuery(api.vibeCoding.getVibeCodeSessions) || [];
+  
+  // Mutations
+  const createSession = useMutation(api.vibeCoding.createVibeCodeSession);
 
   const handleStartChat = async (message: string): Promise<string | null> => {
-    if (!message.trim() || createSessionMutation.isPending) return null;
+    if (!message.trim() || isStarting) return null;
 
     try {
-      const data = await createSessionMutation.mutateAsync(message);
-      return data.session.id;
+      setIsStarting(true);
+
+      // Create new session with initial message
+      const sessionId = await createSession({
+        title: message.length > 50 ? message.substring(0, 47) + "..." : message,
+        initialMessage: message,
+      });
+
+      setCurrentSessionId(sessionId);
+      return sessionId;
     } catch (error) {
-      console.error('Error creating session:', error);
+      console.error('Error starting chat:', error);
       return null;
+    } finally {
+      setIsStarting(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      // This will be handled by the parent component
-    }
+  const handleSessionSelect = (sessionId: Id<"chatSessions">) => {
+    setCurrentSessionId(sessionId);
   };
 
-  const showWelcome = !hasStartedChat;
+  const refetchConversations = () => {
+    // Convex queries automatically refetch, so this is a no-op
+    // but we keep it for compatibility with the existing interface
+  };
 
-  // Fetch recent conversations
-  const {
-    data: recentConversations,
-    isLoading: isLoadingConversations,
-    refetch: refetchConversations,
-  } = useQuery({
-    queryKey: ['vibe-coding', 'conversations'],
-    queryFn: async () => {
-      return fetcher<{ sessions: unknown[] }>('/api/agent/sessions');
-    },
-  });
+  // Transform conversations to match expected format
+  const transformedConversations = recentConversations.map(session => ({
+    id: session._id,
+    title: session.title,
+    first_message: session.title,
+    message_count: session.messageCount || 0,
+  }));
 
   return {
-    // State
-    currentSessionId,
-    hasStartedChat,
-    rightPanelTab,
     welcomeInput,
-    isStarting: createSessionMutation.isPending,
-    showWelcome,
-
-    // Conversations
-    recentConversations: (recentConversations?.sessions || []) as Array<{
-      id: string;
-      title?: string;
-      first_message?: string;
-      message_count?: number;
-    }>,
-    isLoadingConversations,
-
-    // Handlers
-    handleNewChat,
-    handleSessionSelect,
-    handleSessionChange,
-    handleStartChat,
-    handleKeyDown,
-    setRightPanelTab,
     setWelcomeInput,
+    isStarting,
+    handleStartChat,
     refetchConversations,
+    recentConversations: transformedConversations,
+    isLoadingConversations: recentConversations === undefined,
+    handleSessionSelect,
+    currentSessionId,
   };
 }

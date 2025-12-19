@@ -1,14 +1,25 @@
-import { fetcher, HttpError } from '@/lib/fetcher';
 import type { KnowledgeBase, KnowledgeBaseCollection } from './types';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
+async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${url}`, {
+    ...options,
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `API error: ${res.status}`);
+  }
+  return res.json();
+}
 
 type KnowledgeBaseListResponse = {
   knowledgebases?: KnowledgeBase[];
 };
 
 export async function fetchKnowledgeBases(): Promise<KnowledgeBase[]> {
-  const data = await fetcher<KnowledgeBaseListResponse>(
-    '/api/dashboard/knowledge-bases',
-  );
+  const data = await fetcher<KnowledgeBaseListResponse>('/knowledge-bases');
   if (!data || !Array.isArray(data.knowledgebases)) {
     return [];
   }
@@ -23,7 +34,7 @@ export async function createKnowledgeBase(
   }
 
   const payload = await fetcher<{ knowledge_base?: KnowledgeBase }>(
-    '/api/dashboard/knowledge-bases',
+    '/knowledge-bases',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,14 +43,14 @@ export async function createKnowledgeBase(
   );
 
   if (!payload?.knowledge_base) {
-    throw new HttpError(422, 'Failed to create knowledge base.');
+    throw new Error('Failed to create knowledge base.');
   }
 
   return payload.knowledge_base;
 }
 
 export async function deleteKnowledgeBase(id: number): Promise<void> {
-  await fetcher(`/api/dashboard/knowledge-bases/${id}`, {
+  await fetcher(`/knowledge-bases/${id}`, {
     method: 'DELETE',
   });
 }
@@ -59,7 +70,7 @@ export async function createCollection(
   }
 
   const payload = await fetcher<{ collection?: KnowledgeBaseCollection }>(
-    '/api/dashboard/knowledge-bases/collections',
+    '/knowledge-bases/collections',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,7 +86,7 @@ export async function createCollection(
   );
 
   if (!payload?.collection) {
-    throw new HttpError(422, 'Failed to create collection.');
+    throw new Error('Failed to create collection.');
   }
 
   return payload.collection;

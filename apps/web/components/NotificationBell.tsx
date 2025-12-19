@@ -9,59 +9,32 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { cn } from "@/lib/utils";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { Bell, Check, Trash2, X, Loader2 } from "lucide-react";
 import { useState } from "react";
-
-type Notification = {
-  id: string;
-  type: string;
-  data: {
-    title: string;
-    message: string;
-    icon?: string;
-    type?: string;
-    action_url?: string;
-    action_text?: string;
-  };
-  read_at: string | null;
-  created_at: string;
-};
-
-// Mock data for UI preview
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "info",
-    data: {
-      title: "Welcome!",
-      message: "Thanks for joining us.",
-      icon: "👋",
-    },
-    read_at: null,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    type: "update",
-    data: {
-      title: "New feature available",
-      message: "Check out the latest updates.",
-      icon: "🚀",
-      action_url: "#",
-      action_text: "Learn more",
-    },
-    read_at: new Date().toISOString(),
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-  },
-];
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { toast } from "sonner";
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // TODO: Replace with real data
-  const notifications = mockNotifications;
+  // Convex queries and mutations
+  const notifications = useQuery(api.notifications.getNotifications, {
+    limit: 50,
+  }) || [];
+
+  const markAsRead = useMutation(api.notifications.markAsRead);
+  const markAllAsRead = useMutation(api.notifications.markAllAsRead);
+  const deleteNotification = useMutation(api.notifications.deleteNotification);
+  const clearAllNotifications = useMutation(api.notifications.clearAllNotifications);
+  const acceptInvitation = useMutation(api.invitations.acceptInvitation);
+  const declineInvitation = useMutation(api.invitations.declineInvitation);
+
+  const [processingInvitation, setProcessingInvitation] = useState<string | null>(null);
+
   const unreadCount = notifications.filter((n) => !n.read_at).length;
-  const loading = false;
+  const loading = notifications === undefined;
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -78,9 +51,35 @@ export default function NotificationBell() {
     return date.toLocaleDateString();
   };
 
+  const handleAcceptInvitation = async (notificationId: Id<"notifications">, invitationId: string) => {
+    setProcessingInvitation(invitationId);
+    try {
+      await acceptInvitation({ invitationId: invitationId as Id<"invitations"> });
+      await deleteNotification({ notificationId });
+      toast.success("Successfully joined the organization!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to accept invitation");
+    } finally {
+      setProcessingInvitation(null);
+    }
+  };
+
+  const handleDeclineInvitation = async (notificationId: Id<"notifications">, invitationId: string) => {
+    setProcessingInvitation(invitationId);
+    try {
+      await declineInvitation({ invitationId: invitationId as Id<"invitations"> });
+      await deleteNotification({ notificationId });
+      toast.success("Invitation declined");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to decline invitation");
+    } finally {
+      setProcessingInvitation(null);
+    }
+  };
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger className="relative inline-flex items-center justify-center rounded-md hover:bg-white/10">
+      <DropdownMenuTrigger asChild>
         <Button className="flex gap-1" variant={"ghost"}>
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
@@ -106,9 +105,7 @@ export default function NotificationBell() {
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-xs"
-                  onClick={() => {
-                    /* TODO: mark all read */
-                  }}
+                  onClick={() => markAllAsRead()}
                 >
                   <Check className="mr-1 h-3 w-3" />
                   Mark all read
@@ -118,9 +115,7 @@ export default function NotificationBell() {
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs"
-                onClick={() => {
-                  /* TODO: clear all */
-                }}
+                onClick={() => clearAllNotifications()}
               >
                 <Trash2 className="mr-1 h-3 w-3" />
                 Clear all
@@ -135,8 +130,8 @@ export default function NotificationBell() {
               <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Bell className="text-muted-foreground/50 mb-2 h-12 w-12" />
+            <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+              <Bell className="text-muted-foreground/50 mb-3 h-12 w-12" />
               <p className="text-muted-foreground text-sm font-medium">
                 No notifications yet
               </p>
@@ -146,66 +141,98 @@ export default function NotificationBell() {
             </div>
           ) : (
             <div className="divide-y">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors",
-                    !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
-                  )}
-                >
-                  {notification.data.icon && (
-                    <div className="flex-shrink-0 text-2xl">
-                      {notification.data.icon}
-                    </div>
-                  )}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm leading-tight font-semibold">
-                        {notification.data.title}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() => {
-                          /* TODO: delete notification */
-                        }}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <p className="text-muted-foreground text-xs">
-                      {notification.data.message}
-                    </p>
-                    {notification.data.action_url && (
-                      <a
-                        href={notification.data.action_url}
-                        className="text-primary inline-block text-xs font-medium hover:underline"
-                      >
-                        {notification.data.action_text || "View"}
-                      </a>
+              {notifications.map((notification) => {
+                const isInvitation = notification.type === "organization_invitation" && notification.data.metadata?.invitationId;
+                const invitationId = notification.data.metadata?.invitationId;
+                const isProcessing = processingInvitation === invitationId;
+
+                return (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      "group hover:bg-muted/50 relative flex gap-3 p-4 transition-colors",
+                      !notification.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
                     )}
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground text-xs">
-                        {formatTime(notification.created_at)}
-                      </p>
-                      {!notification.read_at && (
+                  >
+                    {notification.data.icon && (
+                      <div className="flex-shrink-0 text-2xl">
+                        {notification.data.icon}
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm leading-tight font-semibold">
+                          {notification.data.title}
+                        </p>
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs"
-                          onClick={() => {
-                            /* TODO: mark as read */
-                          }}
+                          size="icon"
+                          className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                          onClick={() => deleteNotification({ notificationId: notification.id as Id<"notifications"> })}
                         >
-                          Mark as read
+                          <X className="h-3 w-3" />
                         </Button>
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {notification.data.message}
+                      </p>
+                      
+                      {/* Invitation action buttons */}
+                      {isInvitation ? (
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            size="sm"
+                            className="h-7 flex-1 text-xs"
+                            onClick={() => handleAcceptInvitation(notification.id as Id<"notifications">, invitationId)}
+                            disabled={isProcessing}
+                          >
+                            {isProcessing ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <Check className="mr-1 h-3 w-3" />
+                                Accept
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs"
+                            onClick={() => handleDeclineInvitation(notification.id as Id<"notifications">, invitationId)}
+                            disabled={isProcessing}
+                          >
+                            Decline
+                          </Button>
+                        </div>
+                      ) : notification.data.action_url && (
+                        <a
+                          href={notification.data.action_url}
+                          className="text-primary inline-block text-xs font-medium hover:underline"
+                        >
+                          {notification.data.action_text || "View"}
+                        </a>
                       )}
+                      
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground text-xs">
+                          {formatTime(notification.created_at)}
+                        </p>
+                        {!notification.read_at && !isInvitation && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => markAsRead({ notificationId: notification.id as Id<"notifications"> })}
+                          >
+                            Mark as read
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </ScrollArea>

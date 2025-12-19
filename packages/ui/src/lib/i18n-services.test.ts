@@ -431,7 +431,6 @@ describe('Navigation links point to valid routes', () => {
       'fullStackDevelopment',
       'mobileAppDevelopment',
       'apiDevelopment',
-      'createWebsite',
       'fixWebsite',
       'aiIntegration',
       'instagramPost',

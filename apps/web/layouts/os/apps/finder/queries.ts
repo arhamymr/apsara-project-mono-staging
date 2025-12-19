@@ -2,7 +2,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import type { SourceKind } from '@/layouts/os/apps/knowledge-base/types';
-import { fetcher } from '@/lib/fetcher';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
+async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${url}`, {
+    ...options,
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || `API error: ${res.status}`);
+  }
+  return res.json();
+}
 
 export type StorageEntry = {
   key: string;
@@ -47,7 +60,7 @@ export function useStorageList(prefix: string) {
     queryKey: key,
     queryFn: async () => {
       const data = await fetcher<ListResult>(
-        `/api/storage/list?prefix=${encodeURIComponent(prefix)}`,
+        `/storage/list?prefix=${encodeURIComponent(prefix)}`,
       );
       const normalizeName = (value: string) => {
         const trimmed = value.replace(/\/+$/, '');
@@ -409,7 +422,7 @@ export function useStorageActions(prefix: string) {
 
   const createFolder = useMutation({
     mutationFn: async (name: string) =>
-      fetcher(`/api/storage/folder`, {
+      fetcher(`/storage/folder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prefix, name }),
@@ -429,7 +442,7 @@ export function useStorageActions(prefix: string) {
       form.append('file', file);
       form.append('prefix', prefix);
       form.append('visibility', visibility);
-      return fetcher(`/api/storage/upload`, { method: 'POST', body: form });
+      return fetcher(`/storage/upload`, { method: 'POST', body: form });
     },
     onSuccess: invalidate,
   });
@@ -446,7 +459,7 @@ export function useStorageActions(prefix: string) {
 
   const rename = useMutation({
     mutationFn: async ({ key, newName }: { key: string; newName: string }) =>
-      fetcher(`/api/storage/rename`, {
+      fetcher(`/storage/rename`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, new_name: newName }),
@@ -462,7 +475,7 @@ export function useStorageActions(prefix: string) {
       key: string;
       destPrefix: string;
     }) =>
-      fetcher(`/api/storage/move`, {
+      fetcher(`/storage/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, dest_prefix: destPrefix }),
@@ -479,7 +492,7 @@ export function useStorageActions(prefix: string) {
       recursive: boolean;
     }) =>
       fetcher(
-        `/api/storage/object?key=${encodeURIComponent(key)}&recursive=${recursive ? '1' : '0'}`,
+        `/storage/object?key=${encodeURIComponent(key)}&recursive=${recursive ? '1' : '0'}`,
         {
           method: 'DELETE',
         },
@@ -495,7 +508,7 @@ export function useStorageActions(prefix: string) {
       key: string;
       visibility: 'public' | 'private';
     }) =>
-      fetcher(`/api/storage/visibility`, {
+      fetcher(`/storage/visibility`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, visibility }),
@@ -505,7 +518,7 @@ export function useStorageActions(prefix: string) {
 
   async function downloadUrl(key: string, ttl = 600): Promise<string> {
     const data = await fetcher<{ url: string }>(
-      `/api/storage/download-url?key=${encodeURIComponent(key)}&ttl=${ttl}`,
+      `/storage/download-url?key=${encodeURIComponent(key)}&ttl=${ttl}`,
     );
     return data.url;
   }

@@ -5,12 +5,13 @@ import {
 } from '@workspace/ui/components/breadcrumb';
 import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
-import type { StorageEntry } from '@/layouts/os/apps/finder/queries';
-import { useStorageList } from '@/layouts/os/apps/finder/queries';
 import { cn } from '@/lib/utils';
-import { FileIcon, FolderIcon, ImageIcon, Loader2 } from 'lucide-react';
+import { FileIcon, FolderIcon, ImageIcon, Loader2, Upload } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
+
+import type { StorageEntry } from './queries';
+import { useStorageActions, useStorageList } from './queries';
 
 type FinderTabProps = {
   open: boolean;
@@ -26,7 +27,32 @@ export function FinderTab({
   onClose,
 }: FinderTabProps) {
   const [prefix, setPrefix] = React.useState('');
+  const [isUploading, setIsUploading] = React.useState(false);
   const list = useStorageList(prefix);
+  const { uploadFiles } = useStorageActions(prefix);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      await uploadFiles(files);
+      toast.success('Image uploaded successfully');
+    } catch {
+      toast.error('Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   React.useEffect(() => {
     if (!open) {
@@ -133,9 +159,32 @@ export function FinderTab({
               ))}
             </BreadcrumbList>
           </Breadcrumb>
-          <Button variant="outline" size="sm" onClick={goUp} disabled={!prefix}>
-            Up one level
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleUploadClick}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              Upload
+            </Button>
+            <Button variant="outline" size="sm" onClick={goUp} disabled={!prefix}>
+              Up one level
+            </Button>
+          </div>
         </div>
 
         <div className="border-border h-72 overflow-y-auto rounded-md border p-3">

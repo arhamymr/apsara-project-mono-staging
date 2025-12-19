@@ -5,6 +5,7 @@ import type {
 } from '@/layouts/os/types';
 import { arrayMove } from '@dnd-kit/sortable';
 import { cloneShortcut, findShortcut } from './persistence';
+import type React from 'react';
 
 export function reorderShortcuts(
   items: DesktopItem[],
@@ -123,16 +124,42 @@ export function renameGroup(
 export function addShortcutForApp(
   items: DesktopItem[],
   appId: string,
+  appName?: string,
+  appIcon?: React.ReactNode,
 ): DesktopItem[] {
+  console.log('[actions] addShortcutForApp:', { appId, appName, hasIcon: !!appIcon });
   const exists = items.some((it) =>
     it.type === 'app'
       ? it.appId === appId
       : it.children.some((c) => c.appId === appId),
   );
-  if (exists) return items;
+  if (exists) {
+    console.log('[actions] App already exists on desktop');
+    return items;
+  }
+
+  // Try to find from default shortcuts first
   const base = findShortcut(appId);
-  if (!base) return items;
-  return [cloneShortcut(base), ...items];
+  if (base) {
+    console.log('[actions] Found in default shortcuts');
+    return [cloneShortcut(base), ...items];
+  }
+
+  // If not in defaults, create a new shortcut from app info
+  if (appName && appIcon) {
+    console.log('[actions] Creating new shortcut');
+    const newShortcut: DesktopAppShortcut = {
+      type: 'app',
+      id: appId,
+      appId: appId,
+      label: appName,
+      icon: appIcon,
+    };
+    return [newShortcut, ...items];
+  }
+
+  console.log('[actions] No appName or appIcon, returning unchanged');
+  return items;
 }
 
 export function removeShortcutForApp(

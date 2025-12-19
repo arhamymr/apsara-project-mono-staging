@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 
 type DesktopIconProps = {
   id: string;
@@ -10,7 +10,7 @@ type DesktopIconProps = {
   onOpen?: () => void;
 };
 
-export default function DesktopIcon({
+const DesktopIcon = memo(function DesktopIcon({
   id,
   icon,
   label,
@@ -69,4 +69,6 @@ export default function DesktopIcon({
       </span>
     </button>
   );
-}
+});
+
+export default DesktopIcon;

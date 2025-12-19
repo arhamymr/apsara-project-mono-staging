@@ -10,7 +10,7 @@ import {
   Hero,
   // Integrations,
   OSShowcase,
-  Pricing,
+  // Pricing,
   TopNav,
 } from '@/components/home/sections';
 
@@ -18,18 +18,20 @@ export default function ApsaraLandingPage() {
   return (
     <div className="text-foreground relative min-h-dvh">
       <SkipToContent />
-      <TopNav />
-      <main id="main-content">
-        <Hero />
-        <Features />
-        <OSShowcase />
-        {/* <Integrations /> */}
-        <Pricing />
-        <Blog />
-        <CallToAction />
-        <FAQ />
-      </main>
-      <Footer />
+      <div className="mx-auto max-w-[1920px]">
+        <TopNav />
+        <main id="main-content">
+          <Hero />
+          <Features />
+          <OSShowcase />
+          {/* <Integrations /> */}
+          {/* <Pricing /> */}
+          <Blog />
+          <CallToAction />
+          <FAQ />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

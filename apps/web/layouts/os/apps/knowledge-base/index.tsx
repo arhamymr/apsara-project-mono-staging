@@ -144,126 +144,137 @@ export default function KnowledgeBaseExplorer() {
   const portalContainer = portalRef?.current ?? undefined;
 
   return (
-    <div className="flex h-full w-full gap-3 p-3">
-      <aside className="w-[300px] shrink-0">
-        <KnowledgeSidebar
-          knowledgeBases={kbs}
-          collections={collections}
-          selectedKbId={selectedKbId}
-          selectedCollectionId={selectedCollectionId}
-          onSelectKb={selectKb}
-          onSelectCollection={selectCollection}
-          onCreateKb={() => createKbDialog.onOpenChange(true)}
-          onCreateCollection={actions.requestCreateCollection}
-          onCreateCollectionFor={actions.openCreateCollectionForKb}
-          onDeleteKb={actions.deleteKnowledgeBase}
-          search={search.value}
-          onSearch={search.onChange}
-          onClearSearch={search.clear}
-          isLoading={knowledgeBaseQuery.isLoading}
-          isFetching={knowledgeBaseQuery.isFetching}
-          errorMessage={knowledgeBaseQuery.errorMessage}
-          onRetry={knowledgeBaseQuery.retry}
-          portalContainer={portalContainer}
-        />
-      </aside>
-
-      <main className="min-w-0 flex-1 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="text-sm font-semibold">Sources</div>
-            <div className="text-muted-foreground text-xs">
-              {selectedCollection ? selectedCollection.name : ''}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 sm:flex">
-              <Button
-                size="sm"
-                variant={viewMode === 'list' ? 'outline' : 'ghost'}
-                onClick={() => setViewMode('list')}
-              >
-                List
-              </Button>
-              <Button
-                size="sm"
-                variant={viewMode === 'detail' ? 'outline' : 'ghost'}
-                onClick={() => setViewMode('detail')}
-              >
-                Detail
-              </Button>
-            </div>
-            <Button size="sm" onClick={() => createKbDialog.onOpenChange(true)}>
-              New KB <Kbd className="text-primary-900 bg-black/20">N</Kbd>
-            </Button>
-          </div>
+    <div className="text-foreground flex h-full flex-col">
+      {/* Header */}
+      <div className="bg-card sticky top-0 flex w-full items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-base font-semibold">Knowledge Base</h2>
+          {selectedCollection && (
+            <span className="text-muted-foreground text-sm">
+              {selectedCollection.name}
+            </span>
+          )}
         </div>
 
-        {viewMode === 'detail' ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-2"
-                onClick={() => setViewMode('list')}
-              >
-                <ArrowLeft className="h-4 w-4" /> Back to sources
-              </Button>
-            </div>
-
-            <SourceDetailsPanel
-              source={selectedSource}
-              ingestStatus={mastraStatus}
-              isStatusFetching={isFetchingMastraStatus}
-              statusErrorMessage={mastraStatusErrorMessage}
-              onRefreshStatus={() => {
-                void refreshMastraStatus();
-              }}
-              onDelete={handleDeleteSource}
-              isDeleting={isDeleting}
-              onIngest={handleTriggerIngest}
-              canIngest={canIngest}
-              isIngesting={isIngesting}
-            />
-
-            <ChunksPanel
-              selectedSourceId={selectedSourceId}
-              sources={sources}
-              chunks={activeChunks}
-              onEditChunk={handleEditChunk}
-              onCreateFromSource={handleCreateChunkFromSource}
-              disableCreate={!selectedSourceId}
-              isLoading={Boolean(selectedSourceId) && isLoadingChunks}
-              isFetching={isFetchingChunks}
-              errorMessage={chunksErrorMessage}
-              onRefresh={() => {
-                if (!selectedSourceId) return;
-                void refetchChunks();
-              }}
-            />
+        <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 sm:flex">
+            <Button
+              size="sm"
+              variant={viewMode === 'list' ? 'outline' : 'ghost'}
+              onClick={() => setViewMode('list')}
+            >
+              List
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'detail' ? 'outline' : 'ghost'}
+              onClick={() => setViewMode('detail')}
+            >
+              Detail
+            </Button>
           </div>
-        ) : (
-          <SourceTable
-            sources={selectedCollectionId ? sources : []}
-            isLoading={sourcesQueryEnabled && isLoadingSources}
-            isFetching={sourcesQueryEnabled && isFetchingSources}
-            errorMessage={sourcesErrorMessage}
-            onRefresh={refetchSources}
-            onManualUpload={openManualUploadDialog}
-            manualUploadDisabled={manualUploadDisabled}
-            onOpenSource={handleOpenSource}
-            selectedSourceId={selectedSourceId}
-            emptyMessage={
-              selectedCollectionId
-                ? 'No sources yet.'
-                : 'Select a collection to view sources'
-            }
-          />
-        )}
-      </main>
+          <Button size="sm" onClick={() => createKbDialog.onOpenChange(true)}>
+            New KB <Kbd className="text-primary-900 bg-black/20">N</Kbd>
+          </Button>
+        </div>
+      </div>
 
+      {/* Body */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          {/* Sidebar */}
+          <aside className="md:col-span-1">
+            <KnowledgeSidebar
+              knowledgeBases={kbs}
+              collections={collections}
+              selectedKbId={selectedKbId}
+              selectedCollectionId={selectedCollectionId}
+              onSelectKb={selectKb}
+              onSelectCollection={selectCollection}
+              onCreateKb={() => createKbDialog.onOpenChange(true)}
+              onCreateCollection={actions.requestCreateCollection}
+              onCreateCollectionFor={actions.openCreateCollectionForKb}
+              onDeleteKb={actions.deleteKnowledgeBase}
+              search={search.value}
+              onSearch={search.onChange}
+              onClearSearch={search.clear}
+              isLoading={knowledgeBaseQuery.isLoading}
+              isFetching={knowledgeBaseQuery.isFetching}
+              errorMessage={knowledgeBaseQuery.errorMessage}
+              onRetry={knowledgeBaseQuery.retry}
+              portalContainer={portalContainer}
+            />
+          </aside>
+
+          {/* Main Content */}
+          <div className="md:col-span-3">
+            {viewMode === 'detail' ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Back to sources
+                  </Button>
+                </div>
+
+                <SourceDetailsPanel
+                  source={selectedSource}
+                  ingestStatus={mastraStatus}
+                  isStatusFetching={isFetchingMastraStatus}
+                  statusErrorMessage={mastraStatusErrorMessage}
+                  onRefreshStatus={() => {
+                    void refreshMastraStatus();
+                  }}
+                  onDelete={handleDeleteSource}
+                  isDeleting={isDeleting}
+                  onIngest={handleTriggerIngest}
+                  canIngest={canIngest}
+                  isIngesting={isIngesting}
+                />
+
+                <ChunksPanel
+                  selectedSourceId={selectedSourceId}
+                  sources={sources}
+                  chunks={activeChunks}
+                  onEditChunk={handleEditChunk}
+                  onCreateFromSource={handleCreateChunkFromSource}
+                  disableCreate={!selectedSourceId}
+                  isLoading={Boolean(selectedSourceId) && isLoadingChunks}
+                  isFetching={isFetchingChunks}
+                  errorMessage={chunksErrorMessage}
+                  onRefresh={() => {
+                    if (!selectedSourceId) return;
+                    void refetchChunks();
+                  }}
+                />
+              </div>
+            ) : (
+              <SourceTable
+                sources={selectedCollectionId ? sources : []}
+                isLoading={sourcesQueryEnabled && isLoadingSources}
+                isFetching={sourcesQueryEnabled && isFetchingSources}
+                errorMessage={sourcesErrorMessage}
+                onRefresh={refetchSources}
+                onManualUpload={openManualUploadDialog}
+                manualUploadDisabled={manualUploadDisabled}
+                onOpenSource={handleOpenSource}
+                selectedSourceId={selectedSourceId}
+                emptyMessage={
+                  selectedCollectionId
+                    ? 'No sources yet.'
+                    : 'Select a collection to view sources'
+                }
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Dialogs */}
       <CreateCollectionDialog
         open={createCollectionDialog.open}
         onOpenChange={createCollectionDialog.onOpenChange}

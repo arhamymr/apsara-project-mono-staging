@@ -6,6 +6,7 @@ import {
   type Wallpaper,
 } from '@/layouts/os/wallpaper';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import * as React from 'react';
 
 export default function BackgroundPlaceholder() {
@@ -79,6 +80,27 @@ export default function BackgroundPlaceholder() {
     />
   );
 
+  const renderSpinner = () => (
+    <div
+      className={`absolute inset-0 ${isDark ? 'bg-black' : 'bg-white'}`}
+    >
+      <motion.div
+        className="pointer-events-none absolute -right-32 -bottom-32"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      >
+        <Image
+          src="/logo.svg"
+          alt="Background Logo"
+          width={512}
+          height={512}
+          className={isDark ? 'opacity-50' : 'opacity-30'}
+          priority={false}
+        />
+      </motion.div>
+    </div>
+  );
+
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden">
       {wallpaper.kind === 'gradient'
@@ -87,7 +109,9 @@ export default function BackgroundPlaceholder() {
           ? renderSolid(wallpaper.value)
           : wallpaper.kind === 'image' && wallpaper.value
             ? renderImage(wallpaper.value)
-            : renderGradient()}
+            : wallpaper.kind === 'spinner'
+              ? renderSpinner()
+              : renderGradient()}
 
       {/* Grid overlay */}
       <motion.div

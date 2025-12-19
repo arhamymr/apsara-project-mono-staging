@@ -24,7 +24,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       },
     },
     signIn: 'Login',
-    cta: 'Get Started',
+    cta: 'Get in touch',
   },
   id: {
     links: {
@@ -48,7 +48,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
         instagramPost: 'Desain konten media sosial profesional.',
       },
     },
-    signIn: 'Login',
-    cta: 'Get in Touch',
+    signIn: 'Masuk',
+    cta: 'Hubungi Kami',
   },
 };

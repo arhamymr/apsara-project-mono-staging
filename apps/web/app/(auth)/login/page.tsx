@@ -1,14 +1,16 @@
-'use client';
+"use client";
 
 import {
   AuthBrandingPanel,
   AuthSeparator,
   GoogleSignInButton,
   LoginForm,
-} from '@/components/auth';
-import { Button } from '@workspace/ui/components/button';
-import { Toaster } from '@workspace/ui/components/sonner';
-import Link from 'next/link';
+} from "@/components/auth";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
+import { Button } from "@workspace/ui/components/button";
+import { Toaster } from "@workspace/ui/components/sonner";
+import { Construction } from "lucide-react";
+import Link from "next/link";
 
 export default function SignInPage() {
   return (
@@ -23,11 +25,17 @@ export default function SignInPage() {
               Sign in to manage your workspace.
             </p>
           </div>
-
-          <LoginForm />
-          <AuthSeparator />
+          
+          <Alert className="mb-4 border bg-card text-muted-background">
+            <Construction className="h-4 w-4" />
+            <AlertDescription>
+              This project is under heavy development. Features may be unstable or incomplete.
+            </AlertDescription>
+          </Alert>
+          
           <GoogleSignInButton />
-
+          <AuthSeparator />
+          <LoginForm />
           <Button variant="ghost" className="mt-4 w-full" asChild>
             <Link href="/">Back to home</Link>
           </Button>

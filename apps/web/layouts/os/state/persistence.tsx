@@ -48,7 +48,20 @@ export const DEFAULT_SHORTCUTS: DesktopAppShortcut[] = [
     label: 'Finder',
     icon: <span className="text-4xl">📁</span>,
   },
-
+  {
+    type: 'app',
+    id: 'docs',
+    appId: 'docs',
+    label: 'Documentation',
+    icon: <span className="text-4xl">📖</span>,
+  },
+  {
+    type: 'app',
+    id: 'vibe-code',
+    appId: 'vibe-code',
+    label: 'Vibe Code',
+    icon: <span className="text-4xl">⚡</span>,
+  },
   {
     type: 'app',
     id: 'graphicdesignerai',
@@ -77,13 +90,7 @@ export const DEFAULT_SHORTCUTS: DesktopAppShortcut[] = [
     label: 'Knowledge Base',
     icon: <span className="text-4xl">📚</span>,
   },
-  {
-    type: 'app',
-    id: 'website-builder',
-    appId: 'website-builder',
-    label: 'Site Builder',
-    icon: <span className="text-4xl">🧩</span>,
-  },
+
   {
     type: 'app',
     id: 'chatbot',
@@ -162,11 +169,12 @@ export const createDefaultDesktopItems = (): DesktopItem[] => {
   };
   items.push(
     cloneShortcut(shortcutLookup.get('finder')!),
+    cloneShortcut(shortcutLookup.get('docs')!),
+    cloneShortcut(shortcutLookup.get('vibe-code')!),
     prodGroup,
     essentialsGroup,
     cloneShortcut(shortcutLookup.get('graphicdesignerai')!),
     cloneShortcut(shortcutLookup.get('knowledgebase')!),
-    cloneShortcut(shortcutLookup.get('website-builder')!),
     cloneShortcut(shortcutLookup.get('chatbot')!),
   );
   return items;

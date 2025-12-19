@@ -29,7 +29,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableColorScheme
       >
         <AppLocaleProvider>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            {children}
+          </ConvexClientProvider>
         </AppLocaleProvider>
       </NextThemesProvider>
     </QueryClientProvider>

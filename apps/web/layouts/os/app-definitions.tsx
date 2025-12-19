@@ -4,27 +4,25 @@ import ArticleManagerApp from '@/layouts/os/apps/blogs';
 import BroadcastEmailApp from '@/layouts/os/apps/BroadcastEmailApp';
 import CalculatorApp from '@/layouts/os/apps/CalculatorApp';
 import ChatbotApp from '@/layouts/os/apps/ChatbotApp';
-import DesktopIconsManagerApp from '@/layouts/os/apps/DesktopIconsManagerApp';
 import DesktopSettingsApp from '@/layouts/os/apps/DesktopSettingsApp';
 import DockManagerApp from '@/layouts/os/apps/DockManagerApp';
-import FinderApp from '@/layouts/os/apps/FinderApp';
+import DocsApp from '@/layouts/os/apps/docs';
+import FinderApp from '@/layouts/os/apps/finder';
 import GraphicDesignApp from '@/layouts/os/apps/graphic-design';
 import InvoiceApp from '@/layouts/os/apps/InvoiceApp';
-import KanbanApp from '@/layouts/os/apps/KanbanApp';
+import KanbanApp from '@/layouts/os/apps/kanban';
 import KnowledgeBaseApp from '@/layouts/os/apps/knowledge-base';
 import LanguageConversationApp from '@/layouts/os/apps/LanguageConversationApp';
 import LeadManagementApp from '@/layouts/os/apps/LeadManagementApp';
 import MailApp from '@/layouts/os/apps/MailApp';
+import OrganizationApp from '@/layouts/os/apps/OrganizationApp';
 import MapsApp from '@/layouts/os/apps/MapsApp';
-import NotesApp from '@/layouts/os/apps/NotesApp';
+import NotesApp from '@/layouts/os/apps/notes';
 import PhotosApp from '@/layouts/os/apps/PhotosApp';
-import ProductsApp from '@/layouts/os/apps/ProductsApp';
-import SettingsHubApp from '@/layouts/os/apps/SettingsHubApp';
 import SketchApp from '@/layouts/os/apps/SketchApp';
 import TasksApp from '@/layouts/os/apps/TasksApp';
 import UnifiedAnalyticsApp from '@/layouts/os/apps/UnifiedAnalyticsApp';
 import VibeCodeApp from '@/layouts/os/apps/VibeCodeApp';
-import WebsiteBuilderApp from '@/layouts/os/apps/WebsiteBuilderApp';
 import WidgetManagerApp from '@/layouts/os/apps/WidgetManagerApp';
 
 import type { AppDef } from '@/layouts/os/types';
@@ -46,13 +44,6 @@ export function createDefaultApps(): AppDef[] {
       defaultSize: { width: 357 },
     },
     {
-      id: 'settings-hub',
-      name: 'Desktop Settings',
-      icon: '⚙️',
-      content: <SettingsHubApp />,
-      defaultSize: { width: 780, height: 500 },
-    },
-    {
       id: 'widget-manager',
       name: 'Widget Manager',
       icon: '🧩',
@@ -64,22 +55,16 @@ export function createDefaultApps(): AppDef[] {
       name: 'Desktop Settings',
       icon: '🖼️',
       content: <DesktopSettingsApp />,
-      defaultSize: { width: 720 },
+      defaultSize: { width: 920 },
     },
     {
       id: 'dock-manager',
       name: 'Manage Docks',
       icon: '⚙️',
       content: <DockManagerApp />,
-      defaultSize: { width: 460 },
+      defaultSize: { width: 920 },
     },
-    {
-      id: 'desktop-icons',
-      name: 'Desktop Icons',
-      icon: '🗂️',
-      content: <DesktopIconsManagerApp />,
-      defaultSize: { width: 480 },
-    },
+
 
     {
       id: 'graphicdesignerai',
@@ -102,13 +87,7 @@ export function createDefaultApps(): AppDef[] {
       content: <CalculatorApp />,
       defaultSize: { width: 400 },
     },
-    {
-      id: 'products',
-      name: 'Products',
-      icon: '🛍️',
-      content: <ProductsApp />,
-      defaultSize: { width: 900 },
-    },
+
     {
       id: 'notes',
       name: 'Notes',
@@ -130,13 +109,7 @@ export function createDefaultApps(): AppDef[] {
       content: <KnowledgeBaseApp />,
       defaultSize: { width: 1100 },
     },
-    {
-      id: 'website-builder',
-      name: 'Site Builder',
-      icon: '🧩',
-      content: <WebsiteBuilderApp />,
-      defaultSize: { width: 1200 },
-    },
+
     {
       id: 'chatbot',
       name: 'Chatbot AI',
@@ -214,6 +187,20 @@ export function createDefaultApps(): AppDef[] {
       icon: '📋',
       content: <KanbanApp />,
       defaultSize: { width: 1200, height: 800 },
+    },
+    {
+      id: 'organizations',
+      name: 'Organizations',
+      icon: '🏢',
+      content: <OrganizationApp />,
+      defaultSize: { width: 1000, height: 700 },
+    },
+    {
+      id: 'docs',
+      name: 'Documentation',
+      icon: '📖',
+      content: <DocsApp />,
+      defaultSize: { width: 1100, height: 700 },
     },
   ];
 }

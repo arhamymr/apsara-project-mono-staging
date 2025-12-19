@@ -14,6 +14,7 @@ export interface AgentMessage {
   content: string;
   timestamp: Date;
   toolCalls?: string[]; // Array of tool names used
+  isStreaming?: boolean; // True if message is still being streamed
 }
 
 export interface StreamEvent {

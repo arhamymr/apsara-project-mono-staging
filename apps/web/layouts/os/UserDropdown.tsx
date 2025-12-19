@@ -47,7 +47,6 @@ export default function UserDropdown() {
     [apps, openApp],
   );
 
-  console.log(user, "user")
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,11 +59,11 @@ export default function UserDropdown() {
           className="flex cursor-pointer items-center gap-2 text-sm font-medium"
           onSelect={(e) => {
             e.preventDefault();
-            openSettings('settings-hub');
+            openSettings('desktop-settings');
           }}
         >
           <SettingsIcon className="h-4 w-4" />
-          Settings
+          Change Wallpaper
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

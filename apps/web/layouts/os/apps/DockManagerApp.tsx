@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { Checkbox } from '@workspace/ui/components/checkbox';
 import { Input } from '@workspace/ui/components/input';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { useWindowContext } from '@/layouts/os/WindowContext';
@@ -8,6 +7,7 @@ import type { AppDef } from '@/layouts/os/types';
 import { MAX_DOCK_ITEMS } from '@/layouts/os/useDesktopState';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Check, Search } from 'lucide-react';
 
 const toId = (v: unknown) => String(v);
 
@@ -17,39 +17,39 @@ function filterApps(apps: AppDef[], query: string): AppDef[] {
   return apps.filter((a) => a.name?.toLowerCase().includes(q));
 }
 
-function IconCell({ icon }: { icon: AppDef['icon'] }) {
+function AppIcon({ icon }: { icon: AppDef['icon'] }) {
   if (typeof icon === 'string') {
     const s = icon.trim();
     const looksLikeUrl = /^(https?:)?\/\//i.test(s) || s.startsWith('data:');
     if (looksLikeUrl) {
-      return <img src={s} alt="" className="h-4 w-4 rounded-sm object-cover" />;
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={s} alt="" className="h-10 w-10 rounded-lg object-cover" />;
     }
     return (
       <span
         aria-hidden="true"
-        className="bg-muted text-md grid size-6 place-items-center rounded-sm"
+        className="text-3xl"
         title={s}
       >
         {s.length > 2 ? s.slice(0, 2) : s}
       </span>
     );
   }
-  return <span className="h-4 w-4">{icon}</span>;
+  return <span className="text-3xl">{icon}</span>;
 }
 
 export default function DockManagerApp() {
   const { apps, dockAppIds, setDockAppIds } = useWindowContext();
 
-  // always treat dock ids as strings
   const dockIds = React.useMemo(() => dockAppIds.map(toId), [dockAppIds]);
 
   const s = {
     heading: 'Configure Dock',
-    search: 'Search',
+    search: 'Search apps...',
     pinAll: 'Pin all',
     unpinAll: 'Unpin all',
-    allApps: 'All apps',
     none: 'No apps found.',
+    pinned: 'pinned',
   } as const;
 
   const [query, setQuery] = React.useState('');
@@ -121,11 +121,18 @@ export default function DockManagerApp() {
     );
   }, [filtered, setPinnedForIds]);
 
+  const pinnedCount = dockIds.length;
+
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b p-3">
-        <h2 className="text-sm font-medium">{s.heading}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-medium">{s.heading}</h2>
+          <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
+            {pinnedCount} {s.pinned}
+          </span>
+        </div>
         <div className="flex gap-2">
           <button
             className="hover:bg-muted/40 rounded border px-2 py-1 text-xs"
@@ -143,61 +150,69 @@ export default function DockManagerApp() {
       </div>
 
       {/* Search */}
-      <div className="p-3 pb-1">
+      <div className="p-3 pb-2">
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`${s.search}…`}
-          aria-label={s.search}
+          placeholder={s.search}
+          aria-label="Search"
         />
       </div>
 
-      {/* Single list */}
-      <div className="p-3 pt-1">
-        <h3 className="text-muted-foreground mb-2 text-xs font-semibold uppercase">
-          {s.allApps}
-        </h3>
-
-        <ScrollArea className="h-[calc(100vh-240px)] pr-2">
-          {filtered.length === 0 ? (
-            <p className="text-muted-foreground text-xs">{s.none}</p>
-          ) : (
-            <div role="list" aria-label="App list">
-              {filtered.map((app) => {
-                const checked = isPinned(app.id);
-                return (
-                  <div
-                    key={toId(app.id)}
-                    className={cn(
-                      'group mx-1 my-0.5 flex cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1',
-                      checked ? 'bg-muted/40' : 'hover:bg-muted/20',
-                    )}
-                    onClick={() => toggleId(app.id)}
-                    role="listitem"
-                    data-checked={checked ? 'true' : 'false'}
-                  >
-                    <div className="flex min-w-0 items-center gap-2">
-                      <IconCell icon={app.icon} />
-                      <span className="truncate text-lg leading-none">
-                        {app.name}
-                      </span>
-                    </div>
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) => {
-                        if (v === 'indeterminate') return;
-                        toggleId(app.id);
-                      }}
-                      aria-label={checked ? 'Unpin from Dock' : 'Pin to Dock'}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </div>
-                );
-              })}
+      {/* Grid View */}
+      <ScrollArea className="flex-1 overflow-auto px-3 pb-3">
+        {filtered.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center py-12">
+            <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+              <Search className="text-muted-foreground h-8 w-8" />
             </div>
-          )}
-        </ScrollArea>
-      </div>
+            <p className="text-muted-foreground text-sm">{s.none}</p>
+          </div>
+        ) : (
+          <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))' }}>
+            {filtered.map((app) => {
+              const checked = isPinned(app.id);
+              return (
+                <button
+                  key={toId(app.id)}
+                  className={cn(
+                    'group relative flex flex-col items-center gap-2 rounded-xl p-3 transition-all',
+                    'hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    checked && 'bg-primary/10 ring-primary/30 ring-1',
+                  )}
+                  onClick={() => toggleId(app.id)}
+                  aria-pressed={checked}
+                  aria-label={`${app.name} - ${checked ? 'Pinned' : 'Not pinned'}`}
+                >
+                  {/* Check indicator */}
+                  {checked && (
+                    <div className="bg-primary absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full">
+                      <Check className="text-primary-foreground h-3 w-3" />
+                    </div>
+                  )}
+                  
+                  {/* Icon */}
+                  <div className={cn(
+                    'flex h-14 w-14 items-center justify-center rounded-xl transition-transform',
+                    'bg-muted/60 group-hover:scale-105',
+                    checked && 'bg-primary/20',
+                  )}>
+                    <AppIcon icon={app.icon} />
+                  </div>
+                  
+                  {/* Name */}
+                  <span className={cn(
+                    'w-full truncate text-center text-xs',
+                    checked ? 'text-foreground font-medium' : 'text-muted-foreground',
+                  )}>
+                    {app.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 }

@@ -1,8 +1,30 @@
+'use client';
+
+import { Button } from '@workspace/ui/components/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu';
+import { Input } from '@workspace/ui/components/input';
+import { ToggleGroup, ToggleGroupItem } from '@workspace/ui/components/toggle-group';
 import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
-import { Loader2 } from 'lucide-react';
+import {
+  ChevronDown,
+  FolderPlus,
+  Grid3X3,
+  List,
+  Loader2,
+  Search,
+  Upload,
+} from 'lucide-react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { Breadcrumbs } from './Breadcrumbs';
 import { DetailsDialog } from './components/DetailsDialog';
 import { FolderDialog } from './components/FolderDialog';
 import { PreviewDialog } from './components/PreviewDialog';
@@ -13,7 +35,6 @@ import {
   useStorageList,
   type StorageEntry,
 } from './queries';
-import { Toolbar } from './Toolbar';
 import { useFinder } from './useFinder';
 import { useFinderKnowledgeBase } from './useFinderKnowledgeBase';
 
@@ -124,7 +145,7 @@ export default function FinderRoot() {
     try {
       await actions.createFolder.mutateAsync(uniqueName);
       toast.success('Folder created', {
-        description: `“${uniqueName}” is ready to use.`,
+        description: `"${uniqueName}" is ready to use.`,
         action: {
           label: 'Open',
           onClick: () => setPrefix(nextPrefix),
@@ -180,7 +201,7 @@ export default function FinderRoot() {
     try {
       await actions.setVisibility.mutateAsync({ key: entry.key, visibility });
       toast.success('Visibility updated', {
-        description: `“${entry.name}” is now ${visibility}.`,
+        description: `"${entry.name}" is now ${visibility}.`,
       });
     } catch (err) {
       console.error(err);
@@ -277,20 +298,77 @@ export default function FinderRoot() {
     );
   }, [preview]);
 
+  const totalItems = filteredFolders.length + filteredFiles.length;
+
   return (
-    <div className="flex h-full flex-col gap-2 p-3">
-      <Toolbar
-        view={state.view}
-        setView={setView}
-        onSearch={setQuery}
-        isUploading={isUploading}
-        isListLoading={isFetchingList}
-        isCreatingFolder={isCreatingFolder}
-        onCreateFolder={openCreateFolderDialog}
-        onTriggerUpload={triggerUploadDialog}
-        breadcrumbs={breadcrumbs}
-        setPrefix={setPrefix}
-      />
+    <div className="text-foreground flex h-full flex-col">
+      {/* Header */}
+      <div className="bg-card sticky top-0 z-10 flex w-full items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex items-center gap-3">
+          <h2 className="text-base font-semibold">Files</h2>
+          {isFetchingList && (
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Loading...
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={openCreateFolderDialog}
+            disabled={isCreatingFolder}
+          >
+            <FolderPlus className="mr-1.5 h-4 w-4" />
+            New Folder
+          </Button>
+
+          <div className="inline-flex items-center gap-px">
+            <Button
+              size="sm"
+              className="gap-2 rounded-r-none"
+              onClick={() => triggerUploadDialog('private')}
+              disabled={isUploading}
+            >
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {isUploading ? 'Uploading...' : 'Upload'}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  className="rounded-l-none px-2"
+                  disabled={isUploading}
+                >
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="z-[99999] w-44 text-xs">
+                <DropdownMenuLabel>Upload visibility</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => triggerUploadDialog('private')}
+                  disabled={isUploading}
+                >
+                  Private (default)
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => triggerUploadDialog('public')}
+                  disabled={isUploading}
+                >
+                  Public
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
 
       <input
         ref={fileInputRef}
@@ -306,58 +384,119 @@ export default function FinderRoot() {
         onChange={handleUploadSelection}
       />
 
-      <div className="relative min-h-0 flex-1">
-        {state.view === 'grid' ? (
-          <FileGrid
-            prefix={state.prefix}
-            folders={filteredFolders}
-            files={filteredFiles}
-            onOpen={openItem}
-            onPreview={previewFile}
-            onShowDetails={showDetails}
-            isLoading={isFetchingList}
-            onCreateFolder={openCreateFolderDialog}
-            onTriggerUpload={triggerUploadDialog}
-            onSetVisibility={handleSetVisibility}
-            isCreatingFolder={isCreatingFolder}
-            knowledgeBases={knowledgeBases}
-            knowledgeBasesLoading={knowledgeBasesStatus.isLoading}
-            knowledgeBasesError={knowledgeBasesStatus.isError}
-            collectionsByKnowledgeBase={collectionsByKnowledgeBase}
-            collectionStatusByKnowledgeBase={collectionStatusByKnowledgeBase}
-            onAddToKnowledgeBase={queueAddToKnowledgeBase}
-            isAddingToKnowledgeBase={isAddingToKnowledgeBase}
-          />
-        ) : (
-          <FileList
-            prefix={state.prefix}
-            folders={filteredFolders}
-            files={filteredFiles}
-            onOpen={openItem}
-            onPreview={previewFile}
-            onShowDetails={showDetails}
-            isLoading={isFetchingList}
-            onCreateFolder={openCreateFolderDialog}
-            onTriggerUpload={triggerUploadDialog}
-            onSetVisibility={handleSetVisibility}
-            isCreatingFolder={isCreatingFolder}
-            knowledgeBases={knowledgeBases}
-            knowledgeBasesLoading={knowledgeBasesStatus.isLoading}
-            knowledgeBasesError={knowledgeBasesStatus.isError}
-            collectionsByKnowledgeBase={collectionsByKnowledgeBase}
-            collectionStatusByKnowledgeBase={collectionStatusByKnowledgeBase}
-            onAddToKnowledgeBase={queueAddToKnowledgeBase}
-            isAddingToKnowledgeBase={isAddingToKnowledgeBase}
-          />
-        )}
+      {/* Body */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          {/* Sidebar */}
+          <aside className="space-y-4">
+            <p className="text-muted-foreground text-xs">
+              Browse and manage your files. Upload new files or create folders to organize your content.
+            </p>
 
-        {isUploading && (
-          <div className="bg-background/70 pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-            <div className="bg-card flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium shadow">
-              <Loader2 className="h-4 w-4 animate-spin" /> Uploading files...
+            <div>
+              <label className="text-xs">Search</label>
+              <div className="relative">
+                <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
+                <Input
+                  placeholder="Search files..."
+                  className="pl-9"
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
             </div>
+
+            <div>
+              <label className="text-xs">View</label>
+              <ToggleGroup
+                type="single"
+                value={state.view}
+                onValueChange={(value) => {
+                  if (value === 'grid' || value === 'list') setView(value);
+                }}
+                className="mt-1 w-full justify-start"
+              >
+                <ToggleGroupItem value="grid" aria-label="Grid view" className="flex-1">
+                  <Grid3X3 className="mr-1.5 h-4 w-4" />
+                  Grid
+                </ToggleGroupItem>
+                <ToggleGroupItem value="list" aria-label="List view" className="flex-1">
+                  <List className="mr-1.5 h-4 w-4" />
+                  List
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+
+            <div>
+              <label className="text-xs">Location</label>
+              <div className="mt-1">
+                <Breadcrumbs breadcrumbs={breadcrumbs} onClick={setPrefix} />
+              </div>
+            </div>
+
+            <div className="border-t pt-3">
+              <p className="text-muted-foreground text-xs">
+                {totalItems} {totalItems === 1 ? 'item' : 'items'}
+                {filteredFolders.length > 0 && ` • ${filteredFolders.length} folders`}
+                {filteredFiles.length > 0 && ` • ${filteredFiles.length} files`}
+              </p>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="relative md:col-span-3">
+            {state.view === 'grid' ? (
+              <FileGrid
+                prefix={state.prefix}
+                folders={filteredFolders}
+                files={filteredFiles}
+                onOpen={openItem}
+                onPreview={previewFile}
+                onShowDetails={showDetails}
+                isLoading={isFetchingList}
+                onCreateFolder={openCreateFolderDialog}
+                onTriggerUpload={triggerUploadDialog}
+                onSetVisibility={handleSetVisibility}
+                isCreatingFolder={isCreatingFolder}
+                knowledgeBases={knowledgeBases}
+                knowledgeBasesLoading={knowledgeBasesStatus.isLoading}
+                knowledgeBasesError={knowledgeBasesStatus.isError}
+                collectionsByKnowledgeBase={collectionsByKnowledgeBase}
+                collectionStatusByKnowledgeBase={collectionStatusByKnowledgeBase}
+                onAddToKnowledgeBase={queueAddToKnowledgeBase}
+                isAddingToKnowledgeBase={isAddingToKnowledgeBase}
+              />
+            ) : (
+              <FileList
+                prefix={state.prefix}
+                folders={filteredFolders}
+                files={filteredFiles}
+                onOpen={openItem}
+                onPreview={previewFile}
+                onShowDetails={showDetails}
+                isLoading={isFetchingList}
+                onCreateFolder={openCreateFolderDialog}
+                onTriggerUpload={triggerUploadDialog}
+                onSetVisibility={handleSetVisibility}
+                isCreatingFolder={isCreatingFolder}
+                knowledgeBases={knowledgeBases}
+                knowledgeBasesLoading={knowledgeBasesStatus.isLoading}
+                knowledgeBasesError={knowledgeBasesStatus.isError}
+                collectionsByKnowledgeBase={collectionsByKnowledgeBase}
+                collectionStatusByKnowledgeBase={collectionStatusByKnowledgeBase}
+                onAddToKnowledgeBase={queueAddToKnowledgeBase}
+                isAddingToKnowledgeBase={isAddingToKnowledgeBase}
+              />
+            )}
+
+            {isUploading && (
+              <div className="bg-background/70 pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-md">
+                <div className="bg-card flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium shadow">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Uploading files...
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <FolderDialog

@@ -13,7 +13,6 @@ import { XCircle } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 import AppLauncher from "../app-launcher";
-import Assistant from "../assistant";
 import { DockAppTile } from "./dock";
 // DockSettings popover replaced by right-click windowed manager
 
@@ -23,7 +22,8 @@ export default function Dock() {
     windows,
     activeId,
     openApp,
-    openAppById,
+    focusWindow,
+    restoreWindow,
     dockAppIds,
     setDockAppIds,
     clearAllWindows,
@@ -33,11 +33,8 @@ export default function Dock() {
     () => windows.some((window) => window.maximized && !window.minimized),
     [windows]
   );
-  const [isHovering, setIsHovering] = React.useState(false);
-  const [assistantOpen, setAssistantOpen] = React.useState(false);
+
   const [appLauncherOpen, setAppLauncherOpen] = React.useState(false);
-  const hideTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const showTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const dockApps = React.useMemo(
     () => apps.filter((app) => dockAppIds.includes(app.id)),
@@ -77,79 +74,22 @@ export default function Dock() {
     [setDockAppIds]
   );
 
-  React.useEffect(() => {
-    if (!hasMaximizedWindow && isHovering) {
-      setIsHovering(false);
-    }
-  }, [hasMaximizedWindow, isHovering]);
-
-  // Cleanup timeouts on unmount
-  React.useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
-      if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
-    };
-  }, []);
-
-  const handleMouseEnter = React.useCallback(() => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-    if (hasMaximizedWindow) {
-      showTimeoutRef.current = setTimeout(() => {
-        setIsHovering(true);
-      }, 300); // 300ms delay before showing
-    } else {
-      setIsHovering(true);
-    }
-  }, [hasMaximizedWindow]);
-
-  const handleMouseLeave = React.useCallback(() => {
-    if (showTimeoutRef.current) {
-      clearTimeout(showTimeoutRef.current);
-      showTimeoutRef.current = null;
-    }
-    if (hasMaximizedWindow) {
-      hideTimeoutRef.current = setTimeout(() => {
-        setIsHovering(false);
-      }, 500); // 500ms delay before hiding
-    } else {
-      setIsHovering(false);
-    }
-  }, [hasMaximizedWindow]);
-
   const s = useOSStrings();
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div
-        className="fixed bottom-3 left-1/2 z-[9999] -translate-x-1/2"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onFocusCapture={handleMouseEnter}
-        onBlurCapture={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-            handleMouseLeave();
-          }
-        }}
-      >
+      <div className="fixed bottom-3 left-1/2 z-[9999] -translate-x-1/2">
         <Card
           role="menubar"
           aria-label="Desktop dock"
           className={cn(
             "flex flex-row items-center justify-center px-3 py-2 @md:gap-2 @md:px-5",
             "rounded-xl border bg-transparent shadow-none backdrop-blur-xl transition-all duration-300",
-            hasMaximizedWindow &&
-              !isHovering &&
-              !assistantOpen &&
-              !appLauncherOpen
-              ? "translate-y-[85%] opacity-20"
+            hasMaximizedWindow && !appLauncherOpen
+              ? "translate-y-full opacity-0 pointer-events-none"
               : "translate-y-0 opacity-100"
           )}
         >
-          <Assistant onOpenChange={setAssistantOpen} />
-
           <nav
             className="ml-2 flex items-end gap-3 @md:gap-4"
             aria-label="Applications"
@@ -204,13 +144,13 @@ export default function Dock() {
                   onPress={() => {
                     if (isMinimized) {
                       // Restore the window if it's minimized
-                      openAppById(window.id);
+                      restoreWindow(window.id);
                     } else {
                       // Focus or minimize the window
                       if (window.id === activeId) {
                         minimizeWindow(window.id);
                       } else {
-                        openAppById(window.id);
+                        focusWindow(window.id);
                       }
                     }
                   }}

@@ -15,8 +15,7 @@ export function GoogleSignInButton({ redirectTo = '/dashboard' }: GoogleSignInBu
 
   return (
     <Button
-      variant="outline"
-      className="w-full"
+      className="w-full bg-[#4285F4] hover:bg-[#4285F4]/90 text-white"
       disabled={isLoading}
       onClick={() => {
         setIsLoading(true);

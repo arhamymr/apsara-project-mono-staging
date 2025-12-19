@@ -4,7 +4,7 @@ import { Section } from "@/components/home/components";
 import { useFadeUp } from "@/components/home/hooks/useFadeUp";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { cn } from "@/lib/utils";
+import { cn, getWhatsAppUrl } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, type LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -114,7 +114,7 @@ export function ServiceHeroSection({
           >
             <Button size="lg" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
+                href={getWhatsAppUrl(whatsappMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -393,7 +393,7 @@ export function PricingSection({
 
             <Button size="lg" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
+                href={getWhatsAppUrl(whatsappMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -441,7 +441,7 @@ export function PricingSection({
 
             <Button size="lg" variant="secondary" className="w-full" asChild>
               <a
-                href={`https://wa.me/6289669594959?text=${encodeURIComponent(whatsappMessage)}`}
+                href={getWhatsAppUrl(whatsappMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

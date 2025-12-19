@@ -113,6 +113,7 @@ export function TemplatePreviewModal({
                 onLoad={() => setIframeLoaded(true)}
                 onError={() => setIframeError(true)}
                 sandbox="allow-scripts allow-same-origin"
+                {...({ credentialless: "true" } as any)}
               />
             ) : template.previewImage ? (
               /* Fallback image */
