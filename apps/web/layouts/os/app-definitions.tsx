@@ -6,6 +6,7 @@ import CalculatorApp from '@/layouts/os/apps/CalculatorApp';
 import ChatbotApp from '@/layouts/os/apps/ChatbotApp';
 import DesktopSettingsApp from '@/layouts/os/apps/DesktopSettingsApp';
 import DockManagerApp from '@/layouts/os/apps/DockManagerApp';
+import DocsApp from '@/layouts/os/apps/docs';
 import FinderApp from '@/layouts/os/apps/finder';
 import GraphicDesignApp from '@/layouts/os/apps/graphic-design';
 import InvoiceApp from '@/layouts/os/apps/InvoiceApp';
@@ -193,6 +194,13 @@ export function createDefaultApps(): AppDef[] {
       icon: '🏢',
       content: <OrganizationApp />,
       defaultSize: { width: 1000, height: 700 },
+    },
+    {
+      id: 'docs',
+      name: 'Documentation',
+      icon: '📖',
+      content: <DocsApp />,
+      defaultSize: { width: 1100, height: 700 },
     },
   ];
 }
