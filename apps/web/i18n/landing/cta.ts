@@ -9,7 +9,7 @@ export const CTA_STRINGS: Record<Lang, any> = {
     note: 'Free consultation available. No commitment required.',
   },
   id: {
-    title: 'Siap Membangun Kehadiran Digital Anda?',
+    title: 'Siap Membangun Persona Digital Anda?',
     desc: 'Biarkan kami membantu Anda membuat website profesional, mengintegrasikan solusi AI, atau membangun aplikasi kustom yang memberikan hasil bisnis nyata.',
     primary: 'Mulai Proyek Anda',
     secondary: 'Jadwalkan Konsultasi',
