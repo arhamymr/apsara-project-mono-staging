@@ -34,7 +34,7 @@ export function TopNav() {
           { href: '/api-development', label: s.topNav.links.apiDevelopment, description: s.topNav.links.descriptions.apiDevelopment, icon: Server },
           { href: '/fix-website', label: s.topNav.links.fixWebsite, description: s.topNav.links.descriptions.fixWebsite, icon: Wrench },
           { href: '/ai-integration', label: s.topNav.links.aiIntegration, description: s.topNav.links.descriptions.aiIntegration, icon: Bot },
-          { href: '/instagram-post', label: s.topNav.links.instagramPost, description: s.topNav.links.descriptions.instagramPost, icon: ImageIcon },
+          // { href: '/instagram-post', label: s.topNav.links.instagramPost, description: s.topNav.links.descriptions.instagramPost, icon: ImageIcon },
         ],
       },
       { href: '/templates', label: s.topNav.links.templates },
