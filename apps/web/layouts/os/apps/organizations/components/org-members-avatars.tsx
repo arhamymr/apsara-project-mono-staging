@@ -117,7 +117,7 @@ export function OrgMembersAvatars({
             </div>
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-64 p-0" align="end">
+        <PopoverContent className="w-64 p-0 z-[99999]" align="end">
           <div className="border-b px-3 py-2">
             <p className="text-sm font-medium">{orgName}</p>
             <p className="text-xs text-muted-foreground">

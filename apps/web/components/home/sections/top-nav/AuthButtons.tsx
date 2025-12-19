@@ -23,9 +23,6 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
   const { isAuthenticated, isLoading } = useConvexAuth();
   const user = useQuery(api.user.profile);
 
-
-  console.log(user, "user")
-
   // Keyboard shortcut: G to go to login/dashboard
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

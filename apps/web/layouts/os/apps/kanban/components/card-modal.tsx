@@ -157,7 +157,7 @@ export function CardModal({
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="sm:max-w-[900px]"
+          className="sm:max-w-[900px] max-h-[95vh] overflow-y-auto"
           portalContainer={portalContainer?.current ?? undefined}
         >
           <DialogHeader>

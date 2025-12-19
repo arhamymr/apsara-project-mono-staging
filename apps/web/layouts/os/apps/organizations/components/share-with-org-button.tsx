@@ -22,7 +22,9 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
+import { Separator } from '@workspace/ui/components/separator';
 import { useWindowPortalContainer } from '@/layouts/os/WindowPortalContext';
+import { Badge } from '@workspace/ui/components/badge';
 import { Building2, Check, Loader2, Share2, X } from 'lucide-react';
 import type { OrganizationId, ResourceType, SharedResourceId } from '../types';
 
@@ -127,12 +129,19 @@ export function ShareWithOrgButton({
     return null;
   }
 
+  const isSharedWithOrgs = sharedOrganizations && sharedOrganizations.length > 0;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={variant} size={size} className={className}>
           <Share2 className="mr-2 h-4 w-4" />
-          Share
+          Share with Organization
+          {isSharedWithOrgs && (
+            <Badge variant="secondary" className="ml-2 h-5 min-w-5 px-1.5 text-xs">
+              {sharedOrganizations.length}
+            </Badge>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent 
@@ -183,6 +192,11 @@ export function ShareWithOrgButton({
                 </div>
               </ScrollArea>
             </div>
+          )}
+
+          {/* Separator between sections */}
+          {sharedOrganizations && sharedOrganizations.length > 0 && availableOrganizations && availableOrganizations.length > 0 && (
+            <Separator />
           )}
 
           {/* Share with new organization */}

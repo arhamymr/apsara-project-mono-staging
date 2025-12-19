@@ -10,7 +10,7 @@ export const HERO_STRINGS: Record<Lang, unknown> = {
   },
   id: {
     title: 'Bangun, Luncurkan & Kembangkan Bisnis Digital Anda',
-    description: 'Dari website profesional dan otomatisasi AI hingga aplikasi kustom — semua yang Anda butuhkan untuk membangun dan mengembangkan kehadiran online Anda.',
+    description: 'Dari website profesional dan otomatisasi AI hingga aplikasi kustom — semua yang Anda butuhkan untuk membangun dan mengembangkan persona online Anda.',
     ctas: { primary: 'Masuk' },
     checklist: ['Pengembangan Website', 'Integrasi AI', 'Aplikasi Kustom', 'Pemasaran Digital'],
     trustedBy: '',

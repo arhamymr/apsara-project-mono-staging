@@ -47,7 +47,6 @@ export default function UserDropdown() {
     [apps, openApp],
   );
 
-  console.log(user, "user")
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

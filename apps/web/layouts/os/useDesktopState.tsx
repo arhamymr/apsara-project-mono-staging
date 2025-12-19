@@ -178,7 +178,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
         setActiveId(parsed.activeId);
       }
 
-      const anyParsed: unknown = parsed as unknown;
+      const anyParsed = parsed as { shortcuts?: unknown; desktopItems?: unknown };
       if (Array.isArray(anyParsed.shortcuts)) {
         setShortcuts(hydrateFromV1(anyParsed.shortcuts as string[]));
       } else if (Array.isArray(anyParsed.desktopItems)) {
@@ -586,19 +586,39 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
     setShortcuts((prev) => ShortcutActions.renameGroup(prev, groupId, label));
   }, []);
 
-  const addShortcutForApp = useCallback((appId: string) => {
-    const app = apps.find((a) => a.id === appId);
-    const iconElement = app?.icon ? (
-      typeof app.icon === 'string' ? (
-        <span className="text-4xl">{app.icon}</span>
+  const addShortcutForApp = useCallback(
+    (appId: string) => {
+      console.log('[useDesktopState] addShortcutForApp called with:', appId);
+      const app = apps.find((a) => a.id === appId);
+      if (!app) {
+        console.warn(`[addShortcutForApp] App not found: ${appId}`);
+        return;
+      }
+      console.log('[useDesktopState] Found app:', app.name);
+      // Create icon element with fallback
+      const iconElement = app.icon ? (
+        typeof app.icon === 'string' ? (
+          <span className="text-4xl">{app.icon}</span>
+        ) : (
+          app.icon
+        )
       ) : (
-        app.icon
-      )
-    ) : undefined;
-    setShortcuts((prev) =>
-      ShortcutActions.addShortcutForApp(prev, appId, app?.name, iconElement),
-    );
-  }, [apps]);
+        <span className="text-4xl">📱</span>
+      );
+      setShortcuts((prev) => {
+        console.log('[useDesktopState] Current shortcuts:', prev.length);
+        const result = ShortcutActions.addShortcutForApp(
+          prev,
+          appId,
+          app.name,
+          iconElement,
+        );
+        console.log('[useDesktopState] New shortcuts:', result.length);
+        return result;
+      });
+    },
+    [apps],
+  );
 
   const removeShortcutForApp = useCallback((appId: string) => {
     setShortcuts((prev) => ShortcutActions.removeShortcutForApp(prev, appId));
