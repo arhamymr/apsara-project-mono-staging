@@ -6,7 +6,7 @@ import { Lightbulb, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import LanguageSelector from '@/components/LanguageSelector';
 import NotificationBell from '@/components/NotificationBell';
-import { ThemeToggle } from '@/layouts/dark-mode/theme-toggle';
+import { ThemeToggle } from '@/components/dark-mode/theme-toggle';
 import ClockDisplay from '@/layouts/os/components/clock-display';
 import UserDropdown from '@/layouts/os/UserDropdown';
 import { useOSStrings } from '@/i18n/os';

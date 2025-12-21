@@ -1,4 +1,4 @@
-import { useTheme } from '@/layouts/dark-mode/useTheme';
+import { useTheme } from '@/components/dark-mode/useTheme';
 import { getGradientById } from '@/layouts/os/gradients';
 import {
   getWallpaper,

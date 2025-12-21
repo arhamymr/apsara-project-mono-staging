@@ -21,6 +21,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
 import { COLUMN_COLORS } from '../constants';
 import type { PipelineColumn } from '../types';
 
@@ -42,6 +52,8 @@ export function PipelineModal({
   onClose,
 }: PipelineModalProps) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [columnToDelete, setColumnToDelete] = React.useState<{ id: string; title: string } | null>(null);
 
   function handleDragEnd(e: DragEndEvent) {
     const { active, over } = e;
@@ -51,6 +63,19 @@ export function PipelineModal({
     if (oldIndex !== -1 && newIndex !== -1) {
       onReorderColumns(arrayMove(columns, oldIndex, newIndex));
     }
+  }
+
+  function handleDeleteClick(columnId: string, columnTitle: string) {
+    setColumnToDelete({ id: columnId, title: columnTitle });
+    setDeleteDialogOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (columnToDelete) {
+      onDeleteColumn(columnToDelete.id);
+    }
+    setDeleteDialogOpen(false);
+    setColumnToDelete(null);
   }
 
   return (
@@ -77,7 +102,7 @@ export function PipelineModal({
                     key={col.id}
                     column={col}
                     onUpdate={onUpdateColumn}
-                    onDelete={onDeleteColumn}
+                    onDelete={handleDeleteClick}
                     canDelete={columns.length > 1}
                   />
                 ))}
@@ -96,6 +121,27 @@ export function PipelineModal({
           </Button>
         </div>
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="z-[99999]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Stage</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{columnToDelete?.title}&rdquo;? All leads in this stage will be
+              permanently removed. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -103,7 +149,7 @@ export function PipelineModal({
 interface SortablePipelineItemProps {
   column: PipelineColumn;
   onUpdate: (id: string, updates: Partial<PipelineColumn>) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, title: string) => void;
   canDelete: boolean;
 }
 
@@ -156,7 +202,7 @@ function SortablePipelineItem({ column, onUpdate, onDelete, canDelete }: Sortabl
             <Palette className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className='z-[99999]'>
           {COLUMN_COLORS.map((c) => (
             <DropdownMenuItem
               key={c.name}
@@ -174,7 +220,7 @@ function SortablePipelineItem({ column, onUpdate, onDelete, canDelete }: Sortabl
           variant="ghost"
           size="sm"
           className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-          onClick={() => onDelete(column.id)}
+          onClick={() => onDelete(column.id, column.title)}
         >
           <Trash2 className="h-4 w-4" />
         </Button>

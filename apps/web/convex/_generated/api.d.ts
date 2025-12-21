@@ -14,6 +14,7 @@ import type * as chat from "../chat.js";
 import type * as http from "../http.js";
 import type * as invitations from "../invitations.js";
 import type * as kanban from "../kanban.js";
+import type * as leadManagement from "../leadManagement.js";
 import type * as notes from "../notes.js";
 import type * as notifications from "../notifications.js";
 import type * as organizationMembers from "../organizationMembers.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   invitations: typeof invitations;
   kanban: typeof kanban;
+  leadManagement: typeof leadManagement;
   notes: typeof notes;
   notifications: typeof notifications;
   organizationMembers: typeof organizationMembers;

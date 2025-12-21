@@ -3,7 +3,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { Button } from '@workspace/ui/components/button';
 import { TabsContent } from '@workspace/ui/components/tabs';
-import { useTheme } from '@/layouts/dark-mode/useTheme';
+import { useTheme } from '@/components/dark-mode/useTheme';
 import Editor, { Monaco } from '@monaco-editor/react';
 import { getLanguageFromPath } from '@/lib/file-utils';
 import { ChevronLeft, ChevronRight, File, FileCode, Loader2 } from 'lucide-react';

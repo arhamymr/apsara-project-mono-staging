@@ -244,12 +244,6 @@ export function ShareWithOrgButton({
             </p>
           )}
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Done
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -14,21 +14,22 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { arrayMove } from '@dnd-kit/sortable';
-import { Layout, Plus, Settings } from 'lucide-react';
-import { Badge } from '@workspace/ui/components/badge';
+import { Layout, Loader2 } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { SortableColumn } from './components/SortableColumn';
-import { ColumnOverlay } from './components/LeadColumn';
-import { LeadCardOverlay } from './components/LeadCard';
+import { ColumnOverlay } from './components/lead-column';
+import { LeadCardOverlay } from './components/lead-card';
 import { LeadModal } from './components/LeadModal';
 import { PipelineModal } from './components/PipelineModal';
 import { TemplateModal } from './components/TemplateModal';
-import { usePipelineState } from './hooks/usePipelineState';
-import { PIPELINE_TEMPLATES } from './constants';
+import { LeadPipelineHeader } from './components/LeadPipelineHeader';
+import { useLeadManagement } from './hooks/useLeadManagement';
+import { PIPELINE_TEMPLATES, COLUMN_COLORS } from './constants';
+import { useState } from 'react';
 
 export default function LeadManagementApp() {
-  const state = usePipelineState();
+  const state = useLeadManagement();
+  const [optimisticBoard, setOptimisticBoard] = useState<typeof state.board | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -54,26 +55,26 @@ export default function LeadManagementApp() {
 
     const activeId = String(active.id);
     const overId = String(over.id);
+    const currentBoard = optimisticBoard || state.board;
     const fromCol = state.findContainer(activeId);
     const toCol = state.findContainer(overId);
 
     if (!fromCol || !toCol || fromCol === toCol) return;
 
-    state.setBoard((prev) => {
-      const fromItems = prev[fromCol] || [];
-      const toItems = prev[toCol] || [];
-      const moving = fromItems.find((l) => l.id === activeId);
-      if (!moving) return prev;
+    // Optimistic update for smooth drag
+    const fromItems = currentBoard[fromCol] || [];
+    const toItems = currentBoard[toCol] || [];
+    const moving = fromItems.find((l) => l.id === activeId);
+    if (!moving) return;
 
-      const newFrom = fromItems.filter((l) => l.id !== activeId);
-      const overIndex = toItems.findIndex((l) => l.id === overId);
-      const insertAt = overIndex >= 0 ? overIndex : toItems.length;
+    const newFrom = fromItems.filter((l) => l.id !== activeId);
+    const overIndex = toItems.findIndex((l) => l.id === overId);
+    const insertAt = overIndex >= 0 ? overIndex : toItems.length;
 
-      return {
-        ...prev,
-        [fromCol]: newFrom,
-        [toCol]: [...toItems.slice(0, insertAt), moving, ...toItems.slice(insertAt)],
-      };
+    setOptimisticBoard({
+      ...currentBoard,
+      [fromCol]: newFrom,
+      [toCol]: [...toItems.slice(0, insertAt), moving, ...toItems.slice(insertAt)],
     });
   }
 
@@ -81,6 +82,8 @@ export default function LeadManagementApp() {
     const { active, over } = e;
     state.setActiveLead(null);
     state.setActiveColumn(null);
+    setOptimisticBoard(null);
+    
     if (!over) return;
 
     // Handle column reordering
@@ -88,12 +91,18 @@ export default function LeadManagementApp() {
       const oldIndex = state.columns.findIndex((c) => c.id === active.id);
       const newIndex = state.columns.findIndex((c) => c.id === over.id);
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        state.setColumns(arrayMove(state.columns, oldIndex, newIndex));
+        const reordered = [...state.columns];
+        const [moved] = reordered.splice(oldIndex, 1);
+        if (moved) {
+          reordered.splice(newIndex, 0, moved);
+          const columnPositions = reordered.map((col, idx) => ({ id: col.id as any, position: idx }));
+          state.handleReorderColumns(columnPositions);
+        }
       }
       return;
     }
 
-    // Handle lead reordering within same column
+    // Handle lead movement
     const activeId = String(active.id);
     const overId = String(over.id);
     const fromCol = state.findContainer(activeId);
@@ -101,47 +110,146 @@ export default function LeadManagementApp() {
 
     if (!fromCol || !toCol) return;
 
-    if (fromCol === toCol) {
-      const colItems = state.board[fromCol] || [];
-      const oldIndex = colItems.findIndex((l) => l.id === activeId);
-      const newIndex = colItems.findIndex((l) => l.id === overId);
+    const currentBoard = state.board;
+    const toItems = currentBoard[toCol] || [];
+    const targetPosition = toItems.findIndex((l) => l.id === overId);
+    const finalPosition = targetPosition >= 0 ? targetPosition : toItems.length;
 
-      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
-        state.setBoard((prev) => ({
-          ...prev,
-          [fromCol]: arrayMove(prev[fromCol] || [], oldIndex, newIndex),
-        }));
-      }
-    }
+    // Call Convex mutation
+    state.handleMoveLead(activeId as any, toCol as any, finalPosition);
   }
 
-  const totalLeads = Object.values(state.board).flat().length;
+  // Define helper functions before early returns
+  const addColumn = () => {
+    const colorIndex = state.columns.length % COLUMN_COLORS.length;
+    const colorConfig = COLUMN_COLORS[colorIndex];
+    if (colorConfig) {
+      state.handleCreateColumn(
+        'New Stage',
+        colorConfig.color,
+        colorConfig.dotColor
+      );
+    }
+  };
+
+  const updateColumn = (id: string, updates: Partial<{ title: string; color: string; dotColor: string }>) => {
+    state.handleUpdateColumn(id as any, updates);
+  };
+
+  const deleteColumn = (id: string) => {
+    state.handleDeleteColumn(id as any);
+  };
+
+  const saveLead = (data: Partial<any>) => {
+    if (!state.detailLead) return;
+
+    if (state.editingColumnId && !state.detailLead.id) {
+      // Create new lead
+      state.handleCreateLead(state.editingColumnId as any, {
+        name: data.name || 'New Lead',
+        company: data.company,
+        value: data.value,
+        email: data.email,
+        phone: data.phone,
+        owner: data.owner,
+        source: data.source || 'Manual',
+        notes: data.notes,
+      });
+    } else if (state.detailLead.id) {
+      // Update existing lead
+      state.handleUpdateLead(state.detailLead.id as any, data);
+    }
+  };
+
+  const deleteLead = (leadId: string) => {
+    state.handleDeleteLead(leadId as any);
+  };
+
+  const displayBoard = optimisticBoard || state.board;
+  const totalLeads = Object.values(displayBoard).flat().length;
+
+  // Show loading state while fetching pipelines
+  if (state.pipelines === undefined) {
+    return (
+      <div className="text-foreground relative flex h-full flex-col items-center justify-center overflow-hidden">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
+          <p className="text-muted-foreground">Loading pipelines...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while fetching pipeline data
+  if (state.selectedPipelineId && state.pipeline === undefined) {
+    return (
+      <div className="text-foreground relative flex h-full flex-col overflow-hidden">
+        <LeadPipelineHeader
+          pipeline={null}
+          pipelines={state.pipelines}
+          selectedPipelineId={state.selectedPipelineId}
+          totalLeads={0}
+          isCreatingPipeline={state.isCreatingPipeline}
+          isCreatingColumn={state.isCreatingColumn}
+          onAddColumn={addColumn}
+          onSelectPipeline={(id) => state.setSelectedPipelineId(id as any)}
+          onOpenTemplateModal={() => state.setIsTemplateModalOpen(true)}
+          onOpenPipelineModal={() => state.setIsPipelineModalOpen(true)}
+          onDeletePipeline={(id) => state.handleDeletePipeline(id as any)}
+          onUpdatePipeline={(id, name) => state.handleUpdatePipeline(id as any, name)}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
+            <p className="text-muted-foreground">Loading pipeline data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no pipeline selected
+  if (!state.selectedPipelineId) {
+    return (
+      <div className="text-foreground relative flex h-full flex-col items-center justify-center overflow-hidden">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">No Pipeline Selected</h2>
+          <p className="text-muted-foreground mb-4">Create a pipeline or select a template to get started</p>
+          <Button onClick={() => state.setIsTemplateModalOpen(true)}>
+            <Layout className="mr-2 h-4 w-4" />
+            Choose Template
+          </Button>
+        </div>
+        
+        {/* Template Modal */}
+        {state.isTemplateModalOpen && (
+          <TemplateModal
+            templates={PIPELINE_TEMPLATES}
+            onApply={state.applyTemplate}
+            onClose={() => state.setIsTemplateModalOpen(false)}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="text-foreground relative flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="border-border flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-semibold">Lead Pipeline</h1>
-          <Badge variant="secondary" className="text-xs">
-            {totalLeads} leads
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => state.setIsTemplateModalOpen(true)}>
-            <Layout className="mr-1.5 h-4 w-4" />
-            Templates
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => state.setIsPipelineModalOpen(true)}>
-            <Settings className="mr-1.5 h-4 w-4" />
-            Customize
-          </Button>
-          <Button size="sm" onClick={state.addColumn}>
-            <Plus className="mr-1.5 h-4 w-4" />
-            Add Stage
-          </Button>
-        </div>
-      </div>
+      <LeadPipelineHeader
+        pipeline={state.pipeline}
+        pipelines={state.pipelines}
+        selectedPipelineId={state.selectedPipelineId}
+        totalLeads={totalLeads}
+        isCreatingPipeline={state.isCreatingPipeline}
+        isCreatingColumn={state.isCreatingColumn}
+        onAddColumn={addColumn}
+        onSelectPipeline={(id) => state.setSelectedPipelineId(id as any)}
+        onOpenTemplateModal={() => state.setIsTemplateModalOpen(true)}
+        onOpenPipelineModal={() => state.setIsPipelineModalOpen(true)}
+        onDeletePipeline={(id) => state.handleDeletePipeline(id as any)}
+        onUpdatePipeline={(id, name) => state.handleUpdatePipeline(id as any, name)}
+      />
 
       {/* Board */}
       <div className="scrollbar-thin scrollbar-thumb-muted flex-1 overflow-x-auto overflow-y-hidden p-4">
@@ -158,11 +266,11 @@ export default function LeadManagementApp() {
                 <SortableColumn
                   key={col.id}
                   column={col}
-                  leads={state.board[col.id] || []}
+                  leads={displayBoard[col.id] || []}
                   onAddLead={() => state.openCreateLead(col.id)}
                   onEditLead={state.openEditLead}
-                  onUpdateColumn={state.updateColumn}
-                  onDeleteColumn={state.deleteColumn}
+                  onUpdateColumn={updateColumn}
+                  onDeleteColumn={deleteColumn}
                   canDelete={state.columns.length > 1}
                 />
               ))}
@@ -181,8 +289,8 @@ export default function LeadManagementApp() {
         <LeadModal
           lead={state.detailLead}
           isNew={!!state.editingColumnId}
-          onSave={state.saveLead}
-          onDelete={state.deleteLead}
+          onSave={saveLead}
+          onDelete={deleteLead}
           onClose={() => {
             state.setIsLeadModalOpen(false);
             state.setDetailLead(null);
@@ -195,10 +303,13 @@ export default function LeadManagementApp() {
       {state.isPipelineModalOpen && (
         <PipelineModal
           columns={state.columns}
-          onUpdateColumn={state.updateColumn}
-          onDeleteColumn={state.deleteColumn}
-          onAddColumn={state.addColumn}
-          onReorderColumns={state.setColumns}
+          onUpdateColumn={updateColumn}
+          onDeleteColumn={deleteColumn}
+          onAddColumn={addColumn}
+          onReorderColumns={(cols) => {
+            const columnPositions = cols.map((col, idx) => ({ id: col.id as any, position: idx }));
+            state.handleReorderColumns(columnPositions);
+          }}
           onClose={() => state.setIsPipelineModalOpen(false)}
         />
       )}

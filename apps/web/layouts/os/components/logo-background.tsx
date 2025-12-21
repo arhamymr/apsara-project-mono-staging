@@ -1,6 +1,6 @@
 'use client';
 
-import { useTheme } from '@/layouts/dark-mode/useTheme';
+import { useTheme } from '@/components/dark-mode/useTheme';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 

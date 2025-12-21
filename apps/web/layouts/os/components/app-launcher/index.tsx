@@ -4,6 +4,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
+  ContextMenuSeparator,
 } from '@workspace/ui/components/context-menu';
 import {
   Dialog,
@@ -15,8 +16,8 @@ import {
 import { Input } from '@workspace/ui/components/input';
 import { useWindowActions } from '@/layouts/os/WindowActionsContext';
 import { cn } from '@/lib/utils';
-import { Grid3x3, MonitorDown, Search } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { Grid3x3, MonitorDown, Search, ExternalLink } from 'lucide-react';
+import { useCallback, useMemo, useState, useRef } from 'react';
 import type { AppDef } from '@/layouts/os/types';
 
 type AppLauncherProps = {
@@ -27,6 +28,8 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
   const { apps, openApp, addShortcutForApp, shortcuts } = useWindowActions();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastClickRef = useRef<{ appId: string; time: number } | null>(null);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -49,12 +52,49 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
     );
   }, [apps, searchQuery]);
 
-  const handleAppClick = useCallback(
+  const handleAppOpen = useCallback(
     (app: AppDef) => {
       openApp(app);
       handleOpenChange(false);
     },
     [openApp, handleOpenChange],
+  );
+
+  const handleAppClick = useCallback(
+    (app: AppDef) => {
+      const now = Date.now();
+      const lastClick = lastClickRef.current;
+
+      // Check if this is a double-click (within 300ms on the same app)
+      if (
+        lastClick &&
+        lastClick.appId === app.id &&
+        now - lastClick.time < 300
+      ) {
+        // Double-click detected
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+          clickTimeoutRef.current = null;
+        }
+        handleAppOpen(app);
+        lastClickRef.current = null;
+      } else {
+        // First click - store it
+        lastClickRef.current = { appId: app.id, time: now };
+        
+        // Clear any existing timeout
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+        }
+        
+        // Set timeout to reset after double-click window
+        clickTimeoutRef.current = setTimeout(() => {
+          lastClickRef.current = null;
+          clickTimeoutRef.current = null;
+        }, 300);
+      }
+    },
+    [handleAppOpen],
   );
 
   const handleAddToDesktop = useCallback(
@@ -114,7 +154,7 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
                             'hover:bg-muted/50 transition-colors',
                             'focus:ring-primary focus:ring-2 focus:outline-none',
                           )}
-                          title={app.name}
+                          title={`${app.name} (Double-click to open)`}
                         >
                           <span
                             className="text-4xl transition-transform group-hover:scale-110"
@@ -128,6 +168,13 @@ export default function AppLauncher({ onOpenChange }: AppLauncherProps) {
                         </button>
                       </ContextMenuTrigger>
                       <ContextMenuContent className="z-[99999999] w-48">
+                        <ContextMenuItem
+                          onSelect={() => handleAppOpen(app)}
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Open
+                        </ContextMenuItem>
+                        <ContextMenuSeparator />
                         <ContextMenuItem
                           onSelect={() => {
                             if (!alreadyOnDesktop) {

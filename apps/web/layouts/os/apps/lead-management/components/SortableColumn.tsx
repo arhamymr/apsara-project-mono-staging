@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { LeadColumn } from './LeadColumn';
+import { LeadColumn } from './lead-column';
 import type { Lead, PipelineColumn } from '../types';
 
 interface SortableColumnProps {

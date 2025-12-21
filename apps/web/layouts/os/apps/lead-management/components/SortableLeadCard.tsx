@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { LeadCard } from './LeadCard';
+import { LeadCard } from './lead-card';
 import type { Lead } from '../types';
 
 interface SortableLeadCardProps {

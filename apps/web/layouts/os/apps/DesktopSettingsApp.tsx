@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Input } from '@workspace/ui/components/input';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
-import { useTheme } from '@/layouts/dark-mode/useTheme';
+import { useTheme } from '@/components/dark-mode/useTheme';
 import { GRADIENT_VARIANTS } from '@/layouts/os/gradients';
 import {
   getWallpaper,

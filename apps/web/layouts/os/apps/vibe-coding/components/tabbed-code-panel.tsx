@@ -1,6 +1,6 @@
 import { Button } from '@workspace/ui/components/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
-import { useTheme } from '@/layouts/dark-mode/useTheme';
+import { useTheme } from '@/components/dark-mode/useTheme';
 import { fetcher } from '@/lib/fetcher';
 import { getLanguageFromPath } from '@/lib/file-utils';
 import Editor from '@monaco-editor/react';

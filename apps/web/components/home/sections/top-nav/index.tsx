@@ -7,7 +7,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
-import { ThemeToggle } from '@/layouts/dark-mode/theme-toggle';
+import { ThemeToggle } from '@/components/dark-mode/theme-toggle';
 import { cn } from '@/lib/utils';
 
 import { Logo } from './Logo';
