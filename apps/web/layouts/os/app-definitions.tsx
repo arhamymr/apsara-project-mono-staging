@@ -13,7 +13,7 @@ import InvoiceApp from '@/layouts/os/apps/InvoiceApp';
 import KanbanApp from '@/layouts/os/apps/kanban';
 import KnowledgeBaseApp from '@/layouts/os/apps/knowledge-base';
 import LanguageConversationApp from '@/layouts/os/apps/LanguageConversationApp';
-import LeadManagementApp from '@/layouts/os/apps/LeadManagementApp';
+import LeadManagementApp from '@/layouts/os/apps/lead-management';
 import MailApp from '@/layouts/os/apps/MailApp';
 import OrganizationApp from '@/layouts/os/apps/OrganizationApp';
 import MapsApp from '@/layouts/os/apps/MapsApp';

@@ -244,19 +244,6 @@ export function KanbanHeader({
               size="sm"
             />
           )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onOpenBoardModal}
-            disabled={isCreatingBoard}
-          >
-            {isCreatingBoard ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
-            New Board
-          </Button>
           {board && (
             <Button
               size="sm"

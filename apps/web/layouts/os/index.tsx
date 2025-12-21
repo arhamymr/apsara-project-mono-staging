@@ -12,6 +12,7 @@ import DesktopContextMenu from '@/layouts/os/components/DesktopContextMenu';
 import { DesktopShortcutsBoard } from '@/layouts/os/components/DesktopShortcutsBoard';
 import BackgroundPlaceholder from '@/layouts/os/components/background-placeholder';
 import Dock from '@/layouts/os/components/dock';
+import { GlobalRipple } from '@/layouts/os/components/GlobalRipple';
 import { WidgetsBoard } from '@/layouts/os/components/widgets/WidgetsBoard';
 import { WindowList } from '@/layouts/os/components/window-item';
 import { useDesktopState } from '@/layouts/os/useDesktopState';
@@ -43,6 +44,7 @@ export default function MacOSLayout({ initialAppId }: MacOSLayoutProps = {}) {
             <div className="text-foreground relative h-screen w-full overflow-hidden font-sans">
               <BackgroundPlaceholder />
               <BootLoader />
+              <GlobalRipple />
 
               <Navbar activeWindowTitle={activeWindowTitle} />
 

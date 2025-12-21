@@ -211,7 +211,8 @@ const schema = defineSchema({
       v.literal("kanbanBoard"),
       v.literal("note"),
       v.literal("chatSession"),
-      v.literal("artifact")
+      v.literal("artifact"),
+      v.literal("leadPipeline")
     ),
     resourceId: v.string(),
     sharedBy: v.id("users"),
@@ -220,6 +221,42 @@ const schema = defineSchema({
     .index("by_organization", ["organizationId"])
     .index("by_resource", ["resourceType", "resourceId"])
     .index("by_org_resource", ["organizationId", "resourceType", "resourceId"]),
+
+  // Lead Management tables
+  leadPipelines: defineTable({
+    name: v.string(),
+    userId: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
+
+  leadColumns: defineTable({
+    pipelineId: v.id("leadPipelines"),
+    title: v.string(),
+    color: v.string(), // Tailwind class like 'bg-blue-500/10'
+    dotColor: v.string(), // Tailwind class like 'bg-blue-500'
+    position: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_pipeline", ["pipelineId"]),
+
+  leads: defineTable({
+    columnId: v.id("leadColumns"),
+    name: v.string(),
+    company: v.optional(v.string()),
+    value: v.optional(v.number()),
+    email: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    owner: v.optional(v.string()),
+    source: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    position: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_column", ["columnId"]),
 });
 
 export default schema;
