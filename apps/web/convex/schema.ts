@@ -257,6 +257,39 @@ const schema = defineSchema({
     updatedAt: v.number(),
   })
     .index("by_column", ["columnId"]),
+
+  // API Hub tables
+  apiKeys: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    keyHash: v.string(), // SHA-256 hash of the actual key
+    keyPrefix: v.string(), // First 8 chars for display (e.g., "pk_live_")
+    permissions: v.array(v.string()), // e.g., ["blogs:read", "leads:write"]
+    rateLimit: v.number(), // Requests per minute
+    isActive: v.boolean(),
+    lastUsedAt: v.optional(v.number()),
+    expiresAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_key_hash", ["keyHash"])
+    .index("by_active", ["isActive"]),
+
+  apiUsageLogs: defineTable({
+    apiKeyId: v.id("apiKeys"),
+    userId: v.id("users"),
+    endpoint: v.string(),
+    method: v.string(),
+    statusCode: v.number(),
+    responseTimeMs: v.number(),
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_api_key", ["apiKeyId"])
+    .index("by_user", ["userId"])
+    .index("by_created", ["createdAt"])
+    .index("by_user_created", ["userId", "createdAt"]),
 });
 
 export default schema;

@@ -1,13 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { useQuery as useConvexQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 import type { SourceKind } from '@/layouts/os/apps/knowledge-base/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
-async function fetcher<T>(url: string, options?: RequestInit): Promise<T> {
+// Hook to get the current user ID from Convex
+function useCurrentUserId(): string | null {
+  const user = useConvexQuery(api.user.profile);
+  return user?._id ?? null;
+}
+
+async function fetcher<T>(url: string, userId: string | null, options?: RequestInit): Promise<T> {
+  const headers: HeadersInit = {
+    ...(options?.headers || {}),
+  };
+  
+  // Add user ID header for authentication
+  if (userId) {
+    (headers as Record<string, string>)['X-User-ID'] = userId;
+  }
+  
   const res = await fetch(`${API_BASE}${url}`, {
     ...options,
+    headers,
     credentials: 'include',
   });
   if (!res.ok) {
@@ -55,12 +73,17 @@ export type ListResult = {
 };
 
 export function useStorageList(prefix: string) {
-  const key = useMemo(() => ['storage-list', prefix] as const, [prefix]);
+  const userId = useCurrentUserId();
+  const key = useMemo(() => ['storage-list', prefix, userId] as const, [prefix, userId]);
   const query = useQuery({
     queryKey: key,
     queryFn: async () => {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
       const data = await fetcher<ListResult>(
         `/storage/list?prefix=${encodeURIComponent(prefix)}`,
+        userId,
       );
       const normalizeName = (value: string) => {
         const trimmed = value.replace(/\/+$/, '');
@@ -132,6 +155,7 @@ export function useStorageList(prefix: string) {
       return { ...data, folders, files };
     },
     staleTime: 45_000,
+    enabled: !!userId, // Only run query when user is authenticated
   });
   return query;
 }
@@ -417,16 +441,19 @@ function formatBytes(size: number): string {
 
 export function useStorageActions(prefix: string) {
   const qc = useQueryClient();
+  const userId = useCurrentUserId();
   const invalidate = () =>
-    qc.invalidateQueries({ queryKey: ['storage-list', prefix] });
+    qc.invalidateQueries({ queryKey: ['storage-list', prefix, userId] });
 
   const createFolder = useMutation({
-    mutationFn: async (name: string) =>
-      fetcher(`/storage/folder`, {
+    mutationFn: async (name: string) => {
+      if (!userId) throw new Error('User not authenticated');
+      return fetcher(`/storage/folder`, userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prefix, name }),
-      }),
+      });
+    },
     onSuccess: invalidate,
   });
 
@@ -438,11 +465,12 @@ export function useStorageActions(prefix: string) {
       file: File;
       visibility: 'public' | 'private';
     }) => {
+      if (!userId) throw new Error('User not authenticated');
       const form = new FormData();
       form.append('file', file);
       form.append('prefix', prefix);
       form.append('visibility', visibility);
-      return fetcher(`/storage/upload`, { method: 'POST', body: form });
+      return fetcher(`/storage/upload`, userId, { method: 'POST', body: form });
     },
     onSuccess: invalidate,
   });
@@ -458,12 +486,14 @@ export function useStorageActions(prefix: string) {
   }
 
   const rename = useMutation({
-    mutationFn: async ({ key, newName }: { key: string; newName: string }) =>
-      fetcher(`/storage/rename`, {
+    mutationFn: async ({ key, newName }: { key: string; newName: string }) => {
+      if (!userId) throw new Error('User not authenticated');
+      return fetcher(`/storage/rename`, userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, new_name: newName }),
-      }),
+      });
+    },
     onSuccess: invalidate,
   });
 
@@ -474,12 +504,14 @@ export function useStorageActions(prefix: string) {
     }: {
       key: string;
       destPrefix: string;
-    }) =>
-      fetcher(`/storage/move`, {
+    }) => {
+      if (!userId) throw new Error('User not authenticated');
+      return fetcher(`/storage/move`, userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, dest_prefix: destPrefix }),
-      }),
+      });
+    },
     onSuccess: invalidate,
   });
 
@@ -490,13 +522,16 @@ export function useStorageActions(prefix: string) {
     }: {
       key: string;
       recursive: boolean;
-    }) =>
-      fetcher(
+    }) => {
+      if (!userId) throw new Error('User not authenticated');
+      return fetcher(
         `/storage/object?key=${encodeURIComponent(key)}&recursive=${recursive ? '1' : '0'}`,
+        userId,
         {
           method: 'DELETE',
         },
-      ),
+      );
+    },
     onSuccess: invalidate,
   });
 
@@ -507,18 +542,22 @@ export function useStorageActions(prefix: string) {
     }: {
       key: string;
       visibility: 'public' | 'private';
-    }) =>
-      fetcher(`/storage/visibility`, {
+    }) => {
+      if (!userId) throw new Error('User not authenticated');
+      return fetcher(`/storage/visibility`, userId, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, visibility }),
-      }),
+      });
+    },
     onSuccess: invalidate,
   });
 
   async function downloadUrl(key: string, ttl = 600): Promise<string> {
+    if (!userId) throw new Error('User not authenticated');
     const data = await fetcher<{ url: string }>(
       `/storage/download-url?key=${encodeURIComponent(key)}&ttl=${ttl}`,
+      userId,
     );
     return data.url;
   }

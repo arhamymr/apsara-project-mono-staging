@@ -6,20 +6,21 @@ import (
 	"myapp/internal/config"
 	"myapp/internal/handler"
 	"myapp/internal/livekit"
+	"myapp/internal/middleware"
 	"myapp/internal/storage"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *config.Config) {
 	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	e.Use(echomiddleware.Logger())
+	e.Use(echomiddleware.Recover())
+	e.Use(echomiddleware.CORSWithConfig(echomiddleware.CORSConfig{
 		AllowOrigins:     cfg.CORSOrigins,
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "X-Requested-With"},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, "X-Requested-With", "X-User-ID"},
 		AllowCredentials: true,
 	}))
 
@@ -56,10 +57,16 @@ func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *conf
 	// Webhook
 	lk.POST("/webhook", webhookHandler.HandleWebhook)
 
-	// Storage routes (R2)
+	// Storage routes (R2) - with user authentication for isolation
 	if r2 != nil {
 		storageHandler := handler.NewStorageHandler(r2)
 		st := e.Group("/storage")
+		
+		// Apply auth middleware to all storage routes
+		st.Use(middleware.AuthMiddleware(middleware.AuthConfig{
+			ConvexURL: cfg.ConvexURL,
+		}))
+		
 		st.GET("/list", storageHandler.ListObjects)
 		st.POST("/upload", storageHandler.UploadObject)
 		st.DELETE("/object", storageHandler.DeleteObject)
@@ -86,4 +93,26 @@ func Setup(e *echo.Echo, client *livekit.Client, r2 *storage.R2Client, cfg *conf
 	kb.POST("", kbHandler.CreateKnowledgeBase)
 	kb.DELETE("/:id", kbHandler.DeleteKnowledgeBase)
 	kb.POST("/collections", kbHandler.CreateCollection)
+
+	// API Hub routes (public API with API key authentication)
+	apiHubHandler := handler.NewAPIHubHandler()
+	
+	api := e.Group("/api/v1")
+	
+	// Public endpoints (no auth required)
+	api.GET("/health", apiHubHandler.HealthCheck)
+	api.GET("/docs/openapi.json", apiHubHandler.GetOpenAPISpec)
+	
+	// Protected endpoints (require API key)
+	apiProtected := api.Group("")
+	apiProtected.Use(apiHubHandler.APIKeyMiddleware(cfg.ConvexURL))
+	
+	// Blog endpoints
+	apiProtected.GET("/blogs", apiHubHandler.ListBlogs)
+	apiProtected.GET("/blogs/:slug", apiHubHandler.GetBlog)
+	
+	// Lead endpoints
+	apiProtected.POST("/leads", apiHubHandler.CreateLead)
+	apiProtected.POST("/leads/bulk", apiHubHandler.BulkCreateLeads)
+	apiProtected.GET("/leads", apiHubHandler.ListLeads)
 }

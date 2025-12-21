@@ -23,6 +23,7 @@ import { LeadModal } from './components/LeadModal';
 import { PipelineModal } from './components/PipelineModal';
 import { TemplateModal } from './components/TemplateModal';
 import { LeadPipelineHeader } from './components/LeadPipelineHeader';
+import { ApiHelperModal } from './components/ApiHelperModal';
 import { useLeadManagement } from './hooks/useLeadManagement';
 import { PIPELINE_TEMPLATES, COLUMN_COLORS } from './constants';
 import { useState } from 'react';
@@ -30,6 +31,7 @@ import { useState } from 'react';
 export default function LeadManagementApp() {
   const state = useLeadManagement();
   const [optimisticBoard, setOptimisticBoard] = useState<typeof state.board | null>(null);
+  const [isApiHelperOpen, setIsApiHelperOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -197,6 +199,7 @@ export default function LeadManagementApp() {
           onOpenPipelineModal={() => state.setIsPipelineModalOpen(true)}
           onDeletePipeline={(id) => state.handleDeletePipeline(id as any)}
           onUpdatePipeline={(id, name) => state.handleUpdatePipeline(id as any, name)}
+          onOpenApiHelper={() => setIsApiHelperOpen(true)}
         />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -249,6 +252,7 @@ export default function LeadManagementApp() {
         onOpenPipelineModal={() => state.setIsPipelineModalOpen(true)}
         onDeletePipeline={(id) => state.handleDeletePipeline(id as any)}
         onUpdatePipeline={(id, name) => state.handleUpdatePipeline(id as any, name)}
+        onOpenApiHelper={() => setIsApiHelperOpen(true)}
       />
 
       {/* Board */}
@@ -320,6 +324,14 @@ export default function LeadManagementApp() {
           templates={PIPELINE_TEMPLATES}
           onApply={state.applyTemplate}
           onClose={() => state.setIsTemplateModalOpen(false)}
+        />
+      )}
+
+      {/* API Helper Modal */}
+      {isApiHelperOpen && state.pipeline && (
+        <ApiHelperModal
+          pipeline={state.pipeline}
+          onClose={() => setIsApiHelperOpen(false)}
         />
       )}
     </div>

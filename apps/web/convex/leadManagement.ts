@@ -501,3 +501,179 @@ export const moveLead = mutation({
     });
   },
 });
+
+
+// ============================================
+// API Lead Creation (for external API access)
+// ============================================
+
+import { internalMutation, internalQuery } from "./_generated/server";
+
+// Get first column of a pipeline, or create default "API Leads" pipeline
+export const getOrCreateApiPipeline = internalMutation({
+  args: {
+    userId: v.id("users"),
+    pipelineId: v.optional(v.id("leadPipelines")),
+  },
+  handler: async (ctx, args) => {
+    // If pipelineId is provided, use that pipeline
+    if (args.pipelineId) {
+      const pipeline = await ctx.db.get(args.pipelineId);
+      if (!pipeline || pipeline.userId !== args.userId) {
+        return { error: "Pipeline not found or access denied" };
+      }
+      
+      // Get the first column of this pipeline
+      const columns = await ctx.db
+        .query("leadColumns")
+        .withIndex("by_pipeline", (q) => q.eq("pipelineId", args.pipelineId!))
+        .collect();
+      
+      const firstColumn = columns.sort((a, b) => a.position - b.position)[0];
+      if (!firstColumn) {
+        return { error: "Pipeline has no columns" };
+      }
+      
+      return { pipelineId: args.pipelineId, columnId: firstColumn._id };
+    }
+
+    // No pipelineId provided - look for existing "API Leads" pipeline or create one
+    const existingPipelines = await ctx.db
+      .query("leadPipelines")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    const apiPipeline = existingPipelines.find(p => p.name === "API Leads");
+    
+    if (apiPipeline) {
+      // Get the first column
+      const columns = await ctx.db
+        .query("leadColumns")
+        .withIndex("by_pipeline", (q) => q.eq("pipelineId", apiPipeline._id))
+        .collect();
+      
+      const firstColumn = columns.sort((a, b) => a.position - b.position)[0];
+      return { pipelineId: apiPipeline._id, columnId: firstColumn?._id };
+    }
+
+    // Create new "API Leads" pipeline with default columns
+    const now = Date.now();
+    const pipelineId = await ctx.db.insert("leadPipelines", {
+      name: "API Leads",
+      userId: args.userId,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Create default columns
+    const defaultColumns = [
+      { title: "New", color: "bg-blue-500/10", dotColor: "bg-blue-500" },
+      { title: "Contacted", color: "bg-yellow-500/10", dotColor: "bg-yellow-500" },
+      { title: "Qualified", color: "bg-green-500/10", dotColor: "bg-green-500" },
+      { title: "Converted", color: "bg-purple-500/10", dotColor: "bg-purple-500" },
+    ];
+
+    let firstColumnId: Id<"leadColumns"> | undefined;
+
+    for (let i = 0; i < defaultColumns.length; i++) {
+      const columnId = await ctx.db.insert("leadColumns", {
+        pipelineId,
+        title: defaultColumns[i].title,
+        color: defaultColumns[i].color,
+        dotColor: defaultColumns[i].dotColor,
+        position: i,
+        createdAt: now,
+        updatedAt: now,
+      });
+      if (i === 0) firstColumnId = columnId;
+    }
+
+    return { pipelineId, columnId: firstColumnId };
+  },
+});
+
+// Create lead via API (internal, called from HTTP endpoint)
+export const createLeadViaApi = internalMutation({
+  args: {
+    userId: v.id("users"),
+    columnId: v.id("leadColumns"),
+    name: v.string(),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    company: v.optional(v.string()),
+    source: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Get max position in the column
+    const leads = await ctx.db
+      .query("leads")
+      .withIndex("by_column", (q) => q.eq("columnId", args.columnId))
+      .collect();
+    const maxPosition = leads.length > 0 ? Math.max(...leads.map((l) => l.position)) + 1 : 0;
+
+    const now = Date.now();
+    const leadId = await ctx.db.insert("leads", {
+      columnId: args.columnId,
+      name: args.name,
+      email: args.email,
+      phone: args.phone,
+      company: args.company,
+      source: args.source || "api",
+      notes: args.notes,
+      position: maxPosition,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return {
+      id: leadId,
+      name: args.name,
+      email: args.email,
+      status: "new",
+      createdAt: now,
+    };
+  },
+});
+
+// List pipelines for API (internal query)
+export const listPipelinesForApi = internalQuery({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const pipelines = await ctx.db
+      .query("leadPipelines")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    return pipelines.map(p => ({
+      id: p._id,
+      name: p.name,
+      createdAt: p.createdAt,
+    }));
+  },
+});
+
+// Get pipeline columns for API (internal query)
+export const getPipelineColumnsForApi = internalQuery({
+  args: {
+    pipelineId: v.id("leadPipelines"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const pipeline = await ctx.db.get(args.pipelineId);
+    if (!pipeline || pipeline.userId !== args.userId) return null;
+
+    const columns = await ctx.db
+      .query("leadColumns")
+      .withIndex("by_pipeline", (q) => q.eq("pipelineId", args.pipelineId))
+      .collect();
+
+    return columns.sort((a, b) => a.position - b.position).map(c => ({
+      id: c._id,
+      title: c.title,
+      position: c.position,
+    }));
+  },
+});

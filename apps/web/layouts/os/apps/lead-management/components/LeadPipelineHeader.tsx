@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
 import { cn } from '@/lib/utils';
-import { ChevronDown, Layout, Loader2, Pencil, Plus, Settings, Trash2 } from 'lucide-react';
+import { ChevronDown, Code2, Layout, Loader2, Pencil, Plus, Settings, Trash2 } from 'lucide-react';
 import { Badge } from '@workspace/ui/components/badge';
 import { ShareWithOrgButton } from '../../organizations/components/share-with-org-button';
 
@@ -45,6 +45,7 @@ interface LeadPipelineHeaderProps {
   onOpenPipelineModal: () => void;
   onDeletePipeline: (id: string) => void;
   onUpdatePipeline: (id: string, name: string) => void;
+  onOpenApiHelper?: () => void;
 }
 
 export function LeadPipelineHeader({
@@ -60,6 +61,7 @@ export function LeadPipelineHeader({
   onOpenPipelineModal,
   onDeletePipeline,
   onUpdatePipeline,
+  onOpenApiHelper,
 }: LeadPipelineHeaderProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [pipelineToDelete, setPipelineToDelete] = useState<{ id: string; name: string } | null>(null);
@@ -211,6 +213,12 @@ export function LeadPipelineHeader({
         </div>
 
         <div className="flex items-center gap-2">
+          {pipeline && onOpenApiHelper && (
+            <Button variant="outline" size="sm" onClick={onOpenApiHelper}>
+              <Code2 className="mr-1.5 h-4 w-4" />
+              Integrate
+            </Button>
+          )}
           {pipeline && (
             <ShareWithOrgButton
               resourceType="leadPipeline"

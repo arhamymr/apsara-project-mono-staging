@@ -182,7 +182,7 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
       if (Array.isArray(anyParsed.shortcuts)) {
         setShortcuts(hydrateFromV1(anyParsed.shortcuts as string[]));
       } else if (Array.isArray(anyParsed.desktopItems)) {
-        setShortcuts(hydrateDesktopItems(anyParsed.desktopItems));
+        setShortcuts(hydrateDesktopItems(anyParsed.desktopItems, apps));
       }
 
       if (Array.isArray(parsed.dockAppIds)) {
@@ -234,9 +234,16 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
               type: 'group' as const,
               id: item.id,
               label: item.label,
-              children: item.children.map((c) => c.id),
+              children: item.children.map((c) => 
+                // Save additional metadata for non-default shortcuts
+                DEFAULT_SHORTCUT_IDS.includes(c.id)
+                  ? c.id
+                  : { id: c.id, appId: c.appId, label: c.label }
+              ),
             }
-          : ({ type: 'app', id: item.id } as const),
+          : DEFAULT_SHORTCUT_IDS.includes(item.id)
+            ? ({ type: 'app', id: item.id } as const)
+            : ({ type: 'app', id: item.id, appId: item.appId, label: item.label } as const),
       ),
     };
 

@@ -20,6 +20,8 @@ type Config struct {
 	// Unsplash Configuration
 	UnsplashAccessKey string
 	UnsplashUTMSource string
+	// Convex Configuration
+	ConvexURL string
 }
 
 func Load() *Config {
@@ -44,6 +46,7 @@ func Load() *Config {
 		R2PublicBase:      getEnv("R2_PUBLIC_BASE", ""),
 		UnsplashAccessKey: getEnv("UNSPLASH_ACCESS_KEY", ""),
 		UnsplashUTMSource: getEnv("UNSPLASH_UTM_SOURCE", ""),
+		ConvexURL:         getEnv("CONVEX_URL", ""),
 	}
 }
 

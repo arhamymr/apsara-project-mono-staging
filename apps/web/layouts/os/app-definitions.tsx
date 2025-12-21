@@ -1,5 +1,6 @@
 'use client';
 
+import ApiHubApp from '@/layouts/os/apps/api-hub';
 import ArticleManagerApp from '@/layouts/os/apps/blogs';
 import BroadcastEmailApp from '@/layouts/os/apps/BroadcastEmailApp';
 import CalculatorApp from '@/layouts/os/apps/CalculatorApp';
@@ -200,6 +201,13 @@ export function createDefaultApps(): AppDef[] {
       name: 'Documentation',
       icon: '📖',
       content: <DocsApp />,
+      defaultSize: { width: 1100, height: 700 },
+    },
+    {
+      id: 'api-hub',
+      name: 'API Hub',
+      icon: '🔌',
+      content: <ApiHubApp />,
       defaultSize: { width: 1100, height: 700 },
     },
   ];
