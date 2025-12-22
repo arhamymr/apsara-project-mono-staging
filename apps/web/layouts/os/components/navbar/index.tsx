@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Lightbulb, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import LanguageSelector from '@/components/LanguageSelector';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/dark-mode/theme-toggle';
 import ClockDisplay from '@/layouts/os/components/clock-display';
@@ -26,16 +25,6 @@ interface NavbarProps {
 }
 
 const FEATURE_REQUEST_EMAIL = 'arhamymr@gmail.com';
-
-function LangToggle() {
-  const s = useOSStrings();
-  return (
-    <LanguageSelector
-      ariaLabel={s.topbar.langLabel}
-      wrapperClassName="flex items-center gap-1 rounded-md border px-1.5 py-1 text-xs"
-    />
-  );
-}
 
 function TitleLabel({ title }: { title: string | undefined }) {
   const s = useOSStrings();
@@ -134,7 +123,6 @@ export default function Navbar({ activeWindowTitle }: NavbarProps) {
       </div>
       <div className="flex items-center gap-2 text-sm">
         <FeatureRequestDialog />
-        <LangToggle />
         <NotificationBell />
         <ClockDisplay simple />
         <ThemeToggle />

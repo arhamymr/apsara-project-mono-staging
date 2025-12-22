@@ -285,4 +285,111 @@ http.route({
   }),
 });
 
+// List published blogs via API (public, requires API key validation done by Go backend)
+http.route({
+  path: "/api/blogs",
+  method: "POST", // Using POST to pass pagination params
+  handler: httpAction(async (ctx, request) => {
+    try {
+      const body = await request.json();
+      const { limit = 20, page = 1 } = body as { limit?: number; page?: number };
+
+      // Get all published blogs
+      const blogs = await ctx.runQuery(internal.blogs.listPublishedForApi, { 
+        limit: limit + 1, // Fetch one extra to check hasMore
+      });
+
+      const hasMore = blogs.length > limit;
+      const paginatedBlogs = blogs.slice(0, limit);
+
+      // Get author info for each blog
+      const blogsWithAuthor = await Promise.all(
+        paginatedBlogs.map(async (blog) => {
+          const author = await ctx.runQuery(internal.user.getUserById, { userId: blog.authorId });
+          return {
+            id: blog._id,
+            title: blog.title,
+            slug: blog.slug,
+            excerpt: blog.excerpt || "",
+            coverImage: blog.coverImage || "",
+            authorName: author?.name || author?.email || "Unknown",
+            tags: blog.tags || [],
+            publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString() : null,
+          };
+        })
+      );
+
+      return new Response(JSON.stringify({
+        data: blogsWithAuthor,
+        pagination: {
+          page,
+          perPage: limit,
+          total: blogsWithAuthor.length,
+          hasMore,
+        },
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("List blogs error:", error);
+      return new Response(JSON.stringify({ error: "Internal server error" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
+// Get single blog by slug via API
+http.route({
+  path: "/api/blogs/by-slug",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    try {
+      const body = await request.json();
+      const { slug } = body as { slug: string };
+
+      if (!slug) {
+        return new Response(JSON.stringify({ error: "slug is required" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      const blog = await ctx.runQuery(internal.blogs.getBySlugForApi, { slug });
+
+      if (!blog) {
+        return new Response(JSON.stringify({ error: "Blog not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      const author = await ctx.runQuery(internal.user.getUserById, { userId: blog.authorId });
+
+      return new Response(JSON.stringify({
+        id: blog._id,
+        title: blog.title,
+        slug: blog.slug,
+        content: blog.content,
+        excerpt: blog.excerpt || "",
+        coverImage: blog.coverImage || "",
+        authorName: author?.name || author?.email || "Unknown",
+        tags: blog.tags || [],
+        publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString() : null,
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("Get blog error:", error);
+      return new Response(JSON.stringify({ error: "Internal server error" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
 export default http;

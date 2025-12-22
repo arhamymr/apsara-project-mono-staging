@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalQuery } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 // Create a new blog post
@@ -68,6 +68,32 @@ export const listPublished = query({
       .withIndex("by_status", (q) => q.eq("status", "published"))
       .order("desc")
       .take(limit);
+  },
+});
+
+// Internal query for API - list published blogs
+export const listPublishedForApi = internalQuery({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 20;
+    return await ctx.db
+      .query("blogs")
+      .withIndex("by_status", (q) => q.eq("status", "published"))
+      .order("desc")
+      .take(limit);
+  },
+});
+
+// Internal query for API - get blog by slug
+export const getBySlugForApi = internalQuery({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("blogs")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
   },
 });
 

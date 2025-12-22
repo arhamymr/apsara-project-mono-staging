@@ -1,9 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Bot, Code2, Image as ImageIcon, Server, Smartphone, Wrench } from 'lucide-react';
+import { Bot, Code2, Server, Smartphone, Wrench } from 'lucide-react';
 
-import LanguageSelector from '@/components/LanguageSelector';
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
@@ -63,7 +62,6 @@ export function TopNav() {
           </div>
 
           <MobileNav items={navItems} open={open} setOpen={setOpen} ctaLabel={s.topNav.cta} signInLabel={s.topNav.signIn} />
-          <LanguageSelector ariaLabel="Language selector" />
           <ThemeToggle />
         </div>
       </div>

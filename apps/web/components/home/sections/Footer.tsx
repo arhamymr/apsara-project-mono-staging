@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { GithubIcon, LinkedinIcon, TwitterIcon } from 'lucide-react';
 
+import LanguageSelector from '@/components/LanguageSelector';
 import { Logo } from './top-nav/Logo';
 
 export function Footer() {
@@ -189,12 +190,15 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} Apsara Digital. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-            </span>
-            <span className="text-xs font-medium">All systems operational</span>
+          <div className="flex items-center gap-4">
+            <LanguageSelector ariaLabel="Language selector" />
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+              </span>
+              <span className="text-xs font-medium">All systems operational</span>
+            </div>
           </div>
         </div>
       </div>

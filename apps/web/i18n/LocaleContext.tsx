@@ -18,7 +18,7 @@ export function useLocale(): LocaleContextValue {
 }
 
 export function AppLocaleProvider({ children }: React.PropsWithChildren) {
-  const [lang, setLangState] = React.useState<Lang>('id');
+  const [lang, setLangState] = React.useState<Lang>('en');
 
   React.useEffect(() => {
     try {

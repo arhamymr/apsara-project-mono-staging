@@ -60,7 +60,7 @@ export function MobileNav({ items, open, setOpen, ctaLabel, signInLabel }: Mobil
           </nav>
           <div className="mt-5 flex gap-3">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
-              <Button className="w-full">
+              <Button className="w-full" variant={"outline"} size={"sm"}>
                 {ctaLabel} <Kbd>T</Kbd>
               </Button>
             </a>

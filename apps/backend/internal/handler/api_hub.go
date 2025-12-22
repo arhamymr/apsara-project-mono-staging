@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -438,17 +439,59 @@ func (h *APIHubHandler) ListBlogs(c echo.Context) error {
 		})
 	}
 
-	// In production, fetch from Convex with pagination
-	// Mock response for now
-	return c.JSON(http.StatusOK, PaginatedResponse{
-		Data: []BlogResponse{},
-		Pagination: Pagination{
-			Page:    1,
-			PerPage: 10,
-			Total:   0,
-			HasMore: false,
-		},
+	convexURL := c.Get("convexURL").(string)
+	if convexURL == "" {
+		// Mock response for development without Convex
+		return c.JSON(http.StatusOK, PaginatedResponse{
+			Data: []BlogResponse{},
+			Pagination: Pagination{
+				Page:    1,
+				PerPage: 10,
+				Total:   0,
+				HasMore: false,
+			},
+		})
+	}
+
+	// Parse pagination params
+	page := 1
+	perPage := 10
+	if p := c.QueryParam("page"); p != "" {
+		if parsed, err := strconv.Atoi(p); err == nil && parsed > 0 {
+			page = parsed
+		}
+	}
+	if pp := c.QueryParam("perPage"); pp != "" {
+		if parsed, err := strconv.Atoi(pp); err == nil && parsed > 0 && parsed <= 100 {
+			perPage = parsed
+		}
+	}
+
+	// Call Convex HTTP endpoint
+	reqBody, _ := json.Marshal(map[string]interface{}{
+		"limit": perPage,
+		"page":  page,
 	})
+
+	resp, err := http.Post(convexURL+"/api/blogs", "application/json", strings.NewReader(string(reqBody)))
+	if err != nil {
+		fmt.Printf("Convex blogs fetch error: %v\n", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch blogs",
+		})
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return c.JSON(resp.StatusCode, map[string]string{
+			"error": "Failed to fetch blogs from database",
+		})
+	}
+
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	return c.JSON(http.StatusOK, result)
 }
 
 // GetBlog handles GET /api/v1/blogs/:slug
@@ -468,10 +511,41 @@ func (h *APIHubHandler) GetBlog(c echo.Context) error {
 		})
 	}
 
-	// In production, fetch from Convex
-	return c.JSON(http.StatusNotFound, map[string]string{
-		"error": "Blog not found",
-	})
+	convexURL := c.Get("convexURL").(string)
+	if convexURL == "" {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "Blog not found",
+		})
+	}
+
+	// Call Convex HTTP endpoint
+	reqBody, _ := json.Marshal(map[string]string{"slug": slug})
+
+	resp, err := http.Post(convexURL+"/api/blogs/by-slug", "application/json", strings.NewReader(string(reqBody)))
+	if err != nil {
+		fmt.Printf("Convex blog fetch error: %v\n", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "Failed to fetch blog",
+		})
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": "Blog not found",
+		})
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return c.JSON(resp.StatusCode, map[string]string{
+			"error": "Failed to fetch blog from database",
+		})
+	}
+
+	var result map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	return c.JSON(http.StatusOK, result)
 }
 
 // GetOpenAPISpec returns the OpenAPI specification
