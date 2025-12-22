@@ -8,13 +8,19 @@ import EditBannerWindow from './banner-edit';
 import type { Banner } from './types';
 
 export default function BannersWindow() {
-  const { openSubWindow, activeId } = useWindowContext();
+  const { openSubWindow, activeId, closeWindow, windows } = useWindowContext();
 
   const handleCreateBanner = () => {
     if (!activeId) return;
     openSubWindow(activeId, {
       title: 'New Banner',
-      content: <CreateBannerWindow onCreated={() => {}} />,
+      content: <CreateBannerWindow onCreated={() => {
+        // Close the sub-window after creation
+        const windowToClose = windows.find(w => w.title === 'New Banner' && w.parentId === activeId);
+        if (windowToClose) {
+          closeWindow(windowToClose.id);
+        }
+      }} />,
       width: 720,
       height: 600,
     });
@@ -22,9 +28,26 @@ export default function BannersWindow() {
 
   const handleEditBanner = (banner: Banner) => {
     if (!activeId) return;
+    const title = `Edit: ${banner.title}`;
     openSubWindow(activeId, {
-      title: `Edit: ${banner.title}`,
-      content: <EditBannerWindow id={banner._id} onUpdated={() => {}} />,
+      title,
+      content: <EditBannerWindow 
+        id={banner._id} 
+        onUpdated={() => {
+          // Close the sub-window after update
+          const windowToClose = windows.find(w => w.title === title && w.parentId === activeId);
+          if (windowToClose) {
+            closeWindow(windowToClose.id);
+          }
+        }}
+        onClose={() => {
+          // Handle explicit close (e.g., after delete)
+          const windowToClose = windows.find(w => w.title === title && w.parentId === activeId);
+          if (windowToClose) {
+            closeWindow(windowToClose.id);
+          }
+        }}
+      />,
       width: 720,
       height: 600,
     });

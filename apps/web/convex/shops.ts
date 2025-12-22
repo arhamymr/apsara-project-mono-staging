@@ -18,6 +18,13 @@ export const create = mutation({
     logo: v.optional(v.string()),
     whatsappNumber: v.string(),
     currency: v.optional(v.string()),
+    footerEmail: v.optional(v.string()),
+    footerPhone: v.optional(v.string()),
+    footerAddress: v.optional(v.string()),
+    footerFacebook: v.optional(v.string()),
+    footerInstagram: v.optional(v.string()),
+    footerTwitter: v.optional(v.string()),
+    footerLinkedin: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -57,6 +64,13 @@ export const update = mutation({
     logo: v.optional(v.string()),
     whatsappNumber: v.optional(v.string()),
     currency: v.optional(v.string()),
+    footerEmail: v.optional(v.string()),
+    footerPhone: v.optional(v.string()),
+    footerAddress: v.optional(v.string()),
+    footerFacebook: v.optional(v.string()),
+    footerInstagram: v.optional(v.string()),
+    footerTwitter: v.optional(v.string()),
+    footerLinkedin: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);

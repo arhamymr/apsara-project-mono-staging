@@ -24,6 +24,7 @@ import {
   calculatorDocs,
   tasksDocs,
   sketchDocs,
+  ecommerceDocs,
 } from './data/app-docs';
 
 /**
@@ -38,6 +39,7 @@ const docsRegistry: DocsRegistry = {
     calculator: calculatorDocs,
     tasks: tasksDocs,
     sketch: sketchDocs,
+    ecommerce: ecommerceDocs,
   },
 };
 
@@ -68,6 +70,7 @@ const allApps: Array<{ id: string; name: string; icon: string }> = [
   { id: 'vibe-code', name: 'Vibe Code', icon: '⚡' },
   { id: 'invoices', name: 'Invoices', icon: '🧾' },
   { id: 'kanban', name: 'Kanban', icon: '📋' },
+  { id: 'ecommerce', name: 'Ecommerce', icon: '🛒' },
   { id: 'organizations', name: 'Organizations', icon: '🏢' },
   { id: 'docs', name: 'Documentation', icon: '📖' },
 ];

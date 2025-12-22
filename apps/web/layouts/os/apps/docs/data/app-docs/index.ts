@@ -11,3 +11,4 @@ export { knowledgeBaseDocs } from './knowledge-base';
 export { calculatorDocs } from './calculator';
 export { tasksDocs } from './tasks';
 export { sketchDocs } from './sketch';
+export { ecommerceDocs } from './ecommerce';

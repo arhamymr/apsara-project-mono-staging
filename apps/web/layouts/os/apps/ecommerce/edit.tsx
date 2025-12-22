@@ -41,6 +41,9 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
   const [tags, setTags] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Track if form has changes
+  const [hasChanges, setHasChanges] = useState(false);
+
   // Initialize form from product data
   useEffect(() => {
     if (product) {
@@ -53,6 +56,32 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
       setTags(product.tags?.join(', ') || '');
     }
   }, [product]);
+
+  // Check if form has changes
+  useEffect(() => {
+    if (!product) {
+      setHasChanges(false);
+      return;
+    }
+
+    const currentTags = tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .join(', ');
+    const originalTags = (product.tags || []).join(', ');
+
+    const changed =
+      name.trim() !== product.name ||
+      (description.trim() || '') !== (product.description || '') ||
+      parseFloat(price) !== product.price / 100 ||
+      parseInt(inventory, 10) !== product.inventory ||
+      status !== product.status ||
+      (category.trim() || '') !== (product.category || '') ||
+      currentTags !== originalTags;
+
+    setHasChanges(changed);
+  }, [name, description, price, inventory, status, category, tags, product]);
 
   const handleUpdate = useCallback(async () => {
     if (isSubmitting || !product) return;
@@ -171,6 +200,14 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
         <h2 className="text-base font-semibold">Edit Product</h2>
 
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={handleUpdate}
+            disabled={isSubmitting || !hasChanges}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
+
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size="sm" variant="destructive" disabled={isSubmitting}>
@@ -222,9 +259,7 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
             onStatusChange={setStatus}
             onCategoryChange={setCategory}
             onTagsChange={setTags}
-            onSubmit={handleUpdate}
             isSubmitting={isSubmitting}
-            submitLabel="Save Changes"
           />
 
           {/* Image Gallery Section */}

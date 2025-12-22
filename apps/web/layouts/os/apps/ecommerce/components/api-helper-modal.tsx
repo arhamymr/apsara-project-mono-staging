@@ -5,13 +5,11 @@ import { Button } from '@workspace/ui/components/button';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface ApiHelperModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+interface ApiHelperContentProps {
   shopSlug: string;
 }
 
-export function ApiHelperModal({ shopSlug }: ApiHelperModalProps) {
+export function ApiHelperContent({ shopSlug }: ApiHelperContentProps) {
   const [copiedEndpoint, setCopiedEndpoint] = React.useState<string | null>(null);
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -274,4 +272,16 @@ export function ApiHelperModal({ shopSlug }: ApiHelperModalProps) {
       </div>
     </div>
   );
+}
+
+// Legacy modal wrapper for backward compatibility
+interface ApiHelperModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  shopSlug: string;
+}
+
+export function ApiHelperModal({ open, onOpenChange, shopSlug }: ApiHelperModalProps) {
+  // This is now just a wrapper that's not used when opened as sub-window
+  return null;
 }

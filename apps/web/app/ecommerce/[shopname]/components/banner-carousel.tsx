@@ -7,6 +7,26 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { cn } from '@workspace/ui/lib/utils';
 
+// Helper to clean and optimize Unsplash URLs
+function optimizeImageUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    
+    // If it's an Unsplash URL, simplify it
+    if (urlObj.hostname === 'images.unsplash.com') {
+      // Keep only essential parameters
+      const photoId = urlObj.pathname;
+      // Use Unsplash's built-in optimization with reasonable defaults
+      return `https://images.unsplash.com${photoId}?w=1920&q=80&fm=jpg&fit=crop`;
+    }
+    
+    return url;
+  } catch {
+    // If URL parsing fails, return original
+    return url;
+  }
+}
+
 interface Banner {
   _id: string;
   title: string;
@@ -75,25 +95,33 @@ export function BannerCarousel({ banners, shopName }: BannerCarouselProps) {
     if (!banner) return null; // Type guard
     
     const content = (
-      <div className="relative w-full h-[400px] md:h-[600px] overflow-hidden">
+      <div className="relative w-full h-[400px] md:h-[600px] overflow-hidden bg-muted">
         <Image
-          src={banner.imageUrl}
+          src={optimizeImageUrl(banner.imageUrl)}
           alt={banner.title}
           fill
           className="object-cover"
           priority
+          unoptimized={banner.imageUrl.includes('unsplash.com')}
+          onError={(e) => {
+            // Fallback to a gradient background on error
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         <div className="absolute inset-0 flex items-end">
           <div className="container mx-auto max-w-7xl px-4 md:px-6 pb-12 md:pb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
-              {banner.title}
-            </h2>
-            {banner.subtitle && (
-              <p className="text-lg md:text-xl text-white/90 max-w-2xl">
-                {banner.subtitle}
-              </p>
-            )}
+            <div className="inline-block bg-black/40 backdrop-blur-sm rounded-lg px-6 py-4">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
+                {banner.title}
+              </h2>
+              {banner.subtitle && (
+                <p className="text-lg md:text-xl text-white/90 max-w-2xl">
+                  {banner.subtitle}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -125,23 +153,31 @@ export function BannerCarousel({ banners, shopName }: BannerCarouselProps) {
             )}
           >
             <Image
-              src={banner.imageUrl}
+              src={optimizeImageUrl(banner.imageUrl)}
               alt={banner.title}
               fill
               className="object-cover"
               priority={index === 0}
+              unoptimized={banner.imageUrl.includes('unsplash.com')}
+              onError={(e) => {
+                // Fallback to a gradient background on error
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <div className="absolute inset-0 flex items-end">
               <div className="container mx-auto max-w-7xl px-4 md:px-6 pb-12 md:pb-16">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
-                  {banner.title}
-                </h2>
-                {banner.subtitle && (
-                  <p className="text-lg md:text-xl text-white/90 max-w-2xl">
-                    {banner.subtitle}
-                  </p>
-                )}
+                <div className="inline-block bg-black/40 backdrop-blur-sm rounded-lg px-6 py-4">
+                  <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-4">
+                    {banner.title}
+                  </h2>
+                  {banner.subtitle && (
+                    <p className="text-lg md:text-xl text-white/90 max-w-2xl">
+                      {banner.subtitle}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

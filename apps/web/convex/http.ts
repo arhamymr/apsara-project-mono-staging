@@ -59,8 +59,7 @@ http.route({
           headers: { "Content-Type": "application/json" },
         });
       }
-
-      console.log(keyHash, "keyhash from this")
+      
       const validatedKey = await ctx.runQuery(internal.apiKeys.validateApiKeyInternal, { keyHash });
 
       if (!validatedKey) {

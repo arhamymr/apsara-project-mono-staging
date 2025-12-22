@@ -14,12 +14,10 @@ import {
 import React from 'react';
 import { toast } from 'sonner';
 import { useMyShop, useCreateShop, useUpdateShop } from '../hooks';
-import type { Shop } from '../types';
 import { Loader2, Store, AlertCircle, Upload, X, CheckCircle2 } from 'lucide-react';
 
 interface ShopSettingsProps {
   onSaved?: () => void;
-  onCancel?: () => void;
 }
 
 const CURRENCIES = [
@@ -33,7 +31,7 @@ const CURRENCIES = [
   { value: 'IDR', label: 'IDR (Rp)' },
 ];
 
-export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
+export function ShopSettings({ onSaved }: ShopSettingsProps) {
   const shop = useMyShop();
   const createShop = useCreateShop();
   const updateShop = useUpdateShop();
@@ -48,6 +46,13 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
   const [logo, setLogo] = React.useState('');
   const [whatsappNumber, setWhatsappNumber] = React.useState('');
   const [currency, setCurrency] = React.useState('USD');
+  const [footerEmail, setFooterEmail] = React.useState('');
+  const [footerPhone, setFooterPhone] = React.useState('');
+  const [footerAddress, setFooterAddress] = React.useState('');
+  const [footerFacebook, setFooterFacebook] = React.useState('');
+  const [footerInstagram, setFooterInstagram] = React.useState('');
+  const [footerTwitter, setFooterTwitter] = React.useState('');
+  const [footerLinkedin, setFooterLinkedin] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [slugError, setSlugError] = React.useState('');
   const [slugTouched, setSlugTouched] = React.useState(false);
@@ -65,6 +70,13 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
       setLogoPreview(shop.logo || '');
       setWhatsappNumber(shop.whatsappNumber);
       setCurrency(shop.currency || 'USD');
+      setFooterEmail(shop.footerEmail || '');
+      setFooterPhone(shop.footerPhone || '');
+      setFooterAddress(shop.footerAddress || '');
+      setFooterFacebook(shop.footerFacebook || '');
+      setFooterInstagram(shop.footerInstagram || '');
+      setFooterTwitter(shop.footerTwitter || '');
+      setFooterLinkedin(shop.footerLinkedin || '');
     }
   }, [shop]);
 
@@ -211,6 +223,13 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
           logo: logoData,
           whatsappNumber: whatsappNumber.trim(),
           currency: currency,
+          footerEmail: footerEmail.trim() || undefined,
+          footerPhone: footerPhone.trim() || undefined,
+          footerAddress: footerAddress.trim() || undefined,
+          footerFacebook: footerFacebook.trim() || undefined,
+          footerInstagram: footerInstagram.trim() || undefined,
+          footerTwitter: footerTwitter.trim() || undefined,
+          footerLinkedin: footerLinkedin.trim() || undefined,
         });
         toast.success('Shop updated successfully');
       } else {
@@ -222,6 +241,13 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
           logo: logoData,
           whatsappNumber: whatsappNumber.trim(),
           currency: currency,
+          footerEmail: footerEmail.trim() || undefined,
+          footerPhone: footerPhone.trim() || undefined,
+          footerAddress: footerAddress.trim() || undefined,
+          footerFacebook: footerFacebook.trim() || undefined,
+          footerInstagram: footerInstagram.trim() || undefined,
+          footerTwitter: footerTwitter.trim() || undefined,
+          footerLinkedin: footerLinkedin.trim() || undefined,
         });
         toast.success('Shop created successfully');
       }
@@ -258,28 +284,50 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="border-b px-6 py-4">
-        <div className="flex items-center gap-2">
-          <Store className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">
-            {isEditing ? 'Shop Settings' : 'Create Your Shop'}
-          </h2>
-          {isEditing && (
-            <span className="ml-auto flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Shop Active
-            </span>
-          )}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <h2 className="text-lg font-semibold">
+                {isEditing ? 'Shop Settings' : 'Create Your Shop'}
+              </h2>
+              {!isEditing && (
+                <p className="text-muted-foreground text-sm">
+                  Set up your shop to start selling products
+                </p>
+              )}
+            </div>
+            {isEditing && (
+              <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-600 dark:text-green-400">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                Shop Active
+              </span>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={handleSubmit} 
+              disabled={isSubmitting}
+              size="sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>{isEditing ? 'Save Changes' : 'Create Shop'}</>
+              )}
+            </Button>
+          </div>
         </div>
-        {!isEditing && (
-          <p className="text-muted-foreground mt-1 text-sm">
-            Set up your shop to start selling products
-          </p>
-        )}
       </div>
 
       {/* Form */}
       <div className="flex-1 overflow-auto p-6">
-        <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
+        <form id="shop-settings-form" onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
           {/* Shop Name */}
           <div>
             <label className="text-sm font-medium">
@@ -468,28 +516,107 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
             </p>
           </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-2 border-t pt-4">
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-            )}
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>{isEditing ? 'Save Changes' : 'Create Shop'}</>
-              )}
-            </Button>
+          {/* Footer Section */}
+          <div className="border-t pt-6 mt-6">
+            <h3 className="text-base font-semibold mb-4">Footer Information</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              Customize the contact information and social links displayed in your storefront footer
+            </p>
+
+            <div className="space-y-6">
+              {/* Footer Email */}
+              <div>
+                <label className="text-sm font-medium">Contact Email</label>
+                <Input
+                  value={footerEmail}
+                  onChange={(e) => setFooterEmail(e.target.value)}
+                  placeholder="support@myshop.com"
+                  type="email"
+                  disabled={isSubmitting}
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Email address displayed in the footer
+                </p>
+              </div>
+
+              {/* Footer Phone */}
+              <div>
+                <label className="text-sm font-medium">Contact Phone</label>
+                <Input
+                  value={footerPhone}
+                  onChange={(e) => setFooterPhone(e.target.value)}
+                  placeholder="+1 (555) 123-4567"
+                  type="tel"
+                  disabled={isSubmitting}
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Phone number displayed in the footer
+                </p>
+              </div>
+
+              {/* Footer Address */}
+              <div>
+                <label className="text-sm font-medium">Business Address</label>
+                <Input
+                  value={footerAddress}
+                  onChange={(e) => setFooterAddress(e.target.value)}
+                  placeholder="123 Shop Street, City, State"
+                  disabled={isSubmitting}
+                />
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Physical address displayed in the footer
+                </p>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Social Media Links</h4>
+                
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Facebook</label>
+                  <Input
+                    value={footerFacebook}
+                    onChange={(e) => setFooterFacebook(e.target.value)}
+                    placeholder="https://facebook.com/yourpage"
+                    type="url"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Instagram</label>
+                  <Input
+                    value={footerInstagram}
+                    onChange={(e) => setFooterInstagram(e.target.value)}
+                    placeholder="https://instagram.com/yourprofile"
+                    type="url"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Twitter/X</label>
+                  <Input
+                    value={footerTwitter}
+                    onChange={(e) => setFooterTwitter(e.target.value)}
+                    placeholder="https://twitter.com/yourhandle"
+                    type="url"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">LinkedIn</label>
+                  <Input
+                    value={footerLinkedin}
+                    onChange={(e) => setFooterLinkedin(e.target.value)}
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    type="url"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       </div>

@@ -10,6 +10,13 @@ export interface Shop {
   logo?: string;
   whatsappNumber: string;
   currency: string;
+  footerEmail?: string;
+  footerPhone?: string;
+  footerAddress?: string;
+  footerFacebook?: string;
+  footerInstagram?: string;
+  footerTwitter?: string;
+  footerLinkedin?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -84,6 +91,13 @@ export interface ShopInput {
   logo?: string;
   whatsappNumber: string;
   currency?: string;
+  footerEmail?: string;
+  footerPhone?: string;
+  footerAddress?: string;
+  footerFacebook?: string;
+  footerInstagram?: string;
+  footerTwitter?: string;
+  footerLinkedin?: string;
 }
 
 export interface ShopUpdateInput {
@@ -93,6 +107,13 @@ export interface ShopUpdateInput {
   logo?: string;
   whatsappNumber?: string;
   currency?: string;
+  footerEmail?: string;
+  footerPhone?: string;
+  footerAddress?: string;
+  footerFacebook?: string;
+  footerInstagram?: string;
+  footerTwitter?: string;
+  footerLinkedin?: string;
 }
 
 // Cart Item (Client-side)

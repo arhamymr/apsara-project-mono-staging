@@ -6,9 +6,9 @@ import { useParams } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { StorefrontHeader } from './components/storefront-header';
 import { BannerCarousel } from './components/banner-carousel';
-import { SearchFilter } from './components/search-filter';
 import { ProductGrid } from './components/product-grid';
 import { CartDrawer } from './components/cart-drawer';
+import { StorefrontFooter } from './components/storefront-footer';
 import { useCart } from '../components/cart-provider';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Button } from '@workspace/ui/components/button';
@@ -36,9 +36,6 @@ export default function StorefrontPage() {
     api.banners.listActiveByShop,
     shop ? { shopId: shop._id } : 'skip'
   );
-
-  // Note: Product images are fetched per-product in the ProductGrid component
-  // for better performance with large product catalogs
 
   // Extract unique categories from products
   const categories = useMemo(() => {
@@ -98,14 +95,6 @@ export default function StorefrontPage() {
 
     return filtered;
   }, [products, searchQuery, selectedCategory]);
-
-  // Add primary image to products
-  const productsWithImages = useMemo(() => {
-    if (!filteredProducts) return [];
-    // For now, we'll fetch images per product in the ProductGrid component
-    // This is a simplified version - in production, you'd want to batch fetch all images
-    return filteredProducts;
-  }, [filteredProducts]);
 
   // Loading state
   if (shop === undefined || products === undefined || banners === undefined) {
@@ -205,6 +194,11 @@ export default function StorefrontPage() {
         }}
         cartItemCount={itemCount}
         onCartClick={openCart}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        categories={categories}
       />
 
       {/* Banner Carousel */}
@@ -222,30 +216,29 @@ export default function StorefrontPage() {
 
       {/* Main Content */}
       <main className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
-        {/* Search and Filter */}
-        <div className="mb-8">
-          <SearchFilter
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categories={categories}
-            resultsCount={filteredProducts.length}
-            totalCount={products.length}
-          />
-        </div>
+        {/* Results Count */}
+        {(searchQuery || selectedCategory !== 'all') && (
+          <div className="mb-6">
+            <p className="text-sm text-muted-foreground">
+              {filteredProducts.length === products.length ? (
+                <span>
+                  Showing <span className="font-medium text-foreground">{products.length}</span>{' '}
+                  {products.length === 1 ? 'product' : 'products'}
+                </span>
+              ) : (
+                <span>
+                  Showing <span className="font-medium text-foreground">{filteredProducts.length}</span> of{' '}
+                  <span className="font-medium text-foreground">{products.length}</span>{' '}
+                  {products.length === 1 ? 'product' : 'products'}
+                </span>
+              )}
+            </p>
+          </div>
+        )}
 
         {/* Product Grid */}
         <ProductGrid
-          products={productsWithImages.map((product) => ({
-            _id: product._id,
-            slug: product.slug,
-            name: product.name,
-            price: product.price,
-            inventory: product.inventory,
-            category: product.category,
-            primaryImage: undefined, // TODO: Fetch images efficiently
-          }))}
+          products={filteredProducts}
           shopSlug={shop.slug}
           currency={shop.currency}
           onAddToCart={handleAddToCart}
@@ -257,6 +250,16 @@ export default function StorefrontPage() {
         currency={shop.currency || 'USD'}
         whatsappNumber={shop.whatsappNumber ?? undefined}
         shopName={shop.name}
+      />
+
+      {/* Footer */}
+      <StorefrontFooter
+        shop={{
+          name: shop.name,
+          description: shop.description,
+          logo: shop.logo,
+          slug: shop.slug,
+        }}
       />
     </div>
   );

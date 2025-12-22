@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import React from 'react';
-import type { ProductInput } from '../types';
 
 interface ProductFormProps {
   name: string;
@@ -29,7 +28,7 @@ interface ProductFormProps {
   onStatusChange: (value: 'draft' | 'active' | 'archived') => void;
   onCategoryChange: (value: string) => void;
   onTagsChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   onCancel?: () => void;
   isSubmitting: boolean;
   submitLabel?: string;
@@ -77,7 +76,9 @@ export function ProductForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit();
+    if (onSubmit) {
+      onSubmit();
+    }
   };
 
   return (
@@ -205,21 +206,23 @@ export function ProductForm({
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-2 pt-4">
-        {showCancel && onCancel && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            Cancel
+      {onSubmit && (
+        <div className="flex justify-end gap-2 pt-4">
+          {showCancel && onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+          )}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : submitLabel}
           </Button>
-        )}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : submitLabel}
-        </Button>
-      </div>
+        </div>
+      )}
     </form>
   );
 }

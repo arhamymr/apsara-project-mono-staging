@@ -43,6 +43,20 @@ function formatPrice(price: number, currency: string = 'USD'): string {
   }).format(amount);
 }
 
+// Helper to optimize image URLs
+function optimizeImageUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.hostname === 'images.unsplash.com') {
+      const photoId = urlObj.pathname;
+      return `https://images.unsplash.com${photoId}?w=1200&q=85&fm=jpg&fit=crop`;
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 export function ProductDetail({ product, images, currency = 'USD', onAddToCart }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const isOutOfStock = product.inventory === 0;
@@ -67,11 +81,16 @@ export function ProductDetail({ product, images, currency = 'USD', onAddToCart }
           {sortedImages.length > 0 ? (
             <>
               <Image
-                src={sortedImages[selectedImageIndex]?.url || ''}
+                src={optimizeImageUrl(sortedImages[selectedImageIndex]?.url || '')}
                 alt={product.name}
                 fill
                 className="object-cover"
                 priority
+                unoptimized={sortedImages[selectedImageIndex]?.url.includes('unsplash.com')}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
               
               {/* Navigation Arrows (only show if multiple images) */}
@@ -120,10 +139,15 @@ export function ProductDetail({ product, images, currency = 'USD', onAddToCart }
                 )}
               >
                 <Image
-                  src={image.url}
+                  src={optimizeImageUrl(image.url)}
                   alt={`${product.name} - Image ${index + 1}`}
                   fill
                   className="object-cover"
+                  unoptimized={image.url.includes('unsplash.com')}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
                 />
               </button>
             ))}

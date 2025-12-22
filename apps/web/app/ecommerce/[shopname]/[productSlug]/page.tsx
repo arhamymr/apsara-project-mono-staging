@@ -6,10 +6,11 @@ import { useParams } from 'next/navigation';
 import { StorefrontHeader } from '../components/storefront-header';
 import { ProductDetail } from '../components/product-detail';
 import { CartDrawer } from '../components/cart-drawer';
+import { StorefrontFooter } from '../components/storefront-footer';
 import { useCart } from '../../components/cart-provider';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Button } from '@workspace/ui/components/button';
-import { Store, Package, AlertCircle } from 'lucide-react';
+import { Store, Package, AlertCircle, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
@@ -138,6 +139,11 @@ export default function ProductDetailPage() {
           }}
           cartItemCount={0}
           onCartClick={() => console.log('Cart clicked')}
+          searchQuery=""
+          onSearchChange={() => {}}
+          selectedCategory="all"
+          onCategoryChange={() => {}}
+          categories={[]}
         />
         
         <div className="container mx-auto max-w-7xl px-4 md:px-6 py-16">
@@ -171,6 +177,11 @@ export default function ProductDetailPage() {
           }}
           cartItemCount={0}
           onCartClick={() => console.log('Cart clicked')}
+          searchQuery=""
+          onSearchChange={() => {}}
+          selectedCategory="all"
+          onCategoryChange={() => {}}
+          categories={[]}
         />
         
         <div className="container mx-auto max-w-7xl px-4 md:px-6 py-16">
@@ -203,10 +214,27 @@ export default function ProductDetailPage() {
         }}
         cartItemCount={itemCount}
         onCartClick={openCart}
+        searchQuery=""
+        onSearchChange={() => {}}
+        selectedCategory="all"
+        onCategoryChange={() => {}}
+        categories={[]}
       />
 
       {/* Product Detail */}
       <main className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
+        {/* Breadcrumb Navigation */}
+        <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link 
+            href={`/ecommerce/${shop.slug}`}
+            className="hover:text-foreground transition-colors"
+          >
+            {shop.name}
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">{product.name}</span>
+        </nav>
+
         <ProductDetail
           product={{
             _id: product._id,
@@ -235,6 +263,16 @@ export default function ProductDetailPage() {
         currency={shop.currency || 'USD'}
         whatsappNumber={shop.whatsappNumber ?? undefined}
         shopName={shop.name}
+      />
+
+      {/* Footer */}
+      <StorefrontFooter
+        shop={{
+          name: shop.name,
+          description: shop.description,
+          logo: shop.logo,
+          slug: shop.slug,
+        }}
       />
     </div>
   );

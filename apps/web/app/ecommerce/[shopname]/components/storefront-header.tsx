@@ -1,9 +1,17 @@
 'use client';
 
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Search, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@workspace/ui/components/button';
+import { Input } from '@workspace/ui/components/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@workspace/ui/components/select';
 
 interface StorefrontHeaderProps {
   shop: {
@@ -14,12 +22,27 @@ interface StorefrontHeaderProps {
   };
   cartItemCount: number;
   onCartClick: () => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
+  categories: string[];
 }
 
-export function StorefrontHeader({ shop, cartItemCount, onCartClick }: StorefrontHeaderProps) {
+export function StorefrontHeader({ 
+  shop, 
+  cartItemCount, 
+  onCartClick,
+  searchQuery,
+  onSearchChange,
+  selectedCategory,
+  onCategoryChange,
+  categories,
+}: StorefrontHeaderProps) {
   return (
     <header className="border-b bg-background sticky top-0 z-50">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
+        {/* Top Row: Logo and Cart */}
         <div className="flex items-center justify-between py-4">
           {/* Shop Branding */}
           <Link href={`/ecommerce/${shop.slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
@@ -64,6 +87,51 @@ export function StorefrontHeader({ shop, cartItemCount, onCartClick }: Storefron
               </span>
             )}
           </Button>
+        </div>
+
+        {/* Search Bar Row */}
+        <div className="pb-4 flex flex-col sm:flex-row gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => onSearchChange('')}
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {/* Category Filter */}
+          {categories.length > 0 && (
+            <div className="w-full sm:w-48">
+              <Select value={selectedCategory} onValueChange={onCategoryChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </div>
     </header>

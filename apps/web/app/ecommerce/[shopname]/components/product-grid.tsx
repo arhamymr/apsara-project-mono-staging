@@ -1,20 +1,16 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { ShoppingCart, Package } from 'lucide-react';
-import { Button } from '@workspace/ui/components/button';
-import { Badge } from '@workspace/ui/components/badge';
-import { cn } from '@workspace/ui/lib/utils';
+import { Package } from 'lucide-react';
+import { ProductCardWithImage } from './product-card-with-image';
+import type { Id } from '@/convex/_generated/dataModel';
 
 interface Product {
-  _id: string;
+  _id: Id<'products'>;
   slug: string;
   name: string;
   price: number;
   inventory: number;
   category?: string;
-  primaryImage?: string;
 }
 
 interface ProductGridProps {
@@ -22,16 +18,6 @@ interface ProductGridProps {
   shopSlug: string;
   currency?: string;
   onAddToCart?: (product: Product) => void;
-}
-
-function formatPrice(price: number, currency: string = 'USD'): string {
-  // Price is stored in smallest unit (cents), convert to dollars
-  const amount = price / 100;
-  
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
 }
 
 export function ProductGrid({ products, shopSlug, currency = 'USD', onAddToCart }: ProductGridProps) {
@@ -51,88 +37,15 @@ export function ProductGrid({ products, shopSlug, currency = 'USD', onAddToCart 
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product) => {
-        const isOutOfStock = product.inventory === 0;
-
-        return (
-          <div
-            key={product._id}
-            className="group relative bg-card rounded-lg border overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <Link href={`/ecommerce/${shopSlug}/${product.slug}`}>
-              {/* Product Image */}
-              <div className="relative aspect-square bg-muted overflow-hidden">
-                {product.primaryImage ? (
-                  <Image
-                    src={product.primaryImage}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Package className="h-16 w-16 text-muted-foreground/30" />
-                  </div>
-                )}
-                
-                {/* Out of Stock Overlay */}
-                {isOutOfStock && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                    <Badge variant="secondary" className="text-sm font-semibold">
-                      Out of Stock
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Category Badge */}
-                {product.category && !isOutOfStock && (
-                  <div className="absolute top-2 left-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {product.category}
-                    </Badge>
-                  </div>
-                )}
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                  {product.name}
-                </h3>
-                
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-xl font-bold">
-                    {formatPrice(product.price, currency)}
-                  </span>
-                  
-                  {!isOutOfStock && (
-                    <span className="text-sm text-muted-foreground">
-                      {product.inventory} in stock
-                    </span>
-                  )}
-                </div>
-              </div>
-            </Link>
-
-            {/* Add to Cart Button */}
-            {onAddToCart && (
-              <div className="p-4 pt-0">
-                <Button
-                  className="w-full"
-                  disabled={isOutOfStock}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onAddToCart(product);
-                  }}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-                </Button>
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {products.map((product) => (
+        <ProductCardWithImage
+          key={product._id}
+          product={product}
+          shopSlug={shopSlug}
+          currency={currency}
+          onAddToCart={onAddToCart}
+        />
+      ))}
     </div>
   );
 }

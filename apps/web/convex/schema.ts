@@ -303,6 +303,14 @@ const schema = defineSchema({
     logo: v.optional(v.string()),
     whatsappNumber: v.string(),
     currency: v.optional(v.string()),
+    // Footer information
+    footerEmail: v.optional(v.string()),
+    footerPhone: v.optional(v.string()),
+    footerAddress: v.optional(v.string()),
+    footerFacebook: v.optional(v.string()),
+    footerInstagram: v.optional(v.string()),
+    footerTwitter: v.optional(v.string()),
+    footerLinkedin: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
