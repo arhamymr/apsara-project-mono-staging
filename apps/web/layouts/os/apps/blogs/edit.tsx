@@ -30,6 +30,7 @@ import { Editor } from '@/components/blocks/editor-x/editor';
 import type { SerializedEditorState } from 'lexical';
 import type { Id } from '@/convex/_generated/dataModel';
 import { Trash2 } from 'lucide-react';
+import { ShareWithOrgButton } from '../organizations/components/share-with-org-button';
 
 type BlogStatus = 'draft' | 'published';
 
@@ -202,6 +203,13 @@ export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticl
         </div>
 
         <div className="flex items-center gap-2">
+          <ShareWithOrgButton
+            resourceType="blog"
+            resourceId={blog._id}
+            resourceName={blog.title}
+            variant="outline"
+            size="sm"
+          />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size="sm" variant="destructive" disabled={isSubmitting}>

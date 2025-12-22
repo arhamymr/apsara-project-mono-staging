@@ -10,6 +10,8 @@ import {
   Clock,
   ExternalLink,
   User,
+  Newspaper,
+  GitBranch,
 } from 'lucide-react';
 import type { SharedResource, ResourceType } from '../types';
 
@@ -26,6 +28,8 @@ const resourceTypeIcons: Record<ResourceType, React.ElementType> = {
   note: FileText,
   chatSession: MessageSquare,
   artifact: Package,
+  leadPipeline: GitBranch,
+  blog: Newspaper,
 };
 
 const resourceTypeLabels: Record<ResourceType, string> = {
@@ -33,6 +37,8 @@ const resourceTypeLabels: Record<ResourceType, string> = {
   note: 'Note',
   chatSession: 'Chat Session',
   artifact: 'Artifact',
+  leadPipeline: 'Lead Pipeline',
+  blog: 'Blog',
 };
 
 const resourceTypeColors: Record<ResourceType, string> = {
@@ -40,6 +46,8 @@ const resourceTypeColors: Record<ResourceType, string> = {
   note: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   chatSession: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   artifact: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  leadPipeline: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+  blog: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 };
 
 function formatRelativeTime(timestamp: number): string {

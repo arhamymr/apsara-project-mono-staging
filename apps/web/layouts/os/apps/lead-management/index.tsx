@@ -22,7 +22,7 @@ import { LeadCardOverlay } from './components/lead-card';
 import { LeadModal } from './components/LeadModal';
 import { PipelineModal } from './components/PipelineModal';
 import { TemplateModal } from './components/TemplateModal';
-import { LeadPipelineHeader } from './components/LeadPipelineHeader';
+import { LeadPipelineHeader } from './components/lead-pipeline-header';
 import { ApiHelperModal } from './components/ApiHelperModal';
 import { useLeadManagement } from './hooks/useLeadManagement';
 import { PIPELINE_TEMPLATES, COLUMN_COLORS } from './constants';

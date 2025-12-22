@@ -3,10 +3,11 @@
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { useWindowContext } from '@/layouts/os/WindowContext';
-import { FileText } from 'lucide-react';
+import { FileText, Code2 } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
 import { ArticleCard } from './components/card';
+import { BlogApiHelperModal } from './components/BlogApiHelperModal';
 import CreateArticleWindow from './create';
 import EditArticleWindow from './edit';
 import { useMyBlogs, useDeleteBlog, useSearchBlogs } from './hooks';
@@ -15,6 +16,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 export default function ArticleManagerApp() {
   const { openSubWindow, activeId, closeWindow } = useWindowContext();
   const [search, setSearch] = React.useState('');
+  const [showApiHelper, setShowApiHelper] = React.useState(false);
 
   const blogs = useMyBlogs(50);
   const searchResults = useSearchBlogs(search, 20);
@@ -75,6 +77,11 @@ export default function ArticleManagerApp() {
 
   return (
     <div className="text-foreground flex h-full flex-col">
+      {/* API Helper Modal */}
+      {showApiHelper && (
+        <BlogApiHelperModal onClose={() => setShowApiHelper(false)} />
+      )}
+
       {/* Header */}
       <div className="bg-card sticky top-0 flex w-full flex-col items-center justify-between gap-2 border-b px-4 py-3 @md:flex-row">
         <div className="flex w-full flex-col items-center gap-2 @md:w-[540px] @md:flex-row">
@@ -98,8 +105,12 @@ export default function ArticleManagerApp() {
           </div>
         </div>
 
-        <div className="flex w-full items-center gap-2 @md:w-[130px]">
-          <Button size="sm" onClick={openCreate} className="w-full">
+        <div className="flex w-full items-center gap-2 @md:w-auto">
+          <Button variant="outline" size="sm" onClick={() => setShowApiHelper(true)}>
+            <Code2 className="mr-1.5 h-4 w-4" />
+            Integrate
+          </Button>
+          <Button size="sm" onClick={openCreate}>
             New Article <Kbd className="text-primary-900 bg-black/20">N</Kbd>
           </Button>
         </div>

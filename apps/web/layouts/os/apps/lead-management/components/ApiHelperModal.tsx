@@ -3,6 +3,12 @@
 import { useState, useMemo } from 'react';
 import { X, Copy, Check } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@workspace/ui/components/tabs';
 import { toast } from 'sonner';
 
 interface ApiHelperModalProps {
@@ -15,6 +21,7 @@ type Language = 'curl' | 'javascript' | 'typescript' | 'python';
 export function ApiHelperModal({ pipeline, onClose }: ApiHelperModalProps) {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('curl');
   const [copied, setCopied] = useState(false);
+  const [copiedPayload, setCopiedPayload] = useState(false);
 
   const baseUrl = typeof window !== 'undefined' 
     ? `${window.location.protocol}//${window.location.host}/api/v1`
@@ -25,7 +32,31 @@ export function ApiHelperModal({ pipeline, onClose }: ApiHelperModalProps) {
   // Get first column for examples
   const firstColumn = pipeline?.columns?.[0];
   const pipelineId = pipeline?._id;
-  const columnId = firstColumn?._id;
+
+  // Payload example for POST request
+  const payloadExample = useMemo(() => {
+    return JSON.stringify({
+      pipelineId: pipelineId || 'PIPELINE_ID',
+      name: 'John Doe',
+      email: 'john@example.com',
+      company: 'Acme Corp',
+      phone: '+1-555-0123',
+      value: 5000,
+      source: 'Website',
+      notes: 'Interested in enterprise plan'
+    }, null, 2);
+  }, [pipelineId]);
+
+  const payloadSchema = `{
+  "pipelineId": string,    // Required - ID of the target pipeline
+  "name": string,          // Required - Lead's full name
+  "email": string,         // Optional - Lead's email address
+  "company": string,       // Optional - Company name
+  "phone": string,         // Optional - Phone number
+  "value": number,         // Optional - Deal value
+  "source": string,        // Optional - Lead source (e.g., "Website", "Referral")
+  "notes": string          // Optional - Additional notes
+}`;
 
   const codeExamples = useMemo(() => {
     const examples: Record<Language, string> = {
@@ -137,6 +168,17 @@ else:
     }
   };
 
+  const handleCopyPayload = async () => {
+    try {
+      await navigator.clipboard.writeText(payloadExample);
+      setCopiedPayload(true);
+      toast.success('Payload copied to clipboard!');
+      setTimeout(() => setCopiedPayload(false), 2000);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  };
+
   const languages = [
     { id: 'curl' as Language, label: 'cURL' },
     { id: 'javascript' as Language, label: 'JavaScript' },
@@ -178,54 +220,122 @@ else:
           </div>
         </div>
 
-        {/* Language Tabs */}
-        <div className="border-border flex gap-1 border-b px-6 py-3">
-          {languages.map((lang) => (
-            <button
-              key={lang.id}
-              onClick={() => setSelectedLanguage(lang.id)}
-              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                selectedLanguage === lang.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-muted'
-              }`}
-            >
-              {lang.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Code Display */}
-        <div className="max-h-[400px] overflow-auto p-6">
-          <div className="bg-muted relative rounded-lg">
-            <div className="border-border flex items-center justify-between border-b px-4 py-2">
-              <span className="text-muted-foreground text-xs font-medium">
-                {languages.find((l) => l.id === selectedLanguage)?.label}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                className="h-7 gap-1 text-xs"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3 w-3" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            <pre className="overflow-x-auto p-4">
-              <code className="text-sm">{codeExamples[selectedLanguage]}</code>
-            </pre>
+        {/* Main Tabs: Code & Payload */}
+        <Tabs defaultValue="code" className="flex-1 flex flex-col overflow-hidden">
+          <div className="border-border border-b px-6">
+            <TabsList className="h-10 bg-transparent p-0">
+              <TabsTrigger value="code" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                Code Examples
+              </TabsTrigger>
+              <TabsTrigger value="payload" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                Payload (POST)
+              </TabsTrigger>
+            </TabsList>
           </div>
-        </div>
+
+          <TabsContent value="code" className="flex-1 overflow-hidden flex flex-col m-0">
+            {/* Language Tabs */}
+            <div className="border-border flex gap-1 border-b px-6 py-3">
+              {languages.map((lang) => (
+                <button
+                  key={lang.id}
+                  onClick={() => setSelectedLanguage(lang.id)}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    selectedLanguage === lang.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Code Display */}
+            <div className="flex-1 overflow-auto p-6">
+              <div className="bg-muted relative rounded-lg">
+                <div className="border-border flex items-center justify-between border-b px-4 py-2">
+                  <span className="text-muted-foreground text-xs font-medium">
+                    {languages.find((l) => l.id === selectedLanguage)?.label}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopy}
+                    className="h-7 gap-1 text-xs"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        Copy
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <pre className="overflow-x-auto p-4">
+                  <code className="text-sm">{codeExamples[selectedLanguage]}</code>
+                </pre>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="payload" className="flex-1 overflow-auto m-0 p-6">
+            <div className="space-y-4">
+              {/* Payload Schema */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Request Body Schema</h3>
+                <div className="bg-muted rounded-lg">
+                  <pre className="overflow-x-auto p-4">
+                    <code className="text-sm text-muted-foreground">{payloadSchema}</code>
+                  </pre>
+                </div>
+              </div>
+
+              {/* Example Payload */}
+              <div>
+                <h3 className="text-sm font-medium mb-2">Example Payload</h3>
+                <div className="bg-muted relative rounded-lg">
+                  <div className="border-border flex items-center justify-between border-b px-4 py-2">
+                    <span className="text-muted-foreground text-xs font-medium">JSON</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyPayload}
+                      className="h-7 gap-1 text-xs"
+                    >
+                      {copiedPayload ? (
+                        <>
+                          <Check className="h-3 w-3" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3 w-3" />
+                          Copy
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <pre className="overflow-x-auto p-4">
+                    <code className="text-sm">{payloadExample}</code>
+                  </pre>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="text-muted-foreground text-xs space-y-1">
+                <p>• The <code className="bg-muted rounded px-1">pipelineId</code> field is required and must match an existing pipeline</p>
+                <p>• New leads will be automatically added to the first column of the pipeline</p>
+                <p>• The <code className="bg-muted rounded px-1">value</code> field accepts numeric values for deal tracking</p>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="border-border border-t px-6 py-4">

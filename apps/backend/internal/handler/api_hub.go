@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -171,7 +172,8 @@ func (h *APIHubHandler) validateKeyWithConvex(convexURL, keyHash string) (*Valid
 	// Call Convex HTTP endpoint
 	reqBody, _ := json.Marshal(map[string]string{"keyHash": keyHash})
 	validateURL := convexURL + "/api/validate-key"
-	fmt.Printf("Validating API key against: %s (hash prefix: %s...)\n", validateURL, keyHash[:16])
+	fmt.Printf("Validating API key against: %s\n", validateURL)
+	fmt.Printf("Full key hash: %s\n", keyHash)
 	
 	resp, err := http.Post(validateURL, "application/json", strings.NewReader(string(reqBody)))
 	if err != nil {
@@ -179,6 +181,10 @@ func (h *APIHubHandler) validateKeyWithConvex(convexURL, keyHash string) (*Valid
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	// Read the full response body for debugging
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	fmt.Printf("Convex response status: %d, body: %s\n", resp.StatusCode, string(bodyBytes))
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("Convex validation returned status: %d\n", resp.StatusCode)
@@ -193,7 +199,7 @@ func (h *APIHubHandler) validateKeyWithConvex(convexURL, keyHash string) (*Valid
 		RateLimit   int      `json:"rateLimit"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.Unmarshal(bodyBytes, &result); err != nil {
 		fmt.Printf("Failed to decode Convex response: %v\n", err)
 		return nil, err
 	}

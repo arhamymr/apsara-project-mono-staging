@@ -60,6 +60,7 @@ http.route({
         });
       }
 
+      console.log(keyHash, "keyhash from this")
       const validatedKey = await ctx.runQuery(internal.apiKeys.validateApiKeyInternal, { keyHash });
 
       if (!validatedKey) {

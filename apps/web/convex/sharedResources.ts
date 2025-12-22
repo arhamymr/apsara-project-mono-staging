@@ -11,10 +11,11 @@ const resourceTypeValidator = v.union(
   v.literal("note"),
   v.literal("chatSession"),
   v.literal("artifact"),
-  v.literal("leadPipeline")
+  v.literal("leadPipeline"),
+  v.literal("blog")
 );
 
-type ResourceType = "kanbanBoard" | "note" | "chatSession" | "artifact" | "leadPipeline";
+type ResourceType = "kanbanBoard" | "note" | "chatSession" | "artifact" | "leadPipeline" | "blog";
 
 /**
  * Access level for resources
@@ -67,6 +68,13 @@ async function verifyResourceOwnership(
       }
       return null;
     }
+    case "blog": {
+      const blog = await ctx.db.get(resourceId as Id<"blogs">);
+      if (blog && blog.authorId === userId) {
+        return { name: blog.title, updatedAt: blog.updatedAt };
+      }
+      return null;
+    }
     default:
       return null;
   }
@@ -113,6 +121,13 @@ async function getResourceDetails(
       const pipeline = await ctx.db.get(resourceId as Id<"leadPipelines">);
       if (pipeline) {
         return { name: pipeline.name, updatedAt: pipeline.updatedAt, ownerId: pipeline.userId };
+      }
+      return null;
+    }
+    case "blog": {
+      const blog = await ctx.db.get(resourceId as Id<"blogs">);
+      if (blog) {
+        return { name: blog.title, updatedAt: blog.updatedAt, ownerId: blog.authorId };
       }
       return null;
     }

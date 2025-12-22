@@ -212,7 +212,8 @@ const schema = defineSchema({
       v.literal("note"),
       v.literal("chatSession"),
       v.literal("artifact"),
-      v.literal("leadPipeline")
+      v.literal("leadPipeline"),
+      v.literal("blog")
     ),
     resourceId: v.string(),
     sharedBy: v.id("users"),

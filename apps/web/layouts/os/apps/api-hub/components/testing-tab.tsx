@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, Loader2, Copy, Check, ChevronDown, Eye, EyeOff } from 'lucide-react';
+import { Play, Loader2, Copy, Check, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Input } from '@workspace/ui/components/input';
@@ -16,10 +16,11 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@workspace/ui/components/collapsible';
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@workspace/ui/components/tabs';
 import { cn } from '@workspace/ui/lib/utils';
 import { API_ENDPOINTS } from '../constants';
 import { useQuery } from 'convex/react';
@@ -87,7 +88,6 @@ export function TestingTab() {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [headersOpen, setHeadersOpen] = useState(false);
   const [selectedPipelineId, setSelectedPipelineId] = useState<string>(stored.selectedPipelineId ?? '');
   const [showApiKey, setShowApiKey] = useState(false);
 
@@ -359,15 +359,17 @@ export function TestingTab() {
             </Button>
           </div>
 
-          {/* Headers */}
-          <Collapsible open={headersOpen} onOpenChange={setHeadersOpen}>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <ChevronDown className={cn('h-4 w-4 transition-transform', headersOpen && 'rotate-180')} />
+          {/* Headers & Payload Tabs */}
+          <Tabs defaultValue="headers" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="headers">
                 Headers ({headers.filter(h => h.enabled).length})
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-2 space-y-2">
+              </TabsTrigger>
+              <TabsTrigger value="payload" disabled={!['POST', 'PUT'].includes(method)}>
+                Payload {!['POST', 'PUT'].includes(method) && '(POST/PUT only)'}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="headers" className="mt-4 space-y-2">
               {headers.map((header, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <input
@@ -396,21 +398,25 @@ export function TestingTab() {
               <Button variant="outline" size="sm" onClick={addHeader}>
                 Add Header
               </Button>
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Request Body */}
-          {['POST', 'PUT'].includes(method) && (
-            <div className="space-y-2">
-              <Label>Request Body (JSON)</Label>
-              <Textarea
-                value={requestBody}
-                onChange={(e) => setRequestBody(e.target.value)}
-                placeholder='{"key": "value"}'
-                className="min-h-32 font-mono text-sm"
-              />
-            </div>
-          )}
+            </TabsContent>
+            <TabsContent value="payload" className="mt-4">
+              {['POST', 'PUT'].includes(method) ? (
+                <div className="space-y-2">
+                  <Label>Request Body (JSON)</Label>
+                  <Textarea
+                    value={requestBody}
+                    onChange={(e) => setRequestBody(e.target.value)}
+                    placeholder='{"key": "value"}'
+                    className="min-h-32 font-mono text-sm"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                  <p className="text-sm">Payload is only available for POST and PUT requests</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
