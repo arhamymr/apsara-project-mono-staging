@@ -57,11 +57,11 @@ export const FIX_WEBSITE_STRINGS: Record<Lang, any> = {
       title: 'Simple, Transparent Pricing',
       subtitle: 'Flexible options designed to fit your budget and project scope.',
       hourly: {
-        title: 'Hourly Rate',
-        price: 'IDR 125K',
-        unit: '/hour',
-        description: 'Pay only for the time spent on your project.',
-        cta: 'Book Hours',
+        title: 'Starting From',
+        price: 'IDR 500K',
+        unit: '',
+        description: 'Affordable pricing for your website repair needs.',
+        cta: 'Get Started',
       },
       addons: {
         title: 'Additional Services',
@@ -111,11 +111,11 @@ export const FIX_WEBSITE_STRINGS: Record<Lang, any> = {
       title: 'Harga Sederhana & Transparan',
       subtitle: 'Opsi fleksibel yang dirancang sesuai budget dan cakupan proyek Anda.',
       hourly: {
-        title: 'Tarif Per Jam',
-        price: 'Rp 125 Ribu',
-        unit: '/jam',
-        description: 'Bayar hanya untuk waktu yang dihabiskan pada proyek Anda.',
-        cta: 'Pesan Jam',
+        title: 'Mulai Dari',
+        price: 'Rp 500 Ribu',
+        unit: '',
+        description: 'Harga terjangkau untuk kebutuhan perbaikan website Anda.',
+        cta: 'Mulai Sekarang',
       },
       addons: {
         title: 'Layanan Tambahan',

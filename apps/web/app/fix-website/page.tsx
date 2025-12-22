@@ -42,7 +42,6 @@ export default function FixWebsite() {
         <ServicesSection />
         <WorkflowSection />
         <PricingSection />
-        <TestimonialsSection />
         <CallToAction
           title={s.cta.title}
           subtitle={s.cta.subtitle}
@@ -274,10 +273,10 @@ function PricingSection() {
   const fadeUp = useFadeUp();
 
   const hourlyFeatures = [
-    'Flexible scheduling',
+    'Quick turnaround',
     'Direct communication',
-    'Detailed time tracking',
-    'No minimum hours',
+    'Quality guaranteed',
+    'No hidden fees',
   ];
 
   const projectFeatures = [
@@ -405,64 +404,6 @@ function PricingSection() {
   );
 }
 
-function TestimonialsSection() {
-  const fadeUp = useFadeUp();
-  const testimonials = [
-    {
-      quote:
-        'They transformed my AI-generated landing page into a polished, professional site. The attention to detail was impressive.',
-      author: 'Sarah K.',
-      role: 'Startup Founder',
-    },
-    {
-      quote:
-        'Fast turnaround and excellent communication. My e-commerce site now loads 3x faster.',
-      author: 'Michael R.',
-      role: 'Online Store Owner',
-    },
-    {
-      quote:
-        "Finally found a team that understands AI-generated code. They fixed issues other developers couldn't.",
-      author: 'David L.',
-      role: 'Product Manager',
-    },
-  ];
 
-  return (
-    <Section className="bg-muted/30 py-24 lg:py-32">
-      <div className="container mx-auto px-4">
-        <motion.div {...fadeUp} className="mx-auto mb-20 max-w-2xl text-center">
-          <h2 className="text-3xl font-normal tracking-tight md:text-5xl">
-            What Clients Say
-          </h2>
-          <p className="text-muted-foreground mt-6 text-lg">
-            Trusted by businesses and developers worldwide.
-          </p>
-        </motion.div>
-
-        <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
-          {testimonials.map((testimonial, i) => (
-            <motion.div
-              key={testimonial.author}
-              {...fadeUp}
-              transition={{ delay: i * 0.1 }}
-              className="border-foreground/20 bg-card rounded-xl border p-8"
-            >
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                &ldquo;{testimonial.quote}&rdquo;
-              </p>
-              <div>
-                <p className="font-medium">{testimonial.author}</p>
-                <p className="text-muted-foreground text-sm">
-                  {testimonial.role}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  );
-}
 
 

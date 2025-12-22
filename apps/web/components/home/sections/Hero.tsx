@@ -37,8 +37,8 @@ export function Hero() {
               <div className="flex flex-col gap-4 sm:flex-row">
                 {s.hero.ctas.primary && (
                   <Button size={'lg'} asChild>
-                    <Link href="/login">
-                      {s.hero.ctas.primary}
+                    <Link href="/full-stack-development">
+                      Full-Stack Web Development
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>

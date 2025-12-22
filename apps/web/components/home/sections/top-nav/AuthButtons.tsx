@@ -52,7 +52,7 @@ export function AuthButtons({ signInLabel, isMobile = false, onClose }: AuthButt
   return (
     <>
       <AuthLoading>
-        <Button className={buttonClass} disabled>
+        <Button size="sm" className={buttonClass} disabled>
           <Loader2 className="h-4 w-4 animate-spin" />
         </Button>
       </AuthLoading>

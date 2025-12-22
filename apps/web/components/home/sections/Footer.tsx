@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useFadeUp } from '@/components/home/hooks/useFadeUp';
-import { getWhatsAppUrl } from '@/lib/utils';
-import { Button } from '@workspace/ui/components/button';
-import { Input } from '@workspace/ui/components/input';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { GithubIcon, LinkedinIcon, TwitterIcon } from 'lucide-react';
+import { useFadeUp } from "@/components/home/hooks/useFadeUp";
+import { getWhatsAppUrl } from "@/lib/utils";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { GithubIcon, LinkedinIcon, TwitterIcon } from "lucide-react";
 
-import LanguageSelector from '@/components/LanguageSelector';
-import { Logo } from './top-nav/Logo';
+import LanguageSelector from "@/components/LanguageSelector";
+import { Logo } from "./top-nav/Logo";
 
 export function Footer() {
   const fadeUp = useFadeUp();
@@ -29,28 +29,26 @@ export function Footer() {
               <Logo />
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
-              AI-powered development platform. Build faster with intelligent
-              code generation and sandbox environments.
+              Build, Launch & Scale Your Digital Business From professional
+              websites and AI automation to custom applications — everything you
+              need to establish and grow your online presence.
             </p>
             <div className="flex gap-4">
               <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Twitter"
-              >
-                <TwitterIcon className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
+                href="https://github.com/arhamymr"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="GitHub"
+                target="_blank"
+                rel="noreferrer"
               >
                 <GithubIcon className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/arhamymr"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="LinkedIn"
+                target="_blank"
+                rel="noreferrer"
               >
                 <LinkedinIcon className="h-5 w-5" />
               </a>
@@ -67,15 +65,31 @@ export function Footer() {
               <ul className="text-muted-foreground space-y-3 text-sm">
                 <li>
                   <Link
-                    href="/services/buat-website"
+                    href="/full-stack-development"
                     className="hover:text-foreground transition-colors"
                   >
-                    Create Website
+                    Full Stack Development
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/services/fix-website"
+                    href="/mobile-app-development"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Mobile App Development
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/api-development"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    API Development
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/fix-website"
                     className="hover:text-foreground transition-colors"
                   >
                     Fix Website
@@ -83,18 +97,10 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/services/integrasi-ai"
+                    href="/ai-integration"
                     className="hover:text-foreground transition-colors"
                   >
                     AI Integration
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/products/unified-platform"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Unified Platform
                   </Link>
                 </li>
               </ul>
@@ -197,7 +203,9 @@ export function Footer() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
               </span>
-              <span className="text-xs font-medium">All systems operational</span>
+              <span className="text-xs font-medium">
+                All systems operational
+              </span>
             </div>
           </div>
         </div>
