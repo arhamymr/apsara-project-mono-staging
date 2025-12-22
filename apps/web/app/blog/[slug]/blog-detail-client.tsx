@@ -2,49 +2,74 @@
 
 import { Background, SkipToContent } from '@/components/home/components';
 import { Footer, TopNav } from '@/components/home/sections';
+import { useBlog } from '@/hooks/useBlog';
+import { LexicalRenderer } from '@/components/blog/lexical-renderer';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock, Share2, User } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Calendar, Clock, Share2, User, Facebook, Twitter, Linkedin, Copy, Check } from 'lucide-react';
+import { useState } from 'react';
 
-// Default article data for fallback
-const defaultArticle = {
-  title: 'The Future of AI Automation in Enterprise',
-  excerpt:
-    'Discover how AI agents are revolutionizing business workflows and increasing operational efficiency.',
-  date: 'Nov 15, 2024',
-  author: 'Sarah Chen',
-  category: 'Technology',
-  image:
-    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200',
-  content: `
-    <p>Artificial Intelligence is no longer just a buzzword; it's a fundamental shift in how businesses operate. From predictive analytics to autonomous agents, the landscape of enterprise technology is evolving at an unprecedented pace.</p>
-    
-    <h2>The Rise of Autonomous Agents</h2>
-    <p>Unlike traditional automation which follows rigid rules, AI agents can reason, adapt, and make decisions based on complex data. This capability allows them to handle tasks that previously required human intervention, such as customer support, complex data analysis, and even creative content generation.</p>
-    
-    <h2>Key Benefits for Enterprise</h2>
-    <ul>
-      <li><strong>Efficiency:</strong> Automate repetitive tasks with higher accuracy.</li>
-      <li><strong>Scalability:</strong> Handle increased workloads without proportional staff increases.</li>
-      <li><strong>Insight:</strong> Derive actionable intelligence from vast amounts of unstructured data.</li>
-    </ul>
-    
-    <p>As we move into 2025, we expect to see a surge in the adoption of multi-agent systems where specialized AI agents collaborate to solve complex business problems.</p>
-  `,
-  readTime: '5 min read',
-};
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 interface BlogDetailClientProps {
   slug: string;
 }
 
 export default function BlogDetailClient({ slug }: BlogDetailClientProps) {
-  // In a real app, you would fetch the article based on slug
-  // For now, we use the default article as fallback
-  // The slug parameter is available for future data fetching: slug
-  console.debug('Viewing blog post:', slug);
-  const post = defaultArticle;
+  const { data: post, isLoading, error } = useBlog(slug);
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = post?.title || 'Check out this article';
+  const shareText = post?.excerpt || post?.title || 'Read this interesting article';
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleShareTwitter = () => {
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  };
+
+  const handleShareFacebook = () => {
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    window.open(facebookUrl, '_blank', 'width=550,height=420');
+  };
+
+  const handleShareLinkedin = () => {
+    const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+    window.open(linkedinUrl, '_blank', 'width=550,height=420');
+  };
+
+  const handleShareNative = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    }
+  };
 
   return (
     <div className="bg-background text-foreground relative min-h-dvh">
@@ -60,61 +85,144 @@ export default function BlogDetailClient({ slug }: BlogDetailClientProps) {
               className="text-muted-foreground hover:text-primary inline-flex items-center text-sm transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
+              Back to Blogs
             </Link>
           </div>
 
-          <header className="mb-10 text-center">
-            <div className="mb-6 flex items-center justify-center gap-4">
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
-                {post.category}
-              </Badge>
-              <span className="text-muted-foreground flex items-center text-sm">
-                <Clock className="mr-1 h-3 w-3" />
-                {post.readTime}
-              </span>
-            </div>
-
-            <h1 className="mb-6 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-              {post.title}
-            </h1>
-
-            <div className="text-muted-foreground flex items-center justify-center gap-6 text-sm">
-              <div className="flex items-center">
-                <User className="mr-2 h-4 w-4" />
-                {post.author}
-              </div>
-              <div className="flex items-center">
-                <Calendar className="mr-2 h-4 w-4" />
-                {post.date}
+          {isLoading ? (
+            <div className="space-y-6">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-96 w-full rounded-xl" />
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
               </div>
             </div>
-          </header>
-
-          {post.image && (
-            <div className="border-border mb-10 overflow-hidden rounded-xl border shadow-lg">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="h-auto w-full object-cover"
-              />
+          ) : error ? (
+            <div className="text-center">
+              <p className="text-muted-foreground mb-4">Failed to load blog post.</p>
+              <Link href="/blog" className="text-primary hover:underline">
+                Return to blog
+              </Link>
             </div>
-          )}
+          ) : post ? (
+            <>
+              <header className="mb-10 text-center">
+                <div className="mb-6 flex items-center justify-center gap-4">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    {post.tags[0] || 'General'}
+                  </Badge>
+                  <span className="text-muted-foreground flex items-center text-sm">
+                    <Clock className="mr-1 h-3 w-3" />
+                    5 min read
+                  </span>
+                </div>
 
-          <div className="prose prose-invert prose-lg mx-auto">
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
-          </div>
+                <h1 className="mb-6 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
+                  {post.title}
+                </h1>
 
-          <div className="border-border mt-12 border-t pt-8">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Share this article</h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="rounded-full">
-                  <Share2 className="h-4 w-4" />
-                </Button>
+                <div className="text-muted-foreground flex items-center justify-center gap-6 text-sm">
+                  <div className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    {post.authorName}
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {formatDate(post.publishedAt)}
+                  </div>
+                </div>
+              </header>
+
+              {post.coverImage && (
+                <div className="border-border mb-10 overflow-hidden rounded-xl border shadow-lg">
+                  <Image
+                    src={post.coverImage}
+                    alt={post.title}
+                    width={800}
+                    height={400}
+                    className="h-[400px] w-full object-cover"
+                  />
+                </div>
+              )}
+
+              {post.content && (
+                <div className="mx-auto max-w-3xl">
+                  <LexicalRenderer content={post.content} />
+                </div>
+              )}
+
+              <div className="border-border mt-12 border-t pt-8">
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">Share this article</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {typeof navigator !== 'undefined' && navigator.share && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleShareNative}
+                        className="gap-2"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        Share
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleShareTwitter}
+                      className="gap-2"
+                      title="Share on Twitter"
+                    >
+                      <Twitter className="h-4 w-4" />
+                      Twitter
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleShareFacebook}
+                      className="gap-2"
+                      title="Share on Facebook"
+                    >
+                      <Facebook className="h-4 w-4" />
+                      Facebook
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleShareLinkedin}
+                      className="gap-2"
+                      title="Share on LinkedIn"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                      LinkedIn
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleCopyLink}
+                      className="gap-2"
+                      title="Copy link to clipboard"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="h-4 w-4" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          Copy Link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : null}
         </article>
       </main>
 

@@ -11,6 +11,9 @@ import { BlogApiHelperModal } from './components/BlogApiHelperModal';
 import CreateArticleWindow from './create';
 import EditArticleWindow from './edit';
 import { useMyBlogs, useDeleteBlog, useSearchBlogs } from './hooks';
+import { useSharedResources } from '../organizations/hooks/use-shared-resources';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
 export default function ArticleManagerApp() {
@@ -22,7 +25,49 @@ export default function ArticleManagerApp() {
   const searchResults = useSearchBlogs(search, 20);
   const deleteBlog = useDeleteBlog();
 
-  const displayBlogs = search ? searchResults : blogs;
+  // Get user's organizations to fetch shared blogs
+  const userOrganizations = useQuery(api.organizations.listUserOrganizations, {});
+  
+  // Get shared resources - we need to handle this differently since we can't conditionally call hooks
+  // For now, we'll fetch shared resources for the first org if available
+  const firstOrgId = userOrganizations?.[0]?._id;
+  const firstOrgSharedResources = useSharedResources(firstOrgId ?? null);
+  
+  // Get all shared blogs from all orgs by combining results
+  const allSharedBlogs = React.useMemo(() => {
+    if (!userOrganizations) return [];
+    // For MVP, we're getting shared resources from first org
+    // In production, you'd want to fetch from all orgs
+    return (firstOrgSharedResources.resources || []).filter(r => r.resourceType === 'blog');
+  }, [firstOrgSharedResources.resources, userOrganizations]);
+
+  // Combine personal and shared blogs
+  const displayBlogs = React.useMemo(() => {
+    if (!blogs) return undefined;
+    if (search) return searchResults; // When searching, only show search results
+    
+    const personalBlogIds = new Set(blogs.map(b => b._id));
+    const sharedBlogs = allSharedBlogs.filter(
+      r => !personalBlogIds.has(r.resourceId as Id<'blogs'>)
+    );
+    
+    return [
+      ...blogs,
+      ...sharedBlogs.map(r => ({
+        _id: r.resourceId as Id<'blogs'>,
+        slug: r.name.toLowerCase().replace(/\s+/g, '-'),
+        title: r.name,
+        content: '',
+        excerpt: '',
+        coverImage: undefined,
+        status: 'published' as const,
+        createdAt: r.lastModified,
+        updatedAt: r.lastModified,
+        isShared: true,
+      })),
+    ];
+  }, [blogs, searchResults, search, allSharedBlogs]);
+
   const isLoading = displayBlogs === undefined;
 
   const openCreate = () => {
@@ -43,8 +88,7 @@ export default function ArticleManagerApp() {
 
   const openDetail = (id: Id<"blogs">, title?: string) => {
     if (!activeId) return;
-    let subId: string | undefined;
-    subId = openSubWindow(activeId, {
+    const subId = openSubWindow(activeId, {
       title: title ? `Edit: ${title}` : 'Article',
       content: (
         <EditArticleWindow
@@ -73,6 +117,24 @@ export default function ArticleManagerApp() {
       const message = error instanceof Error ? error.message : 'Failed to delete article.';
       toast.error(message);
     }
+  };
+
+  const handleShareArticle = (id: Id<"blogs">, title?: string) => {
+    if (!activeId) return;
+    const subId = openSubWindow(activeId, {
+      title: title ? `Share: ${title}` : 'Share Article',
+      content: (
+        <EditArticleWindow
+          id={id}
+          onUpdated={() => {}}
+          onClose={() => {
+            if (subId) closeWindow(subId);
+          }}
+        />
+      ),
+      width: 820,
+      height: 600,
+    });
   };
 
   return (
@@ -137,7 +199,7 @@ export default function ArticleManagerApp() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3 @xl:grid-cols-5">
-            {displayBlogs.map((blog: { _id: Id<"blogs">; slug: string; title: string; content: string; excerpt?: string; coverImage?: string; status: string; createdAt: number; updatedAt: number }) => (
+            {displayBlogs.map((blog: { _id: Id<"blogs">; slug: string; title: string; content: string; excerpt?: string; coverImage?: string; status: string; createdAt: number; updatedAt: number; isShared?: boolean }) => (
               <ArticleCard
                 key={blog._id}
                 post={{
@@ -154,6 +216,8 @@ export default function ArticleManagerApp() {
                 onSelect={() => openDetail(blog._id, blog.title)}
                 onEdit={() => openDetail(blog._id, blog.title)}
                 onDelete={() => handleDeleteArticle(blog._id, blog.title)}
+                onShare={() => handleShareArticle(blog._id, blog.title)}
+                isShared={blog.isShared}
               />
             ))}
           </div>

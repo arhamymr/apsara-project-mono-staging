@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.API_URL || 'http://localhost:1234';
 const API_KEY = process.env.API_HUB_KEY || '';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const page = searchParams.get('page') || '1';
-  const limit = searchParams.get('limit') || '10';
+export async function GET(
+  _request: unknown,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
 
   try {
     // Validate environment variables
@@ -18,8 +19,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const url = `${API_BASE_URL}/api/v1/blogs?page=${page}&limit=${limit}`;
-    console.log('Fetching blogs from:', url);
+    const url = `${API_BASE_URL}/api/v1/blogs/${slug}`;
+    console.log('Fetching blog from:', url);
 
     const response = await fetch(url, {
       headers: {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
       const errorText = await response.text();
       console.error('Backend error:', errorText);
       return NextResponse.json(
-        { error: 'Failed to fetch blogs from backend', details: errorText },
+        { error: 'Failed to fetch blog from backend', details: errorText },
         { status: response.status }
       );
     }

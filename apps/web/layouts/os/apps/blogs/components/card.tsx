@@ -21,8 +21,10 @@ type ArticleCardProps = {
   onSelect: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onShare?: () => void;
   onAssignWebsite?: (websiteSlug: string) => void;
   websites?: Array<{ id?: number; slug: string; name?: string }>;
+  isShared?: boolean;
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -36,8 +38,10 @@ export function ArticleCard({
   onSelect,
   onEdit,
   onDelete,
+  onShare,
   onAssignWebsite,
   websites = [],
+  isShared = false,
 }: ArticleCardProps) {
   const statusClass = STATUS_STYLES[post.status] ?? 'bg-muted text-foreground';
   const statusLabel =
@@ -140,14 +144,31 @@ export function ArticleCard({
         >
           Edit Article
         </ContextMenuItem>
-        <ContextMenuItem
-          onSelect={(event) => {
-            event.preventDefault();
-            onDelete?.();
-          }}
-        >
-          Delete Article
-        </ContextMenuItem>
+        {!isShared && (
+          <>
+            <ContextMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                onShare?.();
+              }}
+            >
+              Share with Organization
+            </ContextMenuItem>
+            <ContextMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                onDelete?.();
+              }}
+            >
+              Delete Article
+            </ContextMenuItem>
+          </>
+        )}
+        {isShared && (
+          <ContextMenuItem disabled className="text-xs text-muted-foreground">
+            Shared resource
+          </ContextMenuItem>
+        )}
         <ContextMenuSeparator />
         <ContextMenuSub>
           <ContextMenuSubTrigger>Add to Website</ContextMenuSubTrigger>

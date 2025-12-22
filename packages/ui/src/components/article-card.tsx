@@ -41,7 +41,6 @@ function ArticleCard({
   readMoreLabel = 'Read more',
   className,
   renderLink,
-  renderImage,
   dateIcon,
   authorIcon,
   arrowIcon,
@@ -54,29 +53,24 @@ function ArticleCard({
         <a href={props.href} className={props.className}>{props.children}</a>
       );
 
-  const ImageWrapper = renderImage
-    ? (props: { src: string; alt: string; className?: string }) => renderImage(props)
-    : (props: { src: string; alt: string; className?: string }) => (
-        <img src={props.src} alt={props.alt} className={props.className} />
-      );
 
   return (
     <Card
       className={cn(
-        'border-border bg-card/50 hover:border-foreground/30 flex flex-col overflow-hidden transition-all hover:shadow-lg',
+        'border-border bg-card/50 hover:border-foreground/30 flex flex-col overflow-hidden transition-all hover:shadow-lg px-3.5',
         className
       )}
     >
       {image && (
-        <div className="relative h-48 w-full overflow-hidden">
-          <ImageWrapper
+        <div className="relative h-48 w-full rounded-sm overflow-hidden">
+          <img
             src={image}
             alt={title}
             className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
           />
         </div>
       )}
-      <CardHeader className="p-4">
+      <CardHeader className='px-0'>
         <div className="mb-2 flex items-center justify-between">
           <Badge
             variant="secondary"
@@ -95,12 +89,12 @@ function ArticleCard({
           </LinkWrapper>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 px-4 pb-4 pt-0">
+      <CardContent className="flex-1 px-0">
         <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
           {excerpt}
         </p>
       </CardContent>
-      <CardFooter className="border-border border-t px-4 py-3">
+      <CardFooter className="border-border border-t px-0">
         <div className="flex w-full items-center justify-between">
           <div className="text-muted-foreground flex items-center gap-1 text-xs">
             {authorIcon}
@@ -109,7 +103,7 @@ function ArticleCard({
           <Button
             variant="ghost"
             size="sm"
-            className="text-primary hover:text-primary/80 h-8 p-0 hover:bg-transparent"
+            className="text-primary hover:text-primary/80 p-0 hover:bg-transparent"
             asChild
           >
             <LinkWrapper href={href}>

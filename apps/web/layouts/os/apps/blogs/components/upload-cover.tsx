@@ -47,7 +47,7 @@ export function CoverImagePicker({
                 onClick={() => setPickerOpen(true)}
                 className="bg-background/70 backdrop-blur-sm"
               >
-                Change
+                Select Assets
               </Button>
               <Button
                 size="sm"
@@ -88,7 +88,7 @@ export function CoverImagePicker({
               variant="outline"
               onClick={() => setPickerOpen(true)}
             >
-              Select cover image
+              Select Assets
             </Button>
           </div>
         )}

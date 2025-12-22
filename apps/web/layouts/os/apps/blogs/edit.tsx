@@ -22,63 +22,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from 'sonner';
-import { useBlog, useUpdateBlog, useDeleteBlog } from './hooks';
+import React from 'react';
 import { CoverImagePicker } from './components/upload-cover';
 import { Editor } from '@/components/blocks/editor-x/editor';
-import type { SerializedEditorState } from 'lexical';
 import type { Id } from '@/convex/_generated/dataModel';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit2 } from 'lucide-react';
 import { ShareWithOrgButton } from '../organizations/components/share-with-org-button';
+import { useEditBlogForm } from './hooks/useEditBlogForm';
 
 type BlogStatus = 'draft' | 'published';
-
-const initialEditorState = {
-  root: {
-    children: [
-      {
-        children: [],
-        direction: null,
-        format: '',
-        indent: 0,
-        type: 'paragraph',
-        version: 1,
-      },
-    ],
-    direction: null,
-    format: '',
-    indent: 0,
-    type: 'root',
-    version: 1,
-  },
-} as unknown as SerializedEditorState;
-
-// Extract plain text from Lexical editor state for excerpt
-function extractTextFromLexical(state: SerializedEditorState, maxLength = 200): string {
-  const texts: string[] = [];
-
-  function traverse(node: unknown) {
-    if (!node || typeof node !== 'object') return;
-    const n = node as Record<string, unknown>;
-
-    if (n.type === 'text' && typeof n.text === 'string') {
-      texts.push(n.text);
-    }
-
-    if (Array.isArray(n.children)) {
-      for (const child of n.children) {
-        traverse(child);
-      }
-    }
-  }
-
-  traverse(state.root);
-  const fullText = texts.join(' ').replace(/\s+/g, ' ').trim();
-
-  if (fullText.length <= maxLength) return fullText;
-  return fullText.slice(0, maxLength).trim() + '...';
-}
 
 interface EditArticleWindowProps {
   id: Id<'blogs'>;
@@ -87,98 +39,27 @@ interface EditArticleWindowProps {
 }
 
 export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticleWindowProps) {
-  const blog = useBlog(id);
-  const updateBlog = useUpdateBlog();
-  const deleteBlog = useDeleteBlog();
-
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [status, setStatus] = useState<BlogStatus>('draft');
-  const [coverImage, setCoverImage] = useState<string | undefined>();
-  const [content, setContent] = useState<SerializedEditorState>(initialEditorState);
-  const [tags, setTags] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [editorKey, setEditorKey] = useState(0);
-
-  useEffect(() => {
-    if (blog) {
-      setTitle(blog.title);
-      setSlug(blog.slug ?? '');
-      setStatus(blog.status);
-      setCoverImage(blog.coverImage);
-      setTags(blog.tags?.join(', ') ?? '');
-      try {
-        const parsed = JSON.parse(blog.content);
-        setContent(parsed);
-        setEditorKey((k) => k + 1);
-      } catch {
-        setContent(initialEditorState);
-      }
-    }
-  }, [blog]);
-
-  const handleUpdate = useCallback(async () => {
-    if (isSubmitting || !blog) return;
-
-    if (!title.trim()) {
-      toast.error('Title is required');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const contentString = JSON.stringify(content);
-      const tagsArray = tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean);
-
-      await updateBlog({
-        id: blog._id,
-        title: title.trim(),
-        content: contentString,
-        excerpt: extractTextFromLexical(content),
-        coverImage,
-        status,
-        tags: tagsArray.length > 0 ? tagsArray : undefined,
-      });
-
-      toast.success('Article updated');
-      onUpdated?.();
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update';
-      
-      // Handle slug already exists error
-      if (errorMessage.includes('SLUG_EXISTS:')) {
-        const existingSlug = errorMessage.split('SLUG_EXISTS:')[1];
-        toast.error(`Slug "${existingSlug}" is already in use by another article.`, {
-          duration: 5000,
-        });
-      } else {
-        toast.error(errorMessage);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [title, content, tags, coverImage, status, isSubmitting, blog, updateBlog, onUpdated]);
-
-  const handleDelete = useCallback(async () => {
-    if (!blog) return;
-
-    setIsSubmitting(true);
-    try {
-      await deleteBlog({ id: blog._id });
-      toast.success('Article deleted');
-      onUpdated?.();
-      onClose?.();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to delete';
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [blog, deleteBlog, onUpdated, onClose]);
+  const {
+    blog,
+    title,
+    slug,
+    status,
+    coverImage,
+    content,
+    tags,
+    isSubmitting,
+    editorKey,
+    isEditingSlug,
+    setTitle,
+    setSlug,
+    setStatus,
+    setCoverImage,
+    setContent,
+    setTags,
+    setIsEditingSlug,
+    handleUpdate,
+    handleDelete,
+  } = useEditBlogForm(id, onUpdated, onClose);
 
   if (blog === undefined) return <div className="p-4 text-sm">Loading…</div>;
   if (blog === null) return <div className="p-4 text-sm">Not found</div>;
@@ -261,7 +142,22 @@ export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticl
 
             <div>
               <label className="text-xs">Slug</label>
-              <Input value={slug} disabled placeholder="article-slug" />
+              <div className="flex gap-2">
+                <Input
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  disabled={!isEditingSlug}
+                  placeholder="article-slug"
+                />
+                <Button
+                  size="sm"
+                  variant={isEditingSlug ? 'default' : 'outline'}
+                  onClick={() => setIsEditingSlug(!isEditingSlug)}
+                  className="px-2"
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div>
@@ -281,7 +177,7 @@ export default function EditArticleWindow({ id, onUpdated, onClose }: EditArticl
           </aside>
 
           {/* Editor */}
-          <div className="relative max-h-[calc(100vh-150px)] overflow-hidden md:col-span-2">
+          <div className="relative min-h-[500px] md:col-span-2">
             <Editor
               key={editorKey}
               editorSerializedState={content}

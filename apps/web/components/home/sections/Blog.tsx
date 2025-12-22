@@ -5,11 +5,11 @@ import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { ArticleCard } from '@workspace/ui/components/article-card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 interface BlogPost {
   id: string;
@@ -53,21 +53,18 @@ function formatDate(dateString: string): string {
 export function Blog() {
   const s = useStrings();
   const fadeUp = useFadeUp();
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchBlogs()
-      .then((response) => {
-        setBlogs(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: () => fetchBlogs(),
+  });
+
+  const blogs = data?.data ?? [];
+
+  // Hide section if no data and not loading
+  if (!isLoading && (error || blogs.length === 0)) {
+    return null;
+  }
 
   return (
     <Section id="blog" className="py-20">
@@ -82,7 +79,7 @@ export function Blog() {
         {...fadeUp}
         className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
       >
-        {loading ? (
+        {isLoading ? (
           // Loading skeletons
           Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="space-y-4">
@@ -92,14 +89,6 @@ export function Blog() {
               <Skeleton className="h-4 w-1/2" />
             </div>
           ))
-        ) : error ? (
-          <div className="col-span-full text-center text-muted-foreground">
-            Failed to load blogs. Please try again later.
-          </div>
-        ) : blogs.length === 0 ? (
-          <div className="col-span-full text-center text-muted-foreground">
-            No blog posts available yet.
-          </div>
         ) : (
           blogs.map((blog) => (
             <ArticleCard

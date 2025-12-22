@@ -46,37 +46,39 @@ export function AssetPicker({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl p-0"
+        className="max-w-6xl h-[90vh] p-0 flex flex-col"
         portalContainer={portalContainer}
       >
-        <DialogHeader className="px-4 pt-4 pb-2">
-          <DialogTitle className="text-base">Select Assets</DialogTitle>
+        <DialogHeader className="px-6 pt-6 pb-3 flex-shrink-0">
+          <DialogTitle className="text-lg font-semibold">Select Assets</DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          <div className="px-4 pb-3">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col flex-1 overflow-hidden">
+          <div className="px-6 pb-4 flex-shrink-0">
             <TabsList>
               <TabsTrigger value="finder">Finder</TabsTrigger>
               <TabsTrigger value="unsplash">Unsplash</TabsTrigger>
             </TabsList>
           </div>
 
-          <FinderTab
-            open={open}
-            kindFilter={kindFilter}
-            onSelectUrl={handlePickFinder}
-            onClose={() => onOpenChange(false)}
-          />
+          <div className="flex-1 overflow-hidden px-6">
+            <FinderTab
+              open={open}
+              kindFilter={kindFilter}
+              onSelectUrl={handlePickFinder}
+              onClose={() => onOpenChange(false)}
+            />
 
-          <UnsplashTab
-            open={open}
-            active={activeTab === 'unsplash'}
-            onPick={handlePickUnsplash}
-          />
+            <UnsplashTab
+              open={open}
+              active={activeTab === 'unsplash'}
+              onPick={handlePickUnsplash}
+            />
+          </div>
 
           {/* bottom actions (consistent close control across tabs) */}
-          <TabsContent value={activeTab} className="mt-0">
-            <div className="mt-3 mb-3 flex justify-end px-4">
+          <TabsContent value={activeTab} className="mt-0 flex-shrink-0">
+            <div className="mt-4 mb-6 flex justify-end px-6">
               <Button variant="secondary" onClick={() => onOpenChange(false)}>
                 Close
               </Button>
