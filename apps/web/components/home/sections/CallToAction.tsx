@@ -6,7 +6,7 @@ import { useLandingStrings as useStrings } from '@/i18n/landing';
 import { useFadeUp } from '@/components/home/hooks/useFadeUp';
 import { getWhatsAppNumber } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { ArrowRight, Rocket, LucideIcon } from 'lucide-react';
+import { ArrowRight, LucideIcon } from 'lucide-react';
 
 export interface CallToActionProps {
   title?: string;
@@ -39,8 +39,15 @@ export function CallToAction({
       <div className="container mx-auto">
         <motion.div
           {...fadeUp}
-          className="bg-foreground relative w-full overflow-hidden rounded-xl px-8 py-20 text-center md:px-16 md:py-28 lg:py-32"
+          className="bg-gradient-to-br from-foreground via-foreground to-foreground/95 relative w-full overflow-hidden rounded-xl px-8 py-20 text-center md:px-16 md:py-28 lg:py-32 shadow-2xl"
         >
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 h-60 w-60 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+          </div>
+
           <div className="relative z-10 mx-auto max-w-4xl">
             <h2 className="text-background text-4xl font-normal tracking-tight md:text-5xl lg:text-6xl">
               {displayTitle}

@@ -11,7 +11,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       aiIntegration: 'AI Solutions',
       instagramPost: 'Instagram Post Design',
       templates: 'Templates',
-      blog: 'Blog',
+      blog: 'Blogs',
       faq: 'FAQ',
       pricing: 'About Me',
       descriptions: {
@@ -36,7 +36,7 @@ export const TOP_NAV_STRINGS: Record<Lang, unknown> = {
       aiIntegration: 'Solusi AI',
       instagramPost: 'Desain Post Instagram',
       templates: 'Template',
-      blog: 'Blog',
+      blog: 'Blogs',
       faq: 'FAQ',
       pricing: 'Tentang saya',
       descriptions: {
