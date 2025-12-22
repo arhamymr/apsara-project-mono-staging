@@ -46,7 +46,7 @@ export function AssetPicker({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-6xl h-[90vh] p-0 flex flex-col"
+        className="p-0 flex flex-col"
         portalContainer={portalContainer}
       >
         <DialogHeader className="px-6 pt-6 pb-3 flex-shrink-0">

@@ -642,13 +642,31 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
         height?: number;
       }
     ) => {
-      let newId = '';
+      let resultId = '';
       setWindows((prev) => {
         const parent = prev.find((w) => w.id === parentWindowId);
         if (!parent) return prev;
+
+        // Check if a sub-window with the same title already exists under this parent
+        const existingSubWindow = prev.find(
+          (w) => w.parentId === parentWindowId && w.title === options.title && w.sub
+        );
+
+        if (existingSubWindow) {
+          // Bring existing sub-window to front
+          resultId = existingSubWindow.id;
+          const nextZ = ++zSeed.current;
+          return prev.map((w) =>
+            w.id === existingSubWindow.id
+              ? { ...w, z: nextZ, minimized: false }
+              : w
+          );
+        }
+
+        // Create new sub-window
         const nextZ = ++zSeed.current;
         const id = `${parent.title}-sub-${Date.now()}`;
-        newId = id;
+        resultId = id;
         const width =
           options.width ??
           Math.max(360, Math.min(720, Math.floor(parent.w * 0.6)));
@@ -678,7 +696,11 @@ export function useDesktopState({ apps, initialAppId }: UseDesktopStateArgs): {
           },
         ];
       });
-      return newId;
+
+      // Set the sub-window as active
+      setActiveId(resultId);
+      
+      return resultId;
     },
     []
   );

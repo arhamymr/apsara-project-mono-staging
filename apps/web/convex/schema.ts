@@ -213,7 +213,8 @@ const schema = defineSchema({
       v.literal("chatSession"),
       v.literal("artifact"),
       v.literal("leadPipeline"),
-      v.literal("blog")
+      v.literal("blog"),
+      v.literal("shop")
     ),
     resourceId: v.string(),
     sharedBy: v.id("users"),
@@ -291,6 +292,66 @@ const schema = defineSchema({
     .index("by_user", ["userId"])
     .index("by_created", ["createdAt"])
     .index("by_user_created", ["userId", "createdAt"]),
+
+  // E-commerce tables
+  shops: defineTable({
+    ownerId: v.id("users"),
+    slug: v.string(),
+    name: v.string(),
+    description: v.optional(v.string()),
+    logo: v.optional(v.string()),
+    whatsappNumber: v.string(),
+    currency: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_slug", ["slug"]),
+
+  products: defineTable({
+    shopId: v.id("shops"),
+    slug: v.string(),
+    name: v.string(),
+    description: v.optional(v.string()),
+    price: v.number(),
+    inventory: v.number(),
+    status: v.union(v.literal("draft"), v.literal("active"), v.literal("archived")),
+    category: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_shop", ["shopId"])
+    .index("by_shop_slug", ["shopId", "slug"])
+    .index("by_shop_status", ["shopId", "status"])
+    .index("by_status", ["status"]),
+
+  productImages: defineTable({
+    productId: v.id("products"),
+    url: v.string(),
+    position: v.number(),
+    isPrimary: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_product", ["productId"])
+    .index("by_product_position", ["productId", "position"]),
+
+  banners: defineTable({
+    shopId: v.id("shops"),
+    title: v.string(),
+    subtitle: v.optional(v.string()),
+    imageUrl: v.string(),
+    linkUrl: v.optional(v.string()),
+    status: v.union(v.literal("active"), v.literal("inactive")),
+    position: v.number(),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_shop", ["shopId"])
+    .index("by_shop_status", ["shopId", "status"])
+    .index("by_shop_position", ["shopId", "position"]),
 });
 
 export default schema;

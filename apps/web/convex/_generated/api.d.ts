@@ -10,6 +10,7 @@
 
 import type * as apiKeys from "../apiKeys.js";
 import type * as auth from "../auth.js";
+import type * as banners from "../banners.js";
 import type * as blogs from "../blogs.js";
 import type * as chat from "../chat.js";
 import type * as http from "../http.js";
@@ -20,7 +21,10 @@ import type * as notes from "../notes.js";
 import type * as notifications from "../notifications.js";
 import type * as organizationMembers from "../organizationMembers.js";
 import type * as organizations from "../organizations.js";
+import type * as productImages from "../productImages.js";
+import type * as products from "../products.js";
 import type * as sharedResources from "../sharedResources.js";
+import type * as shops from "../shops.js";
 import type * as user from "../user.js";
 import type * as vibeCoding from "../vibeCoding.js";
 
@@ -33,6 +37,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   auth: typeof auth;
+  banners: typeof banners;
   blogs: typeof blogs;
   chat: typeof chat;
   http: typeof http;
@@ -43,7 +48,10 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   organizationMembers: typeof organizationMembers;
   organizations: typeof organizations;
+  productImages: typeof productImages;
+  products: typeof products;
   sharedResources: typeof sharedResources;
+  shops: typeof shops;
   user: typeof user;
   vibeCoding: typeof vibeCoding;
 }>;
