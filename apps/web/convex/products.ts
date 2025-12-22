@@ -3,6 +3,79 @@ import { query, mutation, QueryCtx, MutationCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "./_generated/dataModel";
 
+// Helper function to check if user can access a shop (owner or org member)
+async function canAccessShop(
+  ctx: QueryCtx | MutationCtx,
+  shopId: Id<"shops">,
+  userId: Id<"users">
+): Promise<boolean> {
+  const shop = await ctx.db.get(shopId);
+  if (!shop) return false;
+
+  // Check if user is the owner
+  if (shop.ownerId === userId) return true;
+
+  // Check if shop is shared with any organization the user is a member of
+  const sharedResources = await ctx.db
+    .query("sharedResources")
+    .withIndex("by_resource", (q) =>
+      q.eq("resourceType", "shop").eq("resourceId", shopId)
+    )
+    .collect();
+
+  for (const sharedResource of sharedResources) {
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", sharedResource.organizationId).eq("userId", userId)
+      )
+      .unique();
+
+    if (membership) {
+      // Any organization member can access (view/edit based on role)
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Helper function to check if user can edit a shop (owner or org editor/admin/owner)
+async function canEditShop(
+  ctx: QueryCtx | MutationCtx,
+  shopId: Id<"shops">,
+  userId: Id<"users">
+): Promise<boolean> {
+  const shop = await ctx.db.get(shopId);
+  if (!shop) return false;
+
+  // Check if user is the owner
+  if (shop.ownerId === userId) return true;
+
+  // Check if shop is shared with any organization where user has edit permissions
+  const sharedResources = await ctx.db
+    .query("sharedResources")
+    .withIndex("by_resource", (q) =>
+      q.eq("resourceType", "shop").eq("resourceId", shopId)
+    )
+    .collect();
+
+  for (const sharedResource of sharedResources) {
+    const membership = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", sharedResource.organizationId).eq("userId", userId)
+      )
+      .unique();
+
+    if (membership && (membership.role === "owner" || membership.role === "admin" || membership.role === "editor")) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Helper function to generate URL-safe slug from name
 function generateSlug(name: string): string {
   return name
@@ -57,10 +130,9 @@ export const create = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(args.shopId);
-    if (!shop) throw new Error("Shop not found");
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can edit this shop (owner or org member with edit permissions)
+    const canEdit = await canEditShop(ctx, args.shopId, userId);
+    if (!canEdit) throw new Error("Not authorized");
 
     // Validate name length (max 200 characters)
     if (args.name.length > 200) {
@@ -87,6 +159,7 @@ export const create = mutation({
       slug,
       createdAt: now,
       updatedAt: now,
+      lastModifiedBy: userId,
     });
   },
 });
@@ -110,10 +183,9 @@ export const update = mutation({
     const product = await ctx.db.get(args.id);
     if (!product) throw new Error("Product not found");
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(product.shopId);
-    if (!shop) throw new Error("Shop not found");
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can edit this shop (owner or org member with edit permissions)
+    const canEdit = await canEditShop(ctx, product.shopId, userId);
+    if (!canEdit) throw new Error("Not authorized");
 
     // Validate name length if changing
     if (args.name !== undefined && args.name.length > 200) {
@@ -144,6 +216,7 @@ export const update = mutation({
       ...updates,
       slug,
       updatedAt: now,
+      lastModifiedBy: userId,
     });
   },
 });
@@ -158,10 +231,9 @@ export const remove = mutation({
     const product = await ctx.db.get(args.id);
     if (!product) throw new Error("Product not found");
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(product.shopId);
-    if (!shop) throw new Error("Shop not found");
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can edit this shop (owner or org member with edit permissions)
+    const canEdit = await canEditShop(ctx, product.shopId, userId);
+    if (!canEdit) throw new Error("Not authorized");
 
     // Cascade delete: Remove all associated product images
     const images = await ctx.db
@@ -184,10 +256,9 @@ export const listByShop = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(args.shopId);
-    if (!shop) throw new Error("Shop not found");
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can access this shop (owner or org member)
+    const canAccess = await canAccessShop(ctx, args.shopId, userId);
+    if (!canAccess) throw new Error("Not authorized");
 
     return await ctx.db
       .query("products")
@@ -206,10 +277,9 @@ export const getById = query({
     const product = await ctx.db.get(args.id);
     if (!product) return null;
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(product.shopId);
-    if (!shop) return null;
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can access this shop (owner or org member)
+    const canAccess = await canAccessShop(ctx, product.shopId, userId);
+    if (!canAccess) throw new Error("Not authorized");
 
     return product;
   },
@@ -246,10 +316,9 @@ export const search = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    // Verify shop ownership
-    const shop = await ctx.db.get(args.shopId);
-    if (!shop) throw new Error("Shop not found");
-    if (shop.ownerId !== userId) throw new Error("Not authorized");
+    // Check if user can access this shop (owner or org member)
+    const canAccess = await canAccessShop(ctx, args.shopId, userId);
+    if (!canAccess) throw new Error("Not authorized");
 
     // Get all products for the shop
     const products = await ctx.db
@@ -298,9 +367,9 @@ export const bulkUpdateStatus = mutation({
         continue;
       }
 
-      // Verify shop ownership
-      const shop = await ctx.db.get(product.shopId);
-      if (!shop || shop.ownerId !== userId) {
+      // Check if user can edit this shop (owner or org member with edit permissions)
+      const canEdit = await canEditShop(ctx, product.shopId, userId);
+      if (!canEdit) {
         results.push({ id: productId, success: false, error: "Not authorized" });
         continue;
       }
@@ -309,11 +378,64 @@ export const bulkUpdateStatus = mutation({
       await ctx.db.patch(productId, {
         status: args.status,
         updatedAt: now,
+        lastModifiedBy: userId,
       });
 
       results.push({ id: productId, success: true });
     }
 
     return results;
+  },
+});
+
+// Get products from shared shops (for displaying shared products)
+export const listFromSharedShops = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    // Get all organizations the user is a member of
+    const memberships = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const orgIds = memberships.map((m) => m.organizationId);
+
+    // Get all shared shop resources for these organizations
+    const sharedShopIds: Id<"shops">[] = [];
+
+    for (const orgId of orgIds) {
+      // Use by_organization index and filter by resourceType
+      const sharedResources = await ctx.db
+        .query("sharedResources")
+        .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
+        .filter((q) => q.eq(q.field("resourceType"), "shop"))
+        .collect();
+
+      for (const resource of sharedResources) {
+        const shop = await ctx.db.get(resource.resourceId as Id<"shops">);
+        if (shop && shop.ownerId !== userId) {
+          // Only include shops not owned by the user
+          sharedShopIds.push(shop._id);
+        }
+      }
+    }
+
+    // Remove duplicates
+    const uniqueShopIds = [...new Set(sharedShopIds)];
+
+    // Get all products from these shops
+    const products = [];
+    for (const shopId of uniqueShopIds) {
+      const shopProducts = await ctx.db
+        .query("products")
+        .withIndex("by_shop", (q) => q.eq("shopId", shopId))
+        .collect();
+      products.push(...shopProducts);
+    }
+
+    return products;
   },
 });

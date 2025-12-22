@@ -10,7 +10,7 @@ export type UserId = Id<'users'>;
 
 export type Role = 'owner' | 'admin' | 'editor' | 'viewer';
 export type InvitationRole = 'admin' | 'editor' | 'viewer';
-export type ResourceType = 'kanbanBoard' | 'note' | 'chatSession' | 'artifact' | 'leadPipeline' | 'blog';
+export type ResourceType = 'kanbanBoard' | 'note' | 'chatSession' | 'artifact' | 'leadPipeline' | 'blog' | 'shop';
 
 export interface Organization {
   _id: OrganizationId;

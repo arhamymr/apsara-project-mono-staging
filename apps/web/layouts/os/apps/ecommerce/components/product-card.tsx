@@ -1,12 +1,14 @@
 import React from 'react';
+import { Users } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductCardProps {
   product: Product;
   onClick: () => void;
+  isShared?: boolean;
 }
 
-export function ProductCard({ product, onClick }: ProductCardProps) {
+export function ProductCard({ product, onClick, isShared = false }: ProductCardProps) {
   const isLowStock = product.inventory < 5 && product.inventory > 0;
   const isOutOfStock = product.inventory === 0;
 
@@ -15,6 +17,13 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
       className="bg-card border-border hover:border-primary group relative cursor-pointer rounded-lg border p-4 transition-colors"
       onClick={onClick}
     >
+      {/* Shared badge */}
+      {isShared && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-700">
+          <Users className="h-3 w-3" />
+          <span>Shared</span>
+        </div>
+      )}
       <div className="space-y-2">
         <h3 className="font-medium line-clamp-2">{product.name}</h3>
         <p className="text-muted-foreground text-sm">

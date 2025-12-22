@@ -136,6 +136,25 @@ export const listByShop = query({
   },
 });
 
+// Get a single banner by ID (requires auth)
+export const getById = query({
+  args: { id: v.id("banners") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const banner = await ctx.db.get(args.id);
+    if (!banner) return null;
+
+    // Verify shop ownership
+    const shop = await ctx.db.get(banner.shopId);
+    if (!shop) throw new Error("Shop not found");
+    if (shop.ownerId !== userId) throw new Error("Not authorized");
+
+    return banner;
+  },
+});
+
 // List active banners by shop (public)
 export const listActiveByShop = query({
   args: { shopId: v.id("shops") },

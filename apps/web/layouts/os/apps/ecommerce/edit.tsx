@@ -17,7 +17,7 @@ import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProductForm } from './components/product-form';
 import { ProductImageManager } from './components/product-image-manager';
-import { useProduct, useUpdateProduct, useDeleteProduct } from './hooks';
+import { useProduct, useUpdateProduct, useDeleteProduct, useBasicUserInfo } from './hooks';
 import type { Id } from '@/convex/_generated/dataModel';
 
 interface EditProductWindowProps {
@@ -30,6 +30,7 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
   const product = useProduct(id);
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const lastModifiedByUser = useBasicUserInfo(product?.lastModifiedBy);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -231,8 +232,11 @@ export default function EditProductWindow({ id, onUpdated, onClose }: EditProduc
             <ProductImageManager productId={product._id} />
           </div>
 
-          <div className="text-muted-foreground text-xs">
-            Last updated: {new Date(product.updatedAt).toLocaleString()}
+          <div className="text-muted-foreground text-xs space-y-1">
+            <div>Last updated: {new Date(product.updatedAt).toLocaleString()}</div>
+            {lastModifiedByUser && (
+              <div>Modified by: {lastModifiedByUser.name || lastModifiedByUser.email || 'Unknown user'}</div>
+            )}
           </div>
         </div>
       </div>

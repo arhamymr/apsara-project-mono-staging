@@ -222,7 +222,8 @@ const schema = defineSchema({
   })
     .index("by_organization", ["organizationId"])
     .index("by_resource", ["resourceType", "resourceId"])
-    .index("by_org_resource", ["organizationId", "resourceType", "resourceId"]),
+    .index("by_org_resource", ["organizationId", "resourceType", "resourceId"])
+    .index("by_org_type", ["organizationId", "resourceType"]),
 
   // Lead Management tables
   leadPipelines: defineTable({
@@ -318,6 +319,7 @@ const schema = defineSchema({
     status: v.union(v.literal("draft"), v.literal("active"), v.literal("archived")),
     category: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
+    lastModifiedBy: v.optional(v.id("users")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

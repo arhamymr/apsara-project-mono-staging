@@ -8,6 +8,7 @@ import ChatbotApp from '@/layouts/os/apps/ChatbotApp';
 import DesktopSettingsApp from '@/layouts/os/apps/DesktopSettingsApp';
 import DockManagerApp from '@/layouts/os/apps/DockManagerApp';
 import DocsApp from '@/layouts/os/apps/docs';
+import ProductManagerApp from '@/layouts/os/apps/ecommerce';
 import FinderApp from '@/layouts/os/apps/finder';
 import GraphicDesignApp from '@/layouts/os/apps/graphic-design';
 import InvoiceApp from '@/layouts/os/apps/InvoiceApp';
@@ -80,6 +81,13 @@ export function createDefaultApps(): AppDef[] {
       icon: '📰',
       content: <ArticleManagerApp />,
       defaultSize: { width: 1100 },
+    },
+    {
+      id: 'product-manager',
+      name: 'Product Manager',
+      icon: '🛒',
+      content: <ProductManagerApp />,
+      defaultSize: { width: 1100, height: 700 },
     },
     {
       id: 'calculator',

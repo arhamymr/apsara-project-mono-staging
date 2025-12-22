@@ -94,3 +94,21 @@ export interface ShopUpdateInput {
   whatsappNumber?: string;
   currency?: string;
 }
+
+// Cart Item (Client-side)
+export interface CartItem {
+  productId: string;
+  shopId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
+  maxQuantity: number; // Based on inventory
+}
+
+// Cart State (localStorage)
+export interface CartState {
+  shopId: string;
+  items: CartItem[];
+  updatedAt: number;
+}

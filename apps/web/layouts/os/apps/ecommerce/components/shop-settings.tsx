@@ -15,7 +15,7 @@ import React from 'react';
 import { toast } from 'sonner';
 import { useMyShop, useCreateShop, useUpdateShop } from '../hooks';
 import type { Shop } from '../types';
-import { Loader2, Store, AlertCircle } from 'lucide-react';
+import { Loader2, Store, AlertCircle, Upload, X, CheckCircle2 } from 'lucide-react';
 
 interface ShopSettingsProps {
   onSaved?: () => void;
@@ -30,6 +30,7 @@ const CURRENCIES = [
   { value: 'CAD', label: 'CAD ($)' },
   { value: 'AUD', label: 'AUD ($)' },
   { value: 'INR', label: 'INR (₹)' },
+  { value: 'IDR', label: 'IDR (Rp)' },
 ];
 
 export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
@@ -50,6 +51,9 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [slugError, setSlugError] = React.useState('');
   const [slugTouched, setSlugTouched] = React.useState(false);
+  const [logoFile, setLogoFile] = React.useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = React.useState<string>('');
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Initialize form with existing shop data
   React.useEffect(() => {
@@ -58,10 +62,58 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
       setSlug(shop.slug);
       setDescription(shop.description || '');
       setLogo(shop.logo || '');
+      setLogoPreview(shop.logo || '');
       setWhatsappNumber(shop.whatsappNumber);
       setCurrency(shop.currency || 'USD');
     }
   }, [shop]);
+
+  // Handle logo file selection
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setLogoFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Remove logo
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview('');
+    setLogo('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Convert file to base64 for storage
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   // Validate slug format
   const validateSlug = (value: string): string => {
@@ -143,6 +195,12 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
     setIsSubmitting(true);
 
     try {
+      // Convert logo file to base64 if a new file was selected
+      let logoData = logo.trim() || undefined;
+      if (logoFile) {
+        logoData = await fileToBase64(logoFile);
+      }
+
       if (isEditing && shop) {
         // Update existing shop
         await updateShop({
@@ -150,7 +208,7 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
           name: name.trim(),
           slug: slug.trim(),
           description: description.trim() || undefined,
-          logo: logo.trim() || undefined,
+          logo: logoData,
           whatsappNumber: whatsappNumber.trim(),
           currency: currency,
         });
@@ -161,7 +219,7 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
           name: name.trim(),
           slug: slug.trim(),
           description: description.trim() || undefined,
-          logo: logo.trim() || undefined,
+          logo: logoData,
           whatsappNumber: whatsappNumber.trim(),
           currency: currency,
         });
@@ -205,6 +263,12 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
           <h2 className="text-lg font-semibold">
             {isEditing ? 'Shop Settings' : 'Create Your Shop'}
           </h2>
+          {isEditing && (
+            <span className="ml-auto flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-600 dark:text-green-400">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Shop Active
+            </span>
+          )}
         </div>
         {!isEditing && (
           <p className="text-muted-foreground mt-1 text-sm">
@@ -287,19 +351,72 @@ export function ShopSettings({ onSaved, onCancel }: ShopSettingsProps) {
             </p>
           </div>
 
-          {/* Logo URL */}
+          {/* Logo Upload */}
           <div>
-            <label className="text-sm font-medium">Logo URL</label>
-            <Input
-              value={logo}
-              onChange={(e) => setLogo(e.target.value)}
-              placeholder="https://example.com/logo.png"
-              type="url"
-              disabled={isSubmitting}
-            />
+            <label className="text-sm font-medium">Shop Logo</label>
+            
+            {/* Logo Preview */}
+            {logoPreview && (
+              <div className="mb-3 relative inline-block">
+                <img
+                  src={logoPreview}
+                  alt="Logo preview"
+                  className="h-24 w-24 rounded-lg border object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveLogo}
+                  disabled={isSubmitting}
+                  className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
+            {/* Upload Button */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isSubmitting}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {logoPreview ? 'Change Logo' : 'Upload Logo'}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoFileChange}
+                className="hidden"
+              />
+            </div>
             <p className="text-muted-foreground mt-1 text-xs">
-              Enter a URL to your shop logo image
+              Upload an image file (max 5MB). Recommended: square image, at least 200x200px
             </p>
+
+            {/* Optional: URL Input */}
+            <div className="mt-3">
+              <Input
+                value={logo}
+                onChange={(e) => {
+                  setLogo(e.target.value);
+                  if (e.target.value) {
+                    setLogoPreview(e.target.value);
+                    setLogoFile(null);
+                  }
+                }}
+                placeholder="Or enter logo URL"
+                type="url"
+                disabled={isSubmitting}
+              />
+              <p className="text-muted-foreground mt-1 text-xs">
+                Alternatively, enter a URL to your logo image
+              </p>
+            </div>
           </div>
 
           {/* WhatsApp Number */}

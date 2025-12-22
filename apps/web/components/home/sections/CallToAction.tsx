@@ -41,11 +41,9 @@ export function CallToAction({
           {...fadeUp}
           className="bg-gradient-to-br from-foreground via-foreground to-foreground/95 relative w-full overflow-hidden rounded-xl px-8 py-20 text-center md:px-16 md:py-28 lg:py-32 shadow-2xl"
         >
-          {/* Animated background elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 h-60 w-60 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+          {/* Background solid circle ornament */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -bottom-140 -right-130 h-[1000px] w-[1000px] rounded-full bg-gray-700/15" />
           </div>
 
           <div className="relative z-10 mx-auto max-w-4xl">

@@ -3,15 +3,17 @@
 import { Button } from '@workspace/ui/components/button';
 import { Kbd } from '@workspace/ui/components/kbd';
 import { useWindowContext } from '@/layouts/os/WindowContext';
-import { ShoppingBag, Search, Settings } from 'lucide-react';
+import { ShoppingBag, Search, Settings, Image, Code, CheckCircle2, Store } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
-import { useMyShop, useMyProducts, useSearchProducts } from './hooks';
+import { useMyShop, useMyProducts, useSearchProducts, useSharedProducts } from './hooks';
 import type { Id } from '@/convex/_generated/dataModel';
 import CreateProductWindow from './create';
 import EditProductWindow from './edit';
+import BannersWindow from './banners';
 import { ProductCard } from './components/product-card';
 import { ShopSettings } from './components/shop-settings';
+import { ApiHelperModal } from './components/api-helper-modal';
 
 export default function ProductManagerApp() {
   const { openSubWindow, activeId } = useWindowContext();
@@ -20,10 +22,33 @@ export default function ProductManagerApp() {
 
   const shop = useMyShop();
   const products = useMyProducts();
+  const sharedProducts = useSharedProducts();
   const searchResults = useSearchProducts(search);
 
-  const displayProducts = search ? searchResults : products;
-  const isLoading = displayProducts === undefined;
+  // Combine personal products with shared products, marking shared ones
+  const allProducts = React.useMemo(() => {
+    const personal = products ?? [];
+    const shared = sharedProducts ?? [];
+    
+    // Create a Set of personal product IDs for quick lookup
+    const personalIds = new Set(personal.map(p => p._id));
+    
+    // Mark shared products and filter out any duplicates
+    const markedShared = shared
+      .filter(p => !personalIds.has(p._id))
+      .map(p => ({ ...p, isShared: true as const }));
+    
+    // Mark personal products as not shared
+    const markedPersonal = personal.map(p => ({ ...p, isShared: false as const }));
+    
+    return [...markedPersonal, ...markedShared];
+  }, [products, sharedProducts]);
+
+  // For search, we only search within personal products (shop-specific)
+  const displayProducts = search 
+    ? searchResults?.map(p => ({ ...p, isShared: false as const })) 
+    : allProducts;
+  const isLoading = displayProducts === undefined || (products === undefined && sharedProducts === undefined);
   const hasShop = shop !== undefined && shop !== null;
 
   const openCreate = () => {
@@ -60,6 +85,34 @@ export default function ProductManagerApp() {
     });
   }, [activeId, hasShop, openSubWindow]);
 
+  const openBanners = React.useCallback(() => {
+    if (!activeId) return;
+    if (!hasShop) {
+      toast.error('Please create a shop first');
+      return;
+    }
+    openSubWindow(activeId, {
+      title: 'Banners',
+      content: <BannersWindow />,
+      width: 900,
+      height: 700,
+    });
+  }, [activeId, hasShop, openSubWindow]);
+
+  const openApiDocs = React.useCallback(() => {
+    if (!activeId) return;
+    if (!hasShop || !shop) {
+      toast.error('Please create a shop first');
+      return;
+    }
+    openSubWindow(activeId, {
+      title: 'API Documentation',
+      content: <ApiHelperModal open={true} onOpenChange={() => {}} shopSlug={shop.slug} />,
+      width: 1000,
+      height: 700,
+    });
+  }, [activeId, hasShop, shop, openSubWindow]);
+
   // Auto-open shop settings for first-time users
   React.useEffect(() => {
     if (shop === null && !hasPromptedShopSetup && activeId) {
@@ -75,6 +128,21 @@ export default function ProductManagerApp() {
     <div className="text-foreground flex h-full flex-col">
       {/* Header */}
       <div className="bg-card sticky top-0 flex w-full flex-col items-center justify-between gap-2 border-b px-4 py-3 @md:flex-row">
+        {/* Shop Status Indicator */}
+        {hasShop && shop && (
+          <div className="flex w-full items-center gap-2 rounded-md bg-green-500/10 px-3 py-2 text-sm @md:w-auto">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <div className="flex items-center gap-1.5">
+              <Store className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-medium">{shop.name}</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-muted-foreground text-xs">
+                /ecommerce/{shop.slug}
+              </span>
+            </div>
+          </div>
+        )}
+        
         <div className="flex w-full flex-col items-center gap-2 @md:w-[540px] @md:flex-row">
           {/* Search */}
           <div className="relative w-full">
@@ -102,6 +170,14 @@ export default function ProductManagerApp() {
           <Button variant="outline" size="sm" onClick={openShopSettings}>
             <Settings className="mr-1.5 h-4 w-4" />
             Shop
+          </Button>
+          <Button variant="outline" size="sm" onClick={openBanners} disabled={!hasShop}>
+            <Image className="mr-1.5 h-4 w-4" />
+            Banners
+          </Button>
+          <Button variant="outline" size="sm" onClick={openApiDocs} disabled={!hasShop}>
+            <Code className="mr-1.5 h-4 w-4" />
+            API
           </Button>
           <Button size="sm" onClick={openCreate} disabled={!hasShop}>
             New Product <Kbd className="text-primary-900 bg-black/20">N</Kbd>
@@ -150,11 +226,13 @@ export default function ProductManagerApp() {
                 key={product._id}
                 product={product}
                 onClick={() => openEdit(product._id, product.name)}
+                isShared={product.isShared}
               />
             ))}
           </div>
         )}
       </div>
+
     </div>
   );
 }

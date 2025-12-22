@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
 // Helper function to validate slug is URL-safe
@@ -131,5 +132,74 @@ export const getBySlug = query({
       .query("shops")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
+  },
+});
+
+// Get shops shared with the user through organizations
+export const getSharedShops = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    // Get all organizations the user is a member of
+    const memberships = await ctx.db
+      .query("organizationMembers")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .collect();
+
+    const orgIds = memberships.map((m) => m.organizationId);
+
+    // Get all shared shop resources for these organizations
+    const sharedShops: Array<{
+      _id: string;
+      ownerId: string;
+      slug: string;
+      name: string;
+      description?: string;
+      logo?: string;
+      whatsappNumber: string;
+      currency?: string;
+      createdAt: number;
+      updatedAt: number;
+      isShared: boolean;
+    }> = [];
+
+    for (const orgId of orgIds) {
+      const sharedResources = await ctx.db
+        .query("sharedResources")
+        .withIndex("by_org_type", (q) =>
+          q.eq("organizationId", orgId).eq("resourceType", "shop")
+        )
+        .collect();
+
+      for (const resource of sharedResources) {
+        const shopId = resource.resourceId as Id<"shops">;
+        const shop = await ctx.db.get(shopId);
+        if (shop && shop.ownerId !== userId) {
+          // Only include shops not owned by the user
+          sharedShops.push({
+            _id: shop._id as unknown as string,
+            ownerId: shop.ownerId as unknown as string,
+            slug: shop.slug,
+            name: shop.name,
+            description: shop.description,
+            logo: shop.logo,
+            whatsappNumber: shop.whatsappNumber,
+            currency: shop.currency,
+            createdAt: shop.createdAt,
+            updatedAt: shop.updatedAt,
+            isShared: true,
+          });
+        }
+      }
+    }
+
+    // Remove duplicates (in case shop is shared through multiple orgs)
+    const uniqueShops = Array.from(
+      new Map(sharedShops.map((shop) => [shop._id, shop])).values()
+    );
+
+    return uniqueShops;
   },
 });

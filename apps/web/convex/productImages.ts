@@ -84,8 +84,9 @@ export const remove = mutation({
         .order("asc")
         .collect();
 
-      if (remainingImages.length > 0) {
-        await ctx.db.patch(remainingImages[0]._id, { isPrimary: true });
+      const firstImage = remainingImages[0];
+      if (firstImage) {
+        await ctx.db.patch(firstImage._id, { isPrimary: true });
       }
     }
 
@@ -97,8 +98,9 @@ export const remove = mutation({
       .collect();
 
     for (let i = 0; i < imagesToReorder.length; i++) {
-      if (imagesToReorder[i].position !== i) {
-        await ctx.db.patch(imagesToReorder[i]._id, { position: i });
+      const img = imagesToReorder[i];
+      if (img && img.position !== i) {
+        await ctx.db.patch(img._id, { position: i });
       }
     }
 
@@ -134,10 +136,13 @@ export const reorder = mutation({
 
     // Update positions and set first image as primary
     for (let i = 0; i < args.imageIds.length; i++) {
-      await ctx.db.patch(args.imageIds[i], {
-        position: i,
-        isPrimary: i === 0, // First image is always primary
-      });
+      const imageId = args.imageIds[i];
+      if (imageId) {
+        await ctx.db.patch(imageId, {
+          position: i,
+          isPrimary: i === 0, // First image is always primary
+        });
+      }
     }
 
     return { success: true };
